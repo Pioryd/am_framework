@@ -8,6 +8,7 @@ const { Connection } = require("./connection");
 class Server {
   constructor({ port = 0, send_delay = 0, timeout = 3 * 1000 }) {
     this.port = port;
+    this.send_delay = send_delay;
     this.timeout = timeout;
 
     this.parse_packet_dict = {};
@@ -53,15 +54,19 @@ class Server {
   }
 
   _close_connection(id, message) {
+    if (!(id in this.connections_map)) return;
+
+    const connection = this.connections_map[id];
+
+    connection.on_close(connection);
+
     console.log(
       `[${Util.get_time_hms()}]Connection[${id}] is disconnected. Error: ` +
         message
     );
-    if (id in this.connections_map) {
-      if (this.connections_map[id].socket.connected)
-        this.connections_map[id].socket.disconnect();
-      delete this.connections_map[id];
-    }
+
+    if (connection.socket.connected) connection.socket.disconnect();
+    delete this.connections_map[id];
   }
 
   _internal_parse_packet(connection, packet_id, data) {
@@ -109,7 +114,7 @@ class Server {
       }
       // Parse packet
       const send_packet = this._internal_parse_packet(
-        socket_id,
+        connection,
         packet_id,
         data
       );

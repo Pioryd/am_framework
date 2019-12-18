@@ -4,6 +4,7 @@ class Connection {
     this.socket = socket;
     this.accepted = false;
     this.user_data = {};
+    this.on_close = () => {};
   }
 }
 
