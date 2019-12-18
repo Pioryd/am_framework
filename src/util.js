@@ -1,8 +1,8 @@
-const fw_fs = require("fs");
+const fs = require("fs");
 
 class Util {
   static read_from_json(file_name) {
-    const json = fw_fs.readFileSync(file_name, "utf8", err => {
+    const json = fs.readFileSync(file_name, "utf8", err => {
       if (err) throw err;
     });
 
@@ -12,7 +12,7 @@ class Util {
   static write_to_json(file_name, data) {
     const json = JSON.stringify(data, null, 2);
 
-    fw_fs.writeFileSync(file_name, json, "utf8", err => {
+    fs.writeFileSync(file_name, json, "utf8", err => {
       if (err) throw err;
     });
   }
@@ -27,7 +27,7 @@ class Util {
   }
 
   static is_path_exist(path) {
-    return fw_fs.existsSync(path);
+    return fs.existsSync(path);
   }
 
   static get_directories(path) {
@@ -37,10 +37,10 @@ class Util {
       );
       return [];
     }
-    return fw_fs
+    return fs
       .readdirSync(path, { withFileTypes: true })
-      .filter(dirent => dirent.isDirectory())
-      .map(dirent => dirent.name);
+      .filter(dir => dir.isDirectory())
+      .map(dir => dir.name);
   }
 
   /**
