@@ -4,6 +4,11 @@ const { Connection } = require("./connection");
 
 /**
  * @description Handling sockets and connections.
+ *
+ * NOTE !!!
+ * Don't use {connections_map} directly.
+ * Connection are checked by id inside {connections_map}. Even it's undefined,
+ * if id exist, then checking connection will work wrong.
  */
 class Server {
   constructor({ port = 0, send_delay = 0, timeout = 3 * 1000 }) {
@@ -54,9 +59,9 @@ class Server {
   }
 
   _close_connection(id, message) {
-    if (!(id in this.connections_map)) return;
+    if (this.get_connection_by_id(id) == null) return;
 
-    const connection = this.connections_map[id];
+    const connection = this.get_connection_by_id(id);
 
     connection.on_close(connection);
 
@@ -80,10 +85,8 @@ class Server {
   }
 
   _parse_packet({ socket_id, packet_id, date, data }) {
-    let connection = undefined;
-    if (socket_id in this.connections_map)
-      connection = this.connections_map[socket_id];
-    else return;
+    let connection = this.get_connection_by_id(socket_id);
+    if (this.get_connection_by_id(socket_id) == null) return;
 
     connection.last_packet_time = date;
 
@@ -119,7 +122,7 @@ class Server {
         data
       );
       // Push to send packet
-      if (send_packet !== undefined && send_packet !== null) {
+      if (send_packet != null) {
         this.pending_send_packets_queue.push({
           socket_id: socket_id,
           packet_id: send_packet.packet_id,
@@ -128,7 +131,14 @@ class Server {
       }
     } catch (error) {
       console.log("Exception: " + error);
+      console.log({ socket_id, packet_id, date, data });
+      console.trace();
     }
+  }
+
+  send(socket_id, packet_id, data) {
+    if (this.get_connection_by_id(socket_id) != null)
+      _send(this.get_connection_by_id(socket_id), packet_id, data);
   }
 
   _send(socket, packet_id, data) {
@@ -144,7 +154,13 @@ class Server {
       }
     } catch (error) {
       console.log("Exception: " + error);
+      console.log({ socket, packet_id, data });
+      console.trace();
     }
+  }
+
+  get_connection_by_id(id) {
+    if (id in this.connections_map) return this.connections_map[id];
   }
 
   add_parse_packet_dict(parse_packet_dict) {
@@ -181,9 +197,9 @@ class Server {
     const locked_length_send = this.pending_send_packets_queue.length;
     for (let i = 0; i < locked_length_send; i++) {
       const send_packet = this.pending_send_packets_queue.shift();
-      if (send_packet.socket_id in this.connections_map) {
+      if (this.get_connection_by_id(send_packet.socket_id) != null) {
         this._send(
-          this.connections_map[send_packet.socket_id].socket,
+          this.get_connection_by_id(send_packet.socket_id).socket,
           send_packet.packet_id,
           send_packet.data
         );
