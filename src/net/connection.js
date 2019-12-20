@@ -6,6 +6,10 @@ class Connection {
     this.user_data = {};
     this.on_close = () => {};
   }
+
+  get_id() {
+    if (this.socket != null) return this.socket.id;
+  }
 }
 
 module.exports = { Connection };
