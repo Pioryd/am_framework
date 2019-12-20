@@ -15,7 +15,7 @@ class Client {
   }
 
   send(packet_id, data) {
-    if (this.socket === undefined || !this.is_connected()) return;
+    if (this.socket == null || !this.is_connected()) return;
 
     try {
       if (this.send_delay > 0) {
@@ -38,7 +38,7 @@ class Client {
       }
 
       let send_packet = this.parse_packet_dict[packet_id](data);
-      if (send_packet !== undefined && send_packet !== null)
+      if (send_packet != null)
         this.pending_send_packets_queue.push({
           packet_id: send_packet.packet_id,
           data: send_packet.data
@@ -70,7 +70,7 @@ class Client {
    *  to connected.
    */
   is_connected() {
-    return this.socket !== undefined && this.socket.connected;
+    return this.socket != null && this.socket.connected;
   }
 
   connect() {
@@ -89,7 +89,7 @@ class Client {
   }
 
   disconnect(message) {
-    if (this.socket === undefined) return;
+    if (this.socket == null) return;
     if (this.is_connected()) this.socket.close();
 
     console.log("Connection disconnected. Error:", message);

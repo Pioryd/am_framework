@@ -96,7 +96,7 @@ class Server {
           data
         );
 
-        if (send_packet !== undefined) {
+        if (send_packet != null) {
           connection.accepted = true;
           this._send(
             connection.socket,
