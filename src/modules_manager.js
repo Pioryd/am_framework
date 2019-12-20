@@ -3,11 +3,13 @@ const { Util } = require("./util.js");
 
 class ModulesManager {
   constructor({
+    application,
     event_emiter,
     modules_directory,
     events_list,
     disabled_modules
   }) {
+    this.application = application;
     this.event_emiter = event_emiter;
     this.events_list = events_list;
     this.modules_directory = modules_directory;
@@ -68,7 +70,9 @@ class ModulesManager {
         let fw_module_class_name = Object.entries(fw_module)
           .values()
           .next().value[0];
-        this.modules_list[module_name] = new fw_module[fw_module_class_name]();
+        this.modules_list[module_name] = new fw_module[fw_module_class_name]({
+          application: this.application
+        });
         this.init_module(module_name);
       } else console.log("Module path does NOT exist: " + module_path);
     }
