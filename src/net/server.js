@@ -137,8 +137,8 @@ class Server {
   }
 
   send(socket_id, packet_id, data) {
-    if (this.get_connection_by_id(socket_id) != null)
-      _send(this.get_connection_by_id(socket_id), packet_id, data);
+    const connection = this.get_connection_by_id(socket_id);
+    if (connection != null) this._send(connection.socket, packet_id, data);
   }
 
   _send(socket, packet_id, data) {
