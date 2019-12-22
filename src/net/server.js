@@ -26,17 +26,15 @@ class Server {
   }
 
   _check_connections() {
-    for (const [socket_id, connection] of Object.entries(
-      this.connections_map
-    )) {
+    for (const [id, connection] of Object.entries(this.connections_map)) {
       let date = new Date();
 
       const is_timeout = date - connection.last_packet_time > this.timeout;
 
       if (is_timeout) {
-        this._close_connection(socket_id, "Timeout");
+        this._close_connection(id, "Timeout");
       } else if (!connection.socket.connected)
-        this._close_connection(socket_id, "Connection lost");
+        this._close_connection(id, "Connection lost");
     }
   }
 
@@ -49,7 +47,7 @@ class Server {
       connection.socket.on(packet_id, data => {
         // This is async code, so we must handle it in poll
         this.pending_parse_packets_queue_async.push({
-          socket_id: connection.socket.id,
+          connection_id: connection.socket.id,
           packet_id: packet_id,
           date: new Date(),
           data: data
@@ -84,9 +82,9 @@ class Server {
       );
   }
 
-  _parse_packet({ socket_id, packet_id, date, data }) {
-    let connection = this.get_connection_by_id(socket_id);
-    if (this.get_connection_by_id(socket_id) == null) return;
+  _parse_packet({ connection_id, packet_id, date, data }) {
+    let connection = this.get_connection_by_id(connection_id);
+    if (this.get_connection_by_id(connection_id) == null) return;
 
     connection.last_packet_time = date;
 
@@ -108,8 +106,8 @@ class Server {
           );
         } else {
           this._close_connection(
-            socket_id,
-            "Unable to accepts connection id: " + socket_id
+            connection_id,
+            "Unable to accepts connection id: " + connection_id
           );
         }
 
@@ -124,20 +122,20 @@ class Server {
       // Push to send packet
       if (send_packet != null) {
         this.pending_send_packets_queue.push({
-          socket_id: socket_id,
+          connection_id: connection_id,
           packet_id: send_packet.packet_id,
           data: send_packet.data
         });
       }
     } catch (error) {
       console.log("Exception: " + error);
-      console.log({ socket_id, packet_id, date, data });
+      console.log({ connection_id, packet_id, date, data });
       console.trace();
     }
   }
 
-  send(socket_id, packet_id, data) {
-    const connection = this.get_connection_by_id(socket_id);
+  send(connection_id, packet_id, data) {
+    const connection = this.get_connection_by_id(connection_id);
     if (connection != null) this._send(connection.socket, packet_id, data);
   }
 
@@ -197,9 +195,9 @@ class Server {
     const locked_length_send = this.pending_send_packets_queue.length;
     for (let i = 0; i < locked_length_send; i++) {
       const send_packet = this.pending_send_packets_queue.shift();
-      if (this.get_connection_by_id(send_packet.socket_id) != null) {
+      if (this.get_connection_by_id(send_packet.connection_id) != null) {
         this._send(
-          this.get_connection_by_id(send_packet.socket_id).socket,
+          this.get_connection_by_id(send_packet.connection_id).socket,
           send_packet.packet_id,
           send_packet.data
         );
