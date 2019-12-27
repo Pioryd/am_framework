@@ -4,6 +4,7 @@ const { setup_exit_handlers } = require("./src/application");
 const { Server } = require("./src/net/server");
 const { Client } = require("./src/net/client");
 const { Config } = require("./src/config");
+const { Database } = require("./src/database");
 const { Stopwatch } = require("./src/stopwatch");
 
 module.exports = {
@@ -12,6 +13,7 @@ module.exports = {
   setup_exit_handlers,
   Server,
   Client,
-  Config
+  Config,
+  Database,
   Stopwatch
 };
