@@ -1,3 +1,5 @@
+const log = require("simple-node-logger").createSimpleLogger();
+
 /**
  * @description contains things related only to application as
  *  system application.
@@ -14,7 +16,7 @@ function setup_exit_handlers(on_closing, on_force_closing) {
     if (options.cleanup) on_closing();
     else on_force_closing();
 
-    if (exitCode || exitCode === 0) console.log(exitCode);
+    if (exitCode || exitCode === 0) log.info(exitCode);
     if (options.exit) process.exit();
   };
 

@@ -1,5 +1,5 @@
 const fs = require("fs");
-
+const log = require("simple-node-logger").createSimpleLogger();
 class Util {
   static read_from_json(file_name) {
     const json = fs.readFileSync(file_name, "utf8", err => {
@@ -32,9 +32,7 @@ class Util {
 
   static get_directories(path) {
     if (!this.is_path_exist(path)) {
-      console.log(
-        "Unable to get directories. Path does NOT not exist: " + path
-      );
+      log.info("Unable to get directories. Path does NOT not exist: " + path);
       return [];
     }
     return fs

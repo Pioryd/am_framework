@@ -1,5 +1,5 @@
 const io = require("socket.io-client");
-
+const log = require("simple-node-logger").createSimpleLogger();
 class Client {
   constructor({ url = "", send_delay = 0, timeout = 3 * 1000 }) {
     this.url = url;
@@ -24,7 +24,7 @@ class Client {
         }, this.send_delay);
       } else this.socket.emit(packet_id, data);
     } catch (error) {
-      console.log("Exception: " + error);
+      log.info("Exception: " + error);
     }
   }
 
@@ -33,7 +33,7 @@ class Client {
       this.last_packet_time = date;
 
       if (!(packet_id in this.parse_packet_dict)) {
-        console.log("Unable to parse packet id: " + packet_id);
+        log.info("Unable to parse packet id: " + packet_id);
         return;
       }
 
@@ -44,7 +44,7 @@ class Client {
           data: send_packet.data
         });
     } catch (error) {
-      console.log("Exception: " + error + error.stack);
+      log.info("Exception: " + error + error.stack);
     }
   }
 
@@ -92,7 +92,7 @@ class Client {
     if (this.socket == null) return;
     if (this.is_connected()) this.socket.close();
 
-    console.log("Connection disconnected. Error:", message);
+    log.info("Connection disconnected. Error:", message);
     this.socket = undefined;
   }
 

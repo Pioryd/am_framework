@@ -1,5 +1,6 @@
 const path = require("path");
 const { Util } = require("./util.js");
+const log = require("simple-node-logger").createSimpleLogger();
 
 class ModulesManager {
   constructor({
@@ -74,7 +75,7 @@ class ModulesManager {
           application: this.application
         });
         this.init_module(module_name);
-      } else console.log("Module path does NOT exist: " + module_path);
+      } else log.info("Module path does NOT exist: " + module_path);
     }
   }
 }
