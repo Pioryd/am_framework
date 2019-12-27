@@ -11,6 +11,8 @@
   "dependencies": {
     "chai": "^4.2.0",
     "mocha": "^6.2.2",
+    "mongoose": "^5.8.3",
+    "simple-node-logger": "^18.12.23",
     "socket.io": "^2.3.0",
     "socket.io-client": "^2.3.0"
   }
