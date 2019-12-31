@@ -178,7 +178,7 @@ class Server {
   }
 
   stop() {
-    if (Object.entries(this.socket).length !== 0) {
+    if (this.socket != null && Object.entries(this.socket).length !== 0) {
       this.socket.close();
       this.socket = undefined;
     }
