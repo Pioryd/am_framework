@@ -2,16 +2,24 @@ const mongoose = require("mongoose");
 const log = require("simple-node-logger").createSimpleLogger();
 
 class Database {
-  constructor({ url, name }) {
+  constructor({ url, name, setup_models }) {
     this.connection = null;
     this.url = url;
     this.name = name;
+    this.setup_models = setup_models;
   }
 
-  connect(callback) {
+  connect(callback = () => {}) {
     const process_callback = db => {
-      db.listCollections().toArray(function(err, collections) {
-        callback(collections);
+      db.listCollections().toArray((error, collections) => {
+        try {
+          if (error) log.error(error);
+
+          this.setup_models(this.connection);
+          callback(collections);
+        } catch (e) {
+          console.log(e);
+        }
       });
     };
 
@@ -27,20 +35,25 @@ class Database {
         useCreateIndex: true,
         useUnifiedTopology: true
       },
-      (err, client) => {
-        if (err) {
-          log.info(err);
-          return;
+      (error, client) => {
+        try {
+          if (error) {
+            log.error(error);
+            return;
+          }
+
+          log.info("Connected to server:", this.get_connection_name());
+
+          process_callback(client.db);
+        } catch (e) {
+          console.log(e);
         }
-
-        log.info("Connected to server:", this.get_connection_name());
-
-        process_callback(client.db);
       }
     );
   }
 
   close() {
+    if (this.connection == null) return;
     log.info("Closing connection:", this.get_connection_name());
     this.connection.close();
   }
@@ -50,22 +63,27 @@ class Database {
   }
 
   is_connecting() {
+    if (this.connection == null) return;
     return this.connection.readyState === 2;
   }
 
   is_connected() {
+    if (this.connection == null) return;
     return this.connection.readyState === 1;
   }
 
   is_disconnecting() {
+    if (this.connection == null) return;
     return this.connection.readyState === 3;
   }
 
   is_disconnected() {
+    if (this.connection == null) return;
     return this.connection.readyState === 0;
   }
 
   get_ready_state() {
+    if (this.connection == null) return;
     return this.connection.readyState;
   }
 }
