@@ -2,17 +2,22 @@ const path = require("path");
 const { Util } = require("./util.js");
 const log = require("simple-node-logger").createSimpleLogger();
 
+const EVENTS_LIST = [
+  "on_initialize",
+  "on_terminate",
+  "on_force_terminate",
+  "on_run"
+];
+
 class ModulesManager {
   constructor({
     application,
     event_emiter,
     modules_directory,
-    events_list,
     disabled_modules
   }) {
     this.application = application;
     this.event_emiter = event_emiter;
-    this.events_list = events_list;
     this.modules_directory = modules_directory;
     this.modules_list = {};
     this.event_module_bounds = {};
@@ -47,12 +52,12 @@ class ModulesManager {
 
   init_module(module_name) {
     this.event_module_bounds[module_name] = {};
-    for (const event_name of this.events_list)
+    for (const event_name of EVENTS_LIST)
       this.add_event(event_name, module_name);
   }
 
   terminate_module(module_name) {
-    for (const event_name of this.events_list) {
+    for (const event_name of EVENTS_LIST) {
       if (event_name in this.modules_list[module_name])
         this.remove_event(event_name, module_name);
     }
