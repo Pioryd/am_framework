@@ -2,11 +2,11 @@ const mongoose = require("mongoose");
 const log = require("simple-node-logger").createSimpleLogger();
 
 class Database {
-  constructor({ url, name, setup_models }) {
+  constructor({ url, name, models }) {
     this.connection = null;
     this.url = url;
     this.name = name;
-    this.setup_models = setup_models;
+    this.models = models;
   }
 
   connect(callback = () => {}) {
@@ -15,7 +15,9 @@ class Database {
         try {
           if (error) log.error(error);
 
-          this.setup_models(this.connection);
+          for (const model of Object.values(this.models))
+            model.setup(this.connection);
+
           callback(collections);
         } catch (e) {
           console.log(e);
