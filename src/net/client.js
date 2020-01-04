@@ -1,7 +1,13 @@
 const io = require("socket.io-client");
 const log = require("simple-node-logger").createSimpleLogger();
+const { Stopwatch } = require("../stopwatch");
 class Client {
-  constructor({ url = "", send_delay = 0, timeout = 3 * 1000 }) {
+  constructor({
+    url = "",
+    send_delay = 0,
+    timeout = 3 * 1000,
+    auto_reconnect = false
+  }) {
     this.url = url;
     this.send_delay = send_delay;
     this.timeout = timeout;
@@ -12,6 +18,12 @@ class Client {
 
     this.pending_parse_packets_queue_async = [];
     this.pending_send_packets_queue = [];
+
+    this.auto_reconnect_data = {
+      enabled: auto_reconnect,
+      running: false,
+      stopwatch: new Stopwatch(5 * 1000)
+    };
   }
 
   send(packet_id, data) {
@@ -20,6 +32,7 @@ class Client {
     try {
       if (this.send_delay > 0) {
         setTimeout(() => {
+          console.log(packet_id, data);
           this.socket.emit(packet_id, data);
         }, this.send_delay);
       } else this.socket.emit(packet_id, data);
@@ -49,6 +62,8 @@ class Client {
   }
 
   _check_timeout() {
+    if (this.timeout === 0) return;
+
     let date = new Date();
 
     const is_timeout = date - this.last_packet_time > this.timeout;
@@ -93,11 +108,14 @@ class Client {
     if (this.is_connected()) this.socket.close();
 
     log.info("Connection disconnected. Error:", message);
-    this.socket = undefined;
+    this.socket = null;
   }
 
   poll() {
-    if (!this.is_connected()) return;
+    if (!this.is_connected()) {
+      this._auto_reconnect();
+      return;
+    }
 
     this._check_timeout();
 
@@ -111,6 +129,28 @@ class Client {
     for (let i = 0; i < locked_length_send; i++) {
       const send_packet = this.pending_send_packets_queue.shift();
       this.send(send_packet.packet_id, send_packet.data);
+    }
+  }
+
+  _auto_reconnect() {
+    const ar = this.auto_reconnect_data;
+    if (!ar.enabled) return;
+
+    if (this.is_connected()) {
+      ar.running = false;
+      return;
+    }
+
+    if (!ar.running) {
+      ar.running = true;
+      ar.stopwatch.reset();
+      return;
+    }
+
+    if (ar.stopwatch.is_elapsed()) {
+      this.disconnect("Reconnecting...");
+      this.connect();
+      ar.running = false;
     }
   }
 }
