@@ -27,6 +27,8 @@ class Server {
   }
 
   _check_connections() {
+    if (this.timeout === 0) return;
+
     for (const [id, connection] of Object.entries(this.connections_map)) {
       let date = new Date();
 
@@ -92,20 +94,13 @@ class Server {
     try {
       // Accept connection by server core, if not accepted yet.
       if (!connection.accepted) {
-        const send_packet = this._internal_parse_packet(
+        connection.accepted = this._internal_parse_packet(
           connection,
           "accept_connection",
           data
         );
 
-        if (send_packet != null) {
-          connection.accepted = true;
-          this._send(
-            connection.socket,
-            send_packet.packet_id,
-            send_packet.data
-          );
-        } else {
+        if (!connection.accepted) {
           this._close_connection(
             connection_id,
             "Unable to accepts connection id: " + connection_id
@@ -114,20 +109,9 @@ class Server {
 
         return;
       }
+
       // Parse packet
-      const send_packet = this._internal_parse_packet(
-        connection,
-        packet_id,
-        data
-      );
-      // Push to send packet
-      if (send_packet != null) {
-        this.pending_send_packets_queue.push({
-          connection_id: connection_id,
-          packet_id: send_packet.packet_id,
-          data: send_packet.data
-        });
-      }
+      this._internal_parse_packet(connection, packet_id, data);
     } catch (error) {
       log.info("Exception: " + error);
       log.info({ connection_id, packet_id, date, data });
@@ -136,8 +120,11 @@ class Server {
   }
 
   send(connection_id, packet_id, data) {
-    const connection = this.get_connection_by_id(connection_id);
-    if (connection != null) this._send(connection.socket, packet_id, data);
+    this.pending_send_packets_queue.push({
+      connection_id,
+      packet_id,
+      data
+    });
   }
 
   _send(socket, packet_id, data) {
