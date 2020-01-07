@@ -65,6 +65,27 @@ class Util {
     max = Math.floor(max);
     return Math.floor(Math.random() * (max - min + 1)) + min;
   }
+
+  /**
+   * @description Convert function in any string format to Function object
+   */
+  static string_to_function(string) {
+    const STRIP_COMMENTS = /((\/\/.*$)|(\/\*[\s\S]*?\*\/))/gm;
+    const ARGUMENT_NAMES = /([^\s,]+)/g;
+    string = string.replace(STRIP_COMMENTS, "");
+
+    let params_names = string
+      .slice(string.indexOf("(") + 1, string.indexOf(")"))
+      .match(ARGUMENT_NAMES);
+    if (params_names === null) params_names = [];
+
+    let body = string.substring(
+      string.indexOf("{") + 1,
+      string.lastIndexOf("}")
+    );
+
+    return new Function(...params_names, body);
+  }
 }
 
 module.exports = { Util };
