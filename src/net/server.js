@@ -1,7 +1,10 @@
 const io = require("socket.io");
 const { Util } = require("../util");
 const { Connection } = require("./connection");
-const log = require("simple-node-logger").createSimpleLogger();
+const logger = require("../logger").create_logger({
+  module_name: "am_framework",
+  file_name: __filename
+});
 
 /**
  * @description Handling sockets and connections.
@@ -44,7 +47,7 @@ class Server {
   _add_connection(connection) {
     this.connections_map[connection.socket.id] = connection;
 
-    log.info("New connection:", connection.socket.id);
+    logger.info("New connection:", connection.socket.id);
 
     for (const [packet_id] of Object.entries(this.parse_packet_dict)) {
       connection.socket.on(packet_id, data => {
@@ -66,7 +69,7 @@ class Server {
 
     connection.on_close(connection);
 
-    log.info(
+    logger.info(
       `[${Util.get_time_hms()}]Connection[${id}] is disconnected. Error: ` +
         message
     );
@@ -113,8 +116,8 @@ class Server {
       // Parse packet
       this._internal_parse_packet(connection, packet_id, data);
     } catch (error) {
-      log.info("Exception: " + error);
-      log.info({ connection_id, packet_id, date, data });
+      logger.info("Exception: " + error);
+      logger.info({ connection_id, packet_id, date, data });
       console.trace();
     }
   }
@@ -139,8 +142,8 @@ class Server {
         socket.emit(packet_id, data);
       }
     } catch (error) {
-      log.info("Exception: " + error);
-      log.info({ socket, packet_id, data });
+      logger.info("Exception: " + error);
+      logger.info({ socket, packet_id, data });
       console.trace();
     }
   }

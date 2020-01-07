@@ -1,5 +1,8 @@
 const io = require("socket.io-client");
-const log = require("simple-node-logger").createSimpleLogger();
+const logger = require("../logger").create_logger({
+  module_name: "am_framework",
+  file_name: __filename
+});
 const { Stopwatch } = require("../stopwatch");
 class Client {
   constructor({
@@ -37,7 +40,7 @@ class Client {
         }, this.send_delay);
       } else this.socket.emit(packet_id, data);
     } catch (error) {
-      log.info("Exception: " + error);
+      logger.info("Exception: " + error);
     }
   }
 
@@ -46,7 +49,7 @@ class Client {
       this.last_packet_time = date;
 
       if (!(packet_id in this.parse_packet_dict)) {
-        log.info("Unable to parse packet id: " + packet_id);
+        logger.info("Unable to parse packet id: " + packet_id);
         return;
       }
 
@@ -57,7 +60,7 @@ class Client {
           data: send_packet.data
         });
     } catch (error) {
-      log.info("Exception: " + error + error.stack);
+      logger.info("Exception: " + error + error.stack);
     }
   }
 
@@ -107,7 +110,7 @@ class Client {
     if (this.socket == null) return;
     if (this.is_connected()) this.socket.close();
 
-    log.info("Connection disconnected. Error:", message);
+    logger.info("Connection disconnected. Error:", message);
     this.socket = null;
   }
 

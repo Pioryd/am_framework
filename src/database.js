@@ -1,5 +1,8 @@
 const mongoose = require("mongoose");
-const log = require("simple-node-logger").createSimpleLogger();
+const logger = require("./logger").create_logger({
+  module_name: "am_framework",
+  file_name: __filename
+});
 
 class Database {
   constructor({ url, name, models }) {
@@ -13,7 +16,7 @@ class Database {
     const process_callback = db => {
       db.listCollections().toArray((error, collections) => {
         try {
-          if (error) log.error(error);
+          if (error) logger.error(error);
 
           for (const model of Object.values(this.models))
             model.setup(this.connection);
@@ -40,11 +43,11 @@ class Database {
       (error, client) => {
         try {
           if (error) {
-            log.error(error);
+            logger.error(error);
             return;
           }
 
-          log.info("Connected to server:", this.get_connection_name());
+          logger.info("Connected to server:", this.get_connection_name());
 
           process_callback(client.db);
         } catch (e) {
@@ -56,7 +59,7 @@ class Database {
 
   close() {
     if (this.connection == null) return;
-    log.info("Closing connection:", this.get_connection_name());
+    logger.info("Closing connection:", this.get_connection_name());
     this.connection.close();
   }
 

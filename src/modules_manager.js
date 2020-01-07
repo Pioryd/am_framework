@@ -1,6 +1,9 @@
 const path = require("path");
 const { Util } = require("./util.js");
-const log = require("simple-node-logger").createSimpleLogger();
+const logger = require("./logger").create_logger({
+  module_name: "am_framework",
+  file_name: __filename
+});
 
 const EVENTS_LIST = [
   "on_initialize",
@@ -98,7 +101,7 @@ class ModulesManager {
         config: this.config
       });
       this.init_module(module_name);
-    } else log.info("Module path does NOT exist: " + module_path);
+    } else logger.info("Module path does NOT exist: " + module_path);
   }
 }
 

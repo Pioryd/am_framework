@@ -1,4 +1,7 @@
-const log = require("simple-node-logger").createSimpleLogger();
+const logger = require("./logger").create_logger({
+  module_name: "am_framework",
+  file_name: __filename
+});
 
 /**
  * @description contains things related only to application as
@@ -16,7 +19,7 @@ function setup_exit_handlers(on_closing, on_force_closing) {
     if (options.cleanup) on_closing();
     else on_force_closing();
 
-    if (exitCode || exitCode === 0) log.info(exitCode);
+    if (exitCode || exitCode === 0) logger.info(exitCode);
     if (options.exit) process.exit();
   };
 
