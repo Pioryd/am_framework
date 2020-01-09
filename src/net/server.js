@@ -1,5 +1,4 @@
 const io = require("socket.io");
-const { Util } = require("../util");
 const { Connection } = require("./connection");
 const logger = require("../logger").create_logger({
   module_name: "am_framework",
@@ -69,10 +68,7 @@ class Server {
 
     connection.on_close(connection);
 
-    logger.info(
-      `[${Util.get_time_hms()}]Connection[${id}] is disconnected. Error: ` +
-        message
-    );
+    logger.info(`Connection[${id}] is disconnected. Error: ` + message);
 
     if (connection.socket.connected) connection.socket.disconnect();
     delete this.connections_map[id];
@@ -116,9 +112,12 @@ class Server {
       // Parse packet
       this._internal_parse_packet(connection, packet_id, data);
     } catch (error) {
-      logger.info("Exception: " + error);
-      logger.info({ connection_id, packet_id, date, data });
-      console.trace();
+      logger.info("Exception: " + error, {
+        connection_id,
+        packet_id,
+        date,
+        data
+      });
     }
   }
 
@@ -142,9 +141,11 @@ class Server {
         socket.emit(packet_id, data);
       }
     } catch (error) {
-      logger.info("Exception: " + error);
-      logger.info({ socket, packet_id, data });
-      console.trace();
+      logger.info("Exception: " + error, {
+        socket_id: socket.id,
+        packet_id,
+        data
+      });
     }
   }
 
