@@ -4,30 +4,18 @@ const logger = require("../logger").create_logger({
   file_name: __filename
 });
 const { Stopwatch } = require("../stopwatch");
-
-/**
- * Socket.io reconnect system is broken. For that reason this class
- * is using own reconnect.
- */
 class Client {
-  constructor({ url = "", options = {}, socket_io_options = {} }) {
+  constructor({
+    url = "",
+    send_delay = 0,
+    timeout = 3 * 1000,
+    auto_reconnect = false
+  }) {
     this.url = url;
-
-    this.options = {
-      send_delay: 0,
-      packet_timeout: 25 * 1000, // Not including internal ping
-      debug: false,
-      ...options
-    };
-
-    this.socket_io_options = {
-      reconnection: false,
-      timeout: 20 * 1000,
-      forceNew: false,
-      ...socket_io_options
-    };
-
+    this.send_delay = send_delay;
+    this.timeout = timeout;
     this.last_packet_time = new Date();
+
     this.parse_packet_dict = {};
     this.socket = undefined;
 
@@ -35,57 +23,24 @@ class Client {
     this.pending_send_packets_queue = [];
 
     this.auto_reconnect_data = {
-      enabled: true,
+      enabled: auto_reconnect,
       running: false,
       stopwatch: new Stopwatch(5 * 1000)
-    };
-
-    // Events for debugging
-    this._socket_io_events = {
-      connect: () => {},
-      connect_error: error => {},
-      connect_timeout: timeout => {},
-      error: error => {},
-      disconnect: reason => {
-        this.events.disconnected();
-      },
-      // This class don't use socket.io reconnect
-      // // reconnect: attemptNumber => {},
-      // // reconnect_attempt: attemptNumber => {},
-      // // reconnecting: attemptNumber => {},
-      // // reconnect_error: error => {},
-      // // reconnect_failed: () => {},
-      ping: () => {},
-      pong: latency => {}
-    };
-
-    this.events = {
-      connected: () => {},
-      disconnected: () => {},
-      reconnecting: () => {}
     };
   }
 
   send(packet_id, data) {
-    this.pending_send_packets_queue.push({
-      packet_id,
-      data
-    });
-  }
-
-  _send(packet_id, data) {
     if (this.socket == null || !this.is_connected()) return;
 
-    if (this.options.debug) logger.log("Send", packet_id);
-
     try {
-      if (this.options.send_delay > 0) {
+      if (this.send_delay > 0) {
         setTimeout(() => {
+          console.log(packet_id, data);
           this.socket.emit(packet_id, data);
-        }, this.options.send_delay);
+        }, this.send_delay);
       } else this.socket.emit(packet_id, data);
     } catch (error) {
-      if (this.options.debug) logger.log("Exception: " + error);
+      logger.info("Exception: " + error);
     }
   }
 
@@ -94,32 +49,31 @@ class Client {
       this.last_packet_time = date;
 
       if (!(packet_id in this.parse_packet_dict)) {
-        if (this.options.debug)
-          logger.log("Unable to parse packet id: " + packet_id);
+        logger.info("Unable to parse packet id: " + packet_id);
         return;
       }
 
-      if (this.options.debug) logger.log("Parse", packet_id);
-
-      this.parse_packet_dict[packet_id](data);
+      let send_packet = this.parse_packet_dict[packet_id](data);
+      if (send_packet != null)
+        this.pending_send_packets_queue.push({
+          packet_id: send_packet.packet_id,
+          data: send_packet.data
+        });
     } catch (error) {
-      if (this.options.debug) logger.log("Exception: " + error + error.stack);
+      logger.info("Exception: " + error + error.stack);
     }
   }
 
   _check_timeout() {
-    if (this.options.packet_timeout === 0) return;
+    if (this.timeout === 0) return;
 
     let date = new Date();
 
-    const diff = date - this.last_packet_time;
-    const is_timeout = diff > this.options.packet_timeout;
+    const is_timeout = date - this.last_packet_time > this.timeout;
 
     if (is_timeout) {
-      this.disconnect("Timeout: " + diff);
-    } else if (!this.socket.connected) {
-      this.disconnect("Connection lost");
-    }
+      this.disconnect("Timeout");
+    } else if (!this.socket.connected) this.disconnect("Connection lost");
   }
 
   add_parse_packet_dict(parse_packet_dict) {
@@ -138,23 +92,8 @@ class Client {
   }
 
   connect() {
-    this.socket = io(this.url, this.socket_io_options);
+    this.socket = io(this.url);
     this.last_packet_time = new Date();
-
-    for (const [event_id, event_fun] of Object.entries(
-      this._socket_io_events
-    )) {
-      this.socket.on(event_id, (...args) => {
-        if (this.options.debug)
-          logger.log("_socket_io_events", event_id, ...args);
-        event_fun(...args);
-      });
-    }
-
-    this.socket.on("connected", (...args) => {
-      if (this.options.debug) logger.log("this.socket.on('connected')");
-      this.events.connected(...args);
-    });
 
     for (const [packet_id] of Object.entries(this.parse_packet_dict)) {
       this.socket.on(packet_id, data => {
@@ -169,22 +108,13 @@ class Client {
 
   disconnect(message) {
     if (this.socket == null) return;
-
-    if (this.options.debug)
-      logger.info("Connection disconnected. Error:", message);
-
     if (this.is_connected()) this.socket.close();
 
-    this.socket.removeAllListeners();
+    logger.info("Connection disconnected. Error:", message);
     this.socket = null;
   }
 
   poll() {
-    // "Async" socket.io can add new parse packet at any time
-    const locked_length_parse = this.pending_parse_packets_queue_async.length;
-    for (let i = 0; i < locked_length_parse; i++)
-      this._parse_packet(this.pending_parse_packets_queue_async.shift());
-
     if (!this.is_connected()) {
       this._auto_reconnect();
       return;
@@ -192,11 +122,16 @@ class Client {
 
     this._check_timeout();
 
+    // "Async" socket.io can add new parse packet at any time
+    const locked_length_parse = this.pending_parse_packets_queue_async.length;
+    for (let i = 0; i < locked_length_parse; i++)
+      this._parse_packet(this.pending_parse_packets_queue_async.shift());
+
     // Only core adds send packet, but keep length it to future changes
     const locked_length_send = this.pending_send_packets_queue.length;
     for (let i = 0; i < locked_length_send; i++) {
       const send_packet = this.pending_send_packets_queue.shift();
-      this._send(send_packet.packet_id, send_packet.data);
+      this.send(send_packet.packet_id, send_packet.data);
     }
   }
 
@@ -216,7 +151,6 @@ class Client {
     }
 
     if (ar.stopwatch.is_elapsed()) {
-      this.events.reconnecting();
       this.disconnect("Reconnecting...");
       this.connect();
       ar.running = false;
