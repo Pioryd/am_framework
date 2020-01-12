@@ -15,11 +15,12 @@ const logger = require("../logger").create_logger({
  */
 class Server {
   constructor({ port = 0, options, socket_io_options }) {
+    this.logger = logger;
+
     this.port = port;
     this.options = {
       send_delay: 0,
       packet_timeout: 25 * 1000, // Not including internal ping
-      debug: false,
       ...options
     };
     this.socket_io_options = {
@@ -57,13 +58,12 @@ class Server {
   _add_connection(connection) {
     this.connections_map[connection.socket.id] = connection;
 
-    if (this.options.debug)
-      logger.info(
-        "New connection:",
-        connection.socket.id,
-        "Clients:",
-        Object.keys(this.socket.clients().connected)
-      );
+    logger.info(
+      "New connection:",
+      connection.socket.id,
+      "Clients:",
+      Object.keys(this.socket.clients().connected)
+    );
 
     for (const [packet_id] of Object.entries(this.parse_packet_dict)) {
       connection.socket.on(packet_id, data => {
@@ -87,12 +87,11 @@ class Server {
 
     connection.on_close(connection);
 
-    if (this.options.debug)
-      logger.info(
-        `Connection[${id}] is disconnected. Error: ` + message,
-        "Clients:",
-        Object.keys(this.socket.clients().connected)
-      );
+    logger.info(
+      `Connection[${id}] is disconnected. Error: ` + message,
+      "Clients:",
+      Object.keys(this.socket.clients().connected)
+    );
 
     if (connection.socket.connected) connection.socket.disconnect();
     delete this.connections_map[id];
@@ -100,8 +99,7 @@ class Server {
 
   _internal_parse_packet(connection, packet_id, data) {
     if (packet_id in this.parse_packet_dict) {
-      if (this.options.debug)
-        logger.log("Parse", connection.get_id(), packet_id);
+      logger.log("Parse", connection.get_id(), packet_id);
 
       return this.parse_packet_dict[packet_id](connection, data);
     } else {
@@ -140,13 +138,12 @@ class Server {
       // Parse packet
       this._internal_parse_packet(connection, packet_id, data);
     } catch (error) {
-      if (this.options.debug)
-        logger.info("Exception: " + error, {
-          connection_id,
-          packet_id,
-          date,
-          data
-        });
+      logger.info("Exception: " + error, {
+        connection_id,
+        packet_id,
+        date,
+        data
+      });
     }
   }
 
@@ -162,7 +159,7 @@ class Server {
     try {
       if (!socket.connected) return;
 
-      if (this.options.debug) logger.log("Send", packet_id);
+      logger.log("Send", packet_id);
 
       if (this.options.send_delay > 0) {
         setTimeout(() => {
@@ -172,12 +169,11 @@ class Server {
         socket.emit(packet_id, data);
       }
     } catch (error) {
-      if (this.options.debug)
-        logger.info("Exception: " + error, {
-          socket_id: socket.id,
-          packet_id,
-          data
-        });
+      logger.info("Exception: " + error, {
+        socket_id: socket.id,
+        packet_id,
+        data
+      });
     }
   }
 

@@ -11,15 +11,14 @@ const { Stopwatch } = require("../stopwatch");
  */
 class Client {
   constructor({ url = "", options = {}, socket_io_options = {} }) {
-    this.url = url;
+    this.logger = logger;
 
+    this.url = url;
     this.options = {
       send_delay: 0,
       packet_timeout: 25 * 1000, // Not including internal ping
-      debug: false,
       ...options
     };
-
     this.socket_io_options = {
       reconnection: false,
       timeout: 20 * 1000,
@@ -76,7 +75,7 @@ class Client {
   _send(packet_id, data) {
     if (this.socket == null || !this.is_connected()) return;
 
-    if (this.options.debug) logger.log("Send", packet_id);
+    logger.debug("Send", packet_id);
 
     try {
       if (this.options.send_delay > 0) {
@@ -85,7 +84,7 @@ class Client {
         }, this.options.send_delay);
       } else this.socket.emit(packet_id, data);
     } catch (error) {
-      if (this.options.debug) logger.log("Exception: " + error);
+      logger.error("Exception: " + error);
     }
   }
 
@@ -94,16 +93,15 @@ class Client {
       this.last_packet_time = date;
 
       if (!(packet_id in this.parse_packet_dict)) {
-        if (this.options.debug)
-          logger.log("Unable to parse packet id: " + packet_id);
+        logger.log("Unable to parse packet id: " + packet_id);
         return;
       }
 
-      if (this.options.debug) logger.log("Parse", packet_id);
+      logger.debug("Parse", packet_id);
 
       this.parse_packet_dict[packet_id](data);
     } catch (error) {
-      if (this.options.debug) logger.log("Exception: " + error + error.stack);
+      logger.error("Exception: " + error + error.stack);
     }
   }
 
@@ -145,14 +143,13 @@ class Client {
       this._socket_io_events
     )) {
       this.socket.on(event_id, (...args) => {
-        if (this.options.debug)
-          logger.log("_socket_io_events", event_id, ...args);
+        logger.debug("_socket_io_events", event_id, ...args);
         event_fun(...args);
       });
     }
 
     this.socket.on("connected", (...args) => {
-      if (this.options.debug) logger.log("this.socket.on('connected')");
+      logger.debug("this.socket.on('connected')");
       this.events.connected(...args);
     });
 
@@ -170,8 +167,7 @@ class Client {
   disconnect(message) {
     if (this.socket == null) return;
 
-    if (this.options.debug)
-      logger.info("Connection disconnected. Error:", message);
+    logger.log("Connection disconnected. Error:", message);
 
     if (this.is_connected()) this.socket.close();
 
