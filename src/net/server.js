@@ -14,10 +14,19 @@ const logger = require("../logger").create_logger({
  * if id exist, then checking connection will work wrong.
  */
 class Server {
-  constructor({ port = 0, send_delay = 0, timeout = 3 * 1000 }) {
+  constructor({ port = 0, options, socket_io_options }) {
     this.port = port;
-    this.send_delay = send_delay;
-    this.timeout = timeout;
+    this.options = {
+      send_delay: 0,
+      packet_timeout: 25 * 1000, // Not including internal ping
+      debug: false,
+      ...options
+    };
+    this.socket_io_options = {
+      pingInterval: 10 * 1000,
+      pingTimeout: 5 * 1000,
+      ...socket_io_options
+    };
 
     this.parse_packet_dict = {};
     this.socket = {};
@@ -29,24 +38,32 @@ class Server {
   }
 
   _check_connections() {
-    if (this.timeout === 0) return;
+    if (this.options.packet_timeout === 0) return;
 
     for (const [id, connection] of Object.entries(this.connections_map)) {
       let date = new Date();
 
-      const is_timeout = date - connection.last_packet_time > this.timeout;
+      const diff = date - connection.last_packet_time;
+      const is_timeout = diff > this.options.packet_timeout;
 
       if (is_timeout) {
-        this._close_connection(id, "Timeout");
-      } else if (!connection.socket.connected)
+        this._close_connection(id, "Timeout: " + diff);
+      } else if (!connection.socket.connected) {
         this._close_connection(id, "Connection lost");
+      }
     }
   }
 
   _add_connection(connection) {
     this.connections_map[connection.socket.id] = connection;
 
-    logger.info("New connection:", connection.socket.id);
+    if (this.options.debug)
+      logger.info(
+        "New connection:",
+        connection.socket.id,
+        "Clients:",
+        Object.keys(this.socket.clients().connected)
+      );
 
     for (const [packet_id] of Object.entries(this.parse_packet_dict)) {
       connection.socket.on(packet_id, data => {
@@ -59,6 +76,8 @@ class Server {
         });
       });
     }
+
+    this.send(connection.socket.id, "connected", {});
   }
 
   _close_connection(id, message) {
@@ -68,20 +87,29 @@ class Server {
 
     connection.on_close(connection);
 
-    logger.info(`Connection[${id}] is disconnected. Error: ` + message);
+    if (this.options.debug)
+      logger.info(
+        `Connection[${id}] is disconnected. Error: ` + message,
+        "Clients:",
+        Object.keys(this.socket.clients().connected)
+      );
 
     if (connection.socket.connected) connection.socket.disconnect();
     delete this.connections_map[id];
   }
 
   _internal_parse_packet(connection, packet_id, data) {
-    if (packet_id in this.parse_packet_dict)
+    if (packet_id in this.parse_packet_dict) {
+      if (this.options.debug)
+        logger.log("Parse", connection.get_id(), packet_id);
+
       return this.parse_packet_dict[packet_id](connection, data);
-    else
+    } else {
       this._close_connection(
         connection.socket.id,
         "Wrong packet id: " + packet_id
       );
+    }
   }
 
   _parse_packet({ connection_id, packet_id, date, data }) {
@@ -112,12 +140,13 @@ class Server {
       // Parse packet
       this._internal_parse_packet(connection, packet_id, data);
     } catch (error) {
-      logger.info("Exception: " + error, {
-        connection_id,
-        packet_id,
-        date,
-        data
-      });
+      if (this.options.debug)
+        logger.info("Exception: " + error, {
+          connection_id,
+          packet_id,
+          date,
+          data
+        });
     }
   }
 
@@ -133,19 +162,22 @@ class Server {
     try {
       if (!socket.connected) return;
 
-      if (this.send_delay > 0) {
+      if (this.options.debug) logger.log("Send", packet_id);
+
+      if (this.options.send_delay > 0) {
         setTimeout(() => {
           socket.emit(packet_id, data);
-        }, this.send_delay);
+        }, this.options.send_delay);
       } else {
         socket.emit(packet_id, data);
       }
     } catch (error) {
-      logger.info("Exception: " + error, {
-        socket_id: socket.id,
-        packet_id,
-        data
-      });
+      if (this.options.debug)
+        logger.info("Exception: " + error, {
+          socket_id: socket.id,
+          packet_id,
+          data
+        });
     }
   }
 
@@ -161,7 +193,7 @@ class Server {
   }
 
   start() {
-    this.socket = io(this.port);
+    this.socket = io(this.port, this.socket_io_options);
 
     this.socket.on("connection", socket => {
       this.pending_connections_queue_async.push(new Connection(socket));
