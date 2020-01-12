@@ -1,31 +1,37 @@
 class Logger {
-  constructor({
-    module_name = "",
-    file_name = "",
-    show_time = true,
-    show_type = true
-  }) {
-    this.options = { module_name, file_name, show_time, show_type };
+  constructor(options) {
+    this.options = {
+      module_name: "",
+      file_name: "",
+      show_time: true,
+      show_type: true,
+      print_log: true,
+      print_info: true,
+      print_error: true,
+      print_warn: true,
+      print_debug: false,
+      ...options
+    };
   }
 
   log(...args) {
-    this.print("log", ...args);
+    if (this.options.print_log) this.print("log", ...args);
   }
 
   info(...args) {
-    this.print("info", ...args);
+    if (this.options.print_info) this.print("info", ...args);
   }
 
   error(...args) {
-    this.print("error", ...args);
+    if (this.options.print_error) this.print("error", ...args);
   }
 
   warn(...args) {
-    this.print("warn", ...args);
+    if (this.options.print_warn) this.print("warn", ...args);
   }
 
   debug(...args) {
-    this.print("debug", ...args);
+    if (this.options.print_debug) this.print("debug", ...args);
   }
 
   print(message_type, ...args) {
