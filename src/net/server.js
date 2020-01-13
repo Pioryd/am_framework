@@ -56,6 +56,8 @@ class Server {
   }
 
   _add_connection(connection) {
+    if (connection == null) return;
+
     this.connections_map[connection.socket.id] = connection;
 
     logger.info(
@@ -110,7 +112,11 @@ class Server {
     }
   }
 
-  _parse_packet({ connection_id, packet_id, date, data }) {
+  _parse_packet(packet_data) {
+    if (packet_data == null) return;
+
+    const { connection_id, packet_id, date, data } = packet_data;
+
     let connection = this.get_connection_by_id(connection_id);
     if (this.get_connection_by_id(connection_id) == null) return;
 
@@ -215,7 +221,10 @@ class Server {
     const locked_length_send = this.pending_send_packets_queue.length;
     for (let i = 0; i < locked_length_send; i++) {
       const send_packet = this.pending_send_packets_queue.shift();
-      if (this.get_connection_by_id(send_packet.connection_id) != null) {
+      if (
+        send_packet != null &&
+        this.get_connection_by_id(send_packet.connection_id) != null
+      ) {
         this._send(
           this.get_connection_by_id(send_packet.connection_id).socket,
           send_packet.packet_id,
