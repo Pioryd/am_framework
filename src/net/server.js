@@ -103,7 +103,10 @@ class Server {
     if (packet_id in this.parse_packet_dict) {
       logger.log("Parse", connection.get_id(), packet_id);
 
-      return this.parse_packet_dict[packet_id](connection, data);
+      return this.parse_packet_dict[packet_id](
+        connection,
+        data != null ? data : {}
+      );
     } else {
       this._close_connection(
         connection.socket.id,

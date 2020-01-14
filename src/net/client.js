@@ -99,7 +99,7 @@ class Client {
 
       logger.debug("Parse", packet_id);
 
-      this.parse_packet_dict[packet_id](data);
+      this.parse_packet_dict[packet_id](data != null ? data : {});
     } catch (e) {
       logger.error(
         "Exception:",
