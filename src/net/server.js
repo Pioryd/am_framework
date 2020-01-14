@@ -60,7 +60,7 @@ class Server {
 
     this.connections_map[connection.socket.id] = connection;
 
-    logger.info(
+    logger.log(
       "New connection:",
       connection.socket.id,
       "Clients:",
@@ -89,7 +89,7 @@ class Server {
 
     connection.on_close(connection);
 
-    logger.info(
+    logger.log(
       `Connection[${id}] is disconnected. Error: ` + message,
       "Clients:",
       Object.keys(this.socket.clients().connected)
@@ -101,7 +101,7 @@ class Server {
 
   _internal_parse_packet(connection, packet_id, data) {
     if (packet_id in this.parse_packet_dict) {
-      logger.log("Parse", connection.get_id(), packet_id);
+      logger.debug("Parse", connection.get_id(), packet_id);
 
       return this.parse_packet_dict[packet_id](
         connection,
@@ -147,7 +147,7 @@ class Server {
       // Parse packet
       this._internal_parse_packet(connection, packet_id, data);
     } catch (e) {
-      logger.info(
+      logger.error(
         "Exception: ",
         {
           connection_id,
@@ -172,7 +172,7 @@ class Server {
     try {
       if (!socket.connected) return;
 
-      logger.log("Send", packet_id);
+      logger.debug("Send", packet_id);
 
       if (this.options.send_delay > 0) {
         setTimeout(() => {
@@ -182,7 +182,7 @@ class Server {
         socket.emit(packet_id, data);
       }
     } catch (e) {
-      logger.info(
+      logger.error(
         "Exception: ",
         {
           socket_id: socket.id,
