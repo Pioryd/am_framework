@@ -143,13 +143,17 @@ class Server {
 
       // Parse packet
       this._internal_parse_packet(connection, packet_id, data);
-    } catch (error) {
-      logger.info("Exception: " + error, {
-        connection_id,
-        packet_id,
-        date,
-        data
-      });
+    } catch (e) {
+      logger.info(
+        "Exception: ",
+        {
+          connection_id,
+          packet_id,
+          date,
+          data
+        },
+        e.stack
+      );
     }
   }
 
@@ -174,12 +178,16 @@ class Server {
       } else {
         socket.emit(packet_id, data);
       }
-    } catch (error) {
-      logger.info("Exception: " + error, {
-        socket_id: socket.id,
-        packet_id,
-        data
-      });
+    } catch (e) {
+      logger.info(
+        "Exception: ",
+        {
+          socket_id: socket.id,
+          packet_id,
+          data
+        },
+        e.stack
+      );
     }
   }
 

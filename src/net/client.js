@@ -83,8 +83,8 @@ class Client {
           this.socket.emit(packet_id, data);
         }, this.options.send_delay);
       } else this.socket.emit(packet_id, data);
-    } catch (error) {
-      logger.error("Exception: " + error);
+    } catch (e) {
+      logger.error(e.stack);
     }
   }
 
@@ -100,8 +100,13 @@ class Client {
       logger.debug("Parse", packet_id);
 
       this.parse_packet_dict[packet_id](data);
-    } catch (error) {
-      logger.error("Exception: " + error + error.stack);
+    } catch (e) {
+      logger.error(
+        "Exception:",
+        { packet_id, date, data },
+        this.parse_packet_dict,
+        e.stack
+      );
     }
   }
 
