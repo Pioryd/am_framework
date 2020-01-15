@@ -23,7 +23,7 @@ class Database {
 
           callback(collections);
         } catch (e) {
-          console.log(e);
+          console.log(e.stack);
         }
       });
     };
@@ -51,7 +51,7 @@ class Database {
 
           process_callback(client.db);
         } catch (e) {
-          console.log(e);
+          console.log(e.stack);
         }
       }
     );
