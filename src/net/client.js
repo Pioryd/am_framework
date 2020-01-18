@@ -111,7 +111,8 @@ class Client {
   }
 
   _check_timeout() {
-    if (this.options.packet_timeout === 0) return;
+    // 0 can be string, so ==
+    if (this.options.packet_timeout == 0) return;
 
     let date = new Date();
 

@@ -39,7 +39,8 @@ class Server {
   }
 
   _check_connections() {
-    if (this.options.packet_timeout === 0) return;
+    // 0 can be string, so ==
+    if (this.options.packet_timeout == 0) return;
 
     for (const [id, connection] of Object.entries(this.connections_map)) {
       let date = new Date();
