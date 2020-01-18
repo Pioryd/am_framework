@@ -46,6 +46,19 @@ class Util {
       .map(dir => dir.name);
   }
 
+  static get_files(path) {
+    if (!this.is_path_exist(path)) {
+      logger.info(
+        "Unable to get directories. Path does NOT not exist: " + path
+      );
+      return [];
+    }
+    return fs
+      .readdirSync(path, { withFileTypes: true })
+      .filter(dir => dir.isFile())
+      .map(dir => dir.name);
+  }
+
   /**
    * Returns a random number between min (inclusive) and max (exclusive)
    */
