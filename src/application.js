@@ -1,40 +1,135 @@
+const EventEmitter = require("events");
+const path = require("path");
 const logger = require("./logger").create_logger({
-  module_name: "am_framework",
+  module_name: "app_server_preview",
   file_name: __filename
 });
+const { Util } = require("./util");
+const { Config } = require("./config");
+const { ModulesManager } = require("./modules_manager");
+const { setup_exit_handlers } = require("./signal_handler");
+class Application extends EventEmitter {
+  constructor({
+    root_full_name,
+    config_file_rel_name,
+    scripts_folder_rel_name
+  }) {
+    super();
+    this.config = new Config({
+      file_full_name: path.join(root_full_name, config_file_rel_name),
+      on_update: () => {
+        logger.info("config updated");
+      }
+    });
+    this.config.load();
+    this.scripts_folder_full_name = path.join(
+      root_full_name,
+      scripts_folder_rel_name
+    );
 
-/**
- * @description contains things related only to application as
- *  system application.
- */
+    global.node_modules_path = path.join(
+      root_full_name,
+      this.config.data.app.node_modules_rel_path
+    );
 
-/**
- * @param {Function} on_closing
- * @param {Function} on_force_closing
- */
-function setup_exit_handlers(on_closing, on_force_closing) {
-  process.stdin.resume(); //so the program will not close instantly
+    this.modules_manager = new ModulesManager({
+      config: this.config.data,
+      event_emitter: this,
+      root_path: root_full_name,
+      modules_map: this.config.data.app.modules.map,
+      paths_auto_find: this.config.data.app.modules.paths_auto_find,
+      disabled_modules: this.config.data.app.modules.disabled
+    });
 
-  this.exitHandler = (options, exitCode) => {
-    if (options.cleanup) on_closing();
-    else on_force_closing();
+    this.commands_map = {};
+  }
 
-    if (exitCode || exitCode === 0) logger.info(exitCode);
-    if (options.exit) process.exit();
-  };
+  _init_commands() {
+    process.stdin.resume();
+    process.stdin.setEncoding("utf8");
+    process.stdin.on("data", data => {
+      try {
+        data = data.trim();
+        if (data === "") data = "help";
+        const command_end_index = data.indexOf(" ");
+        let command = "";
+        let argument = "";
+        if (command_end_index != -1) {
+          command = data.substr(0, command_end_index);
+          argument = data.substr(command_end_index);
+        } else {
+          command = data;
+        }
 
-  //do something when app is closing
-  process.on("exit", this.exitHandler.bind(null, { cleanup: true }));
+        argument = argument.trim();
 
-  //catches ctrl+c event
-  process.on("SIGINT", this.exitHandler.bind(null, { exit: true }));
+        if (!(command in this.commands_map)) {
+          logger.info(`Unknown command: ${command}`);
+          return;
+        }
 
-  // catches "kill pid" (for example: nodemon restart)
-  process.on("SIGUSR1", this.exitHandler.bind(null, { exit: true }));
-  process.on("SIGUSR2", this.exitHandler.bind(null, { exit: true }));
+        logger.info(`Process command: ${command}`);
+        this.commands_map[command](argument);
+      } catch (e) {
+        logger.error(e.stack);
+      }
+    });
+  }
 
-  //catches uncaught exceptions
-  process.on("uncaughtException", this.exitHandler.bind(null, { exit: true }));
+  // Should be called only once
+  run() {
+    this._init_commands();
+    this.modules_manager.load_modules();
+
+    setup_exit_handlers(
+      () => {
+        this.emit("on_force_terminate");
+      },
+      () => {
+        this.emit("on_force_terminate");
+      }
+    );
+
+    this.emit("on_initialize");
+
+    this.emit("on_run");
+
+    this._auto_run_scripts();
+  }
+
+  // Should be called only once
+  close() {
+    logger.info(
+      `Closing in ${this.config.data.app.close_app_delay / 1000} seconds`
+    );
+
+    this.config.terminate();
+
+    this.emit("on_terminate");
+
+    setTimeout(() => {
+      process.exit(0);
+    }, this.config.data.app.close_app_delay);
+  }
+
+  get_scripts_list() {
+    try {
+      const scripts_list = Util.get_files(this.scripts_folder_full_name);
+      for (let i = 0; i < scripts_list.length; i++)
+        scripts_list[i] = scripts_list[i].replace(/\.[^/.]+$/, "");
+      return scripts_list;
+    } catch (e) {
+      logger.error(e);
+      return [];
+    }
+  }
+
+  _auto_run_scripts() {
+    for (const name of this.config.data.app.auto_run_scripts) {
+      logger.log(`Run script [${name}]`);
+      this.commands_map["script"](name);
+    }
+  }
 }
 
-module.exports = { setup_exit_handlers };
+module.exports = { Application };

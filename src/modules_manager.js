@@ -101,7 +101,14 @@ class ModulesManager {
         config: this.config
       });
       this.init_module(module_name);
-    } else logger.info("Module path does NOT exist: " + module_path);
+    } else {
+      logger.info(
+        "Module path does NOT exist: " +
+          module_path +
+          ", Full path: " +
+          module_full_path
+      );
+    }
   }
 }
 
