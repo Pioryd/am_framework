@@ -1,5 +1,6 @@
 const EventEmitter = require("events");
 const path = require("path");
+const fs = require("fs");
 const logger = require("./logger").create_logger({
   module_name: "app_server_preview",
   file_name: __filename
@@ -12,7 +13,8 @@ class Application extends EventEmitter {
   constructor({
     root_full_name,
     config_file_rel_name,
-    scripts_folder_rel_name
+    scripts_folder_rel_name,
+    command_map
   }) {
     super();
     this.config = new Config({
@@ -41,7 +43,43 @@ class Application extends EventEmitter {
       disabled_modules: this.config.data.app.modules.disabled
     });
 
-    this.commands_map = {};
+    this._commands_map = {
+      close: (force = false) => {
+        if (!force) this.close();
+        else process.exit(0);
+      },
+      help: () => {
+        logger.log("Commands list:", Object.keys(this._commands_map));
+      },
+      script: argument => {
+        const modules = this.modules_manager.modules_list;
+        const app = this;
+
+        try {
+          const args_count = argument.split(" ").length;
+          if (args_count === 1 && argument.slice(-1) !== ";") {
+            argument = fs.readFileSync(
+              `${path.join(
+                root_full_name,
+                scripts_folder_rel_name
+              )}/${argument}.js`,
+              "utf8",
+              err => {
+                if (err) throw err;
+              }
+            );
+          }
+
+          const script = Util.string_to_function(
+            `(modules, app)=>{${argument}}`
+          );
+          script(modules, app);
+        } catch (e) {
+          logger.error(e.stack);
+        }
+      },
+      ...command_map
+    };
   }
 
   _init_commands() {
@@ -63,13 +101,13 @@ class Application extends EventEmitter {
 
         argument = argument.trim();
 
-        if (!(command in this.commands_map)) {
+        if (!(command in this._commands_map)) {
           logger.info(`Unknown command: ${command}`);
           return;
         }
 
         logger.info(`Process command: ${command}`);
-        this.commands_map[command](argument);
+        this._commands_map[command](argument);
       } catch (e) {
         logger.error(e.stack);
       }
@@ -127,7 +165,7 @@ class Application extends EventEmitter {
   _auto_run_scripts() {
     for (const name of this.config.data.app.auto_run_scripts) {
       logger.log(`Run script [${name}]`);
-      this.commands_map["script"](name);
+      this._commands_map["script"](name);
     }
   }
 }
