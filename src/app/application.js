@@ -1,12 +1,12 @@
 const EventEmitter = require("events");
 const path = require("path");
 const fs = require("fs");
-const logger = require("./logger").create_logger({
+const logger = require("../logger").create_logger({
   module_name: "app_server_preview",
   file_name: __filename
 });
-const { Util } = require("./util");
-const { Config } = require("./config");
+const { Util } = require("../util");
+const { Config } = require("../config");
 const { ModulesManager } = require("./modules_manager");
 const { setup_exit_handlers } = require("./signal_handler");
 class Application extends EventEmitter {

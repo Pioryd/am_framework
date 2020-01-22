@@ -1,6 +1,6 @@
 const path = require("path");
-const { Util } = require("./util.js");
-const logger = require("./logger").create_logger({
+const { Util } = require("../util.js");
+const logger = require("../logger").create_logger({
   module_name: "am_framework",
   file_name: __filename
 });
