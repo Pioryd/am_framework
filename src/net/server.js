@@ -29,11 +29,11 @@ class Server {
       ...socket_io_options
     };
 
-    this.parse_packet_dict = {};
     this.socket = {};
     this.connections_map = {};
 
-    this.pending_connections_queue_async = [];
+    this.pending_remove_connections_queue_async = [];
+    this.pending_add_connections_queue_async = [];
     this.pending_parse_packets_queue_async = [];
     this.pending_send_packets_queue = [];
   }
@@ -67,6 +67,10 @@ class Server {
       "Clients:",
       Object.keys(this.socket.clients().connected)
     );
+
+    connection.socket.on("disconnect", () => {
+      this.pending_remove_connections_queue_async.push(connection);
+    });
 
     for (const [packet_id] of Object.entries(this.parse_packet_dict)) {
       connection.socket.on(packet_id, data => {
@@ -210,7 +214,7 @@ class Server {
     this.socket = io(this.port, this.socket_io_options);
 
     this.socket.on("connection", socket => {
-      this.pending_connections_queue_async.push(new Connection(socket));
+      this.pending_add_connections_queue_async.push(new Connection(socket));
     });
   }
 
@@ -223,6 +227,14 @@ class Server {
 
   poll() {
     this._check_connections();
+
+    // "Async" socket.io can remove connections at any time
+    const locked_length_remove_connections = this
+      .pending_remove_connections_queue_async.length;
+    for (let i = 0; i < locked_length_remove_connections; i++)
+      this.__remove_connection(
+        this.pending_remove_connections_queue_async.shift()
+      );
 
     // "Async" socket.io can add new parse packet at any time
     const locked_length_parse = this.pending_parse_packets_queue_async.length;
@@ -246,9 +258,18 @@ class Server {
     }
 
     // "Async" socket.io can add new connections at any time
-    const locked_length = this.pending_connections_queue_async.length;
+    const locked_length = this.pending_add_connections_queue_async.length;
     for (let i = 0; i < locked_length; i++)
-      this._add_connection(this.pending_connections_queue_async.shift());
+      this._add_connection(this.pending_add_connections_queue_async.shift());
+  }
+
+  __remove_connection(connection_to_remove) {
+    for (const connection of Object.values(this.connections_map)) {
+      if (connection_to_remove === connection_to_remove) {
+        this._close_connection(connection_to_remove.get_id());
+        return;
+      }
+    }
   }
 }
 
