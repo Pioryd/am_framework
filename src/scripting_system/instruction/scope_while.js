@@ -9,12 +9,12 @@ class Scope_WHILE {
     this.id = null;
     this._condition = () => {};
     this._childs = [];
-    this._current_child_index = 0;
+    this._current_child_index = -1;
     this._debug_info = {};
   }
 
   _reset() {
-    this._current_child_index = 0;
+    this._current_child_index = -1;
   }
 
   process(script, root) {
@@ -44,13 +44,15 @@ class Scope_WHILE {
       return { return_code: RETURN_CODE.PROCESSED };
     }
 
-    if (this._current_child_index === 0)
+    if (this._current_child_index === -1) {
+      this._current_child_index = 0;
       if (!this._condition(script, root)) {
         this._reset();
         return { return_code: RETURN_CODE.PROCESSED };
       } else {
         return { return_code: RETURN_CODE.PROCESSING };
       }
+    }
 
     if (this._current_child_index < this._childs.length) {
       const { return_code, internal } = this._childs[
@@ -64,7 +66,7 @@ class Scope_WHILE {
         this._reset();
         return { return_code: RETURN_CODE.PROCESSED };
       } else if (internal === "continue") {
-        this._current_child_index = 0;
+        this._current_child_index = -1;
       } else if (return_code === RETURN_CODE.PROCESSED) {
         this._current_child_index++;
       } else if (return_code === RETURN_CODE.PROCESSING) {
@@ -73,7 +75,7 @@ class Scope_WHILE {
     }
 
     if (this._current_child_index >= this._childs.length)
-      this._current_child_index = 0;
+      this._current_child_index = -1;
 
     return { return_code: RETURN_CODE.PROCESSING };
   }
