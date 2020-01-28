@@ -4,7 +4,7 @@
   "description": "Framework for AM needs",
   "main": "index.js",
   "scripts": {
-    "test": "mocha"
+    "test": "mocha ./test/**/*.js"
   },
   "author": "Piotr Rydwański",
   "license": "ISC",
