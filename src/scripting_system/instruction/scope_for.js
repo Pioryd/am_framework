@@ -12,13 +12,13 @@ class Scope_FOR {
     this._increment = () => {};
 
     this._childs = [];
-    this._current_child_index = 0;
+    this._current_child_index = -1;
     this._initialized = false;
     this._debug_info = {};
   }
 
   _reset() {
-    this._current_child_index = 0;
+    this._current_child_index = -1;
     this._initialized = false;
   }
 
@@ -58,15 +58,16 @@ class Scope_FOR {
 
     if (this._current_child_index >= this._childs.length) {
       this._increment(script, root);
-      this._current_child_index = 0;
+      this._current_child_index = -1;
       return { return_code: RETURN_CODE.PROCESSING };
     }
 
-    if (this._current_child_index === 0) {
+    if (this._current_child_index === -1) {
       if (!this._condition(script, root)) {
         this._reset();
         return { return_code: RETURN_CODE.PROCESSED };
       } else {
+        this._current_child_index = 0;
         return { return_code: RETURN_CODE.PROCESSING };
       }
     }
@@ -83,8 +84,7 @@ class Scope_FOR {
         this._reset();
         return { return_code: RETURN_CODE.PROCESSED };
       } else if (internal === "continue") {
-        this._increment(script, root);
-        this._current_child_index = 0;
+        this._current_child_index = this._childs.length;
       } else if (return_code === RETURN_CODE.PROCESSED) {
         this._current_child_index++;
       } else if (return_code === RETURN_CODE.PROCESSING) {
