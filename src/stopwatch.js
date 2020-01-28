@@ -4,7 +4,8 @@ class Stopwatch {
     this.state_start_time = new Date();
   }
 
-  reset() {
+  reset(countdown_time) {
+    if (countdown_time != null) this.countdown_time = countdown_time;
     this.state_start_time = new Date();
   }
 
