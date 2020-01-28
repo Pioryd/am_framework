@@ -1,0 +1,219 @@
+{
+  "Test_js": {
+    "data": { "val": 0 },
+    "root_scope": {
+      "type": "scope",
+      "instructions": [{ "type": "js", "body": "script.data.val++" }]
+    }
+  },
+  "Test_scope": {
+    "data": { "val": 0 },
+    "root_scope": {
+      "type": "scope",
+      "instructions": [
+        { "type": "js", "body": "script.data.val++" },
+        { "type": "js", "body": "script.data.val++" },
+        { "type": "js", "body": "script.data.val++" }
+      ]
+    }
+  },
+  "Test_scope_if": {
+    "data": { "val": 0 },
+    "root_scope": {
+      "type": "if",
+      "conditions": {
+        "script.data.val === 0": [
+          { "type": "js", "body": "script.data.val++" },
+          { "type": "js", "body": "script.data.val += 2" }
+        ],
+        "script.data.val === 1": [
+          { "type": "js", "body": "script.data.val++" },
+          { "type": "js", "body": "script.data.val += 3" }
+        ],
+        "": [
+          { "type": "js", "body": "script.data.val++" },
+          { "type": "js", "body": "script.data.val += 4" }
+        ]
+      }
+    }
+  },
+  "Test_scope_while": {
+    "data": { "val": 0 },
+    "root_scope": {
+      "type": "while",
+      "condition": "script.data.val < 3",
+      "instructions": [
+        { "type": "js", "body": "script.data.val++" },
+        { "type": "js", "body": "script.data.val++" }
+      ]
+    }
+  },
+  "Test_scope_for": {
+    "data": { "val": 0 },
+    "root_scope": {
+      "type": "for",
+      "condition": "script.data.i = 0; script.data.i < 2; script.data.i++",
+      "instructions": [
+        { "type": "js", "body": "script.data.val++" },
+        { "type": "js", "body": "script.data.val++" }
+      ]
+    }
+  },
+  "Test_internal_break": {
+    "data": { "val": 0, "val_2": 0 },
+    "root_scope": {
+      "type": "scope",
+      "instructions": [
+        {
+          "type": "for",
+          "condition": "script.data.i = 0; script.data.i < 5; script.data.i++",
+          "instructions": [
+            { "type": "js", "body": "script.data.val = 0" },
+            {
+              "type": "scope",
+              "instructions": [
+                { "type": "js", "body": "script.data.val++" },
+                {
+                  "type": "scope",
+                  "instructions": [
+                    { "type": "js", "body": "script.data.val++" },
+                    { "type": "internal", "command": "break" },
+                    { "type": "js", "body": "script.data.val++" }
+                  ]
+                },
+                { "type": "js", "body": "script.data.val++" }
+              ]
+            },
+            { "type": "js", "body": "script.data.val++" }
+          ]
+        },
+        {
+          "type": "while",
+          "condition": "script.data.val < 3",
+          "instructions": [
+            { "type": "js", "body": "script.data.val++" },
+            {
+              "type": "while",
+              "condition": "script.data.val_2 < 3",
+              "instructions": [
+                { "type": "js", "body": "script.data.val_2++" },
+                { "type": "internal", "command": "break" },
+                { "type": "js", "body": "script.data.val_2++" }
+              ]
+            },
+            { "type": "js", "body": "script.data.val++" }
+          ]
+        }
+      ]
+    }
+  },
+  "Test_internal_continue": {
+    "data": { "val": 0, "val_2": 0 },
+    "root_scope": {
+      "type": "scope",
+      "instructions": [
+        {
+          "type": "for",
+          "condition": "script.data.i = 0; script.data.i < 2; script.data.i++",
+          "instructions": [
+            { "type": "js", "body": "script.data.i = script.data.i" },
+            {
+              "type": "scope",
+              "instructions": [
+                { "type": "js", "body": "script.data.i = script.data.i" },
+                { "type": "internal", "command": "continue" },
+                { "type": "js", "body": "script.data.val++" }
+              ]
+            },
+            { "type": "js", "body": "script.data.i--" }
+          ]
+        },
+        {
+          "type": "while",
+          "condition": "script.data.val < 2",
+          "instructions": [
+            { "type": "js", "body": "script.data.val = script.data.val" },
+            {
+              "type": "scope",
+              "instructions": [
+                { "type": "js", "body": "script.data.val++" },
+                { "type": "internal", "command": "continue" },
+                { "type": "js", "body": "script.data.val_2++" }
+              ]
+            },
+            { "type": "js", "body": "script.data.val--" }
+          ]
+        }
+      ]
+    }
+  },
+  "Test_internal_sleep": {
+    "data": { "val": 0 },
+    "root_scope": {
+      "type": "scope",
+      "instructions": [
+        { "type": "js", "body": "script.data.val++" },
+        { "type": "internal", "command": "sleep 1000" },
+        { "type": "js", "body": "script.data.val++" }
+      ]
+    }
+  },
+  "Test_label_and_goto": {
+    "data": { "val": 0, "val_2": 0 },
+    "root_scope": {
+      "type": "scope",
+      "instructions": [
+        { "type": "js", "body": "script.data.val = -1" },
+        {
+          "type": "if",
+          "conditions": {
+            "script.data.val === 999": [
+              { "type": "internal", "command": "label test_2" },
+              { "type": "js", "body": "script.data.val += 2" },
+              { "type": "internal", "command": "goto test_3" }
+            ]
+          }
+        },
+        { "type": "js", "body": "script.data.val = script.data.val" },
+        {
+          "type": "if",
+          "conditions": {
+            "script.data.val === 0": [
+              { "type": "js", "body": "script.data.val++" },
+              { "type": "js", "body": "script.data.val += 2" }
+            ],
+            "script.data.val === -1": [
+              { "type": "js", "body": "script.data.val++" },
+              { "type": "internal", "command": "goto test_1" },
+              { "type": "js", "body": "script.data.val += 3" }
+            ],
+            "": [
+              { "type": "js", "body": "script.data.val++" },
+              { "type": "js", "body": "script.data.val += 4" }
+            ]
+          }
+        },
+        { "type": "js", "body": "script.data.val++" },
+        {
+          "type": "while",
+          "condition": "script.data.val < 10",
+          "instructions": [
+            { "type": "js", "body": "script.data.val = script.data.val" },
+            {
+              "type": "scope",
+              "instructions": [
+                { "type": "js", "body": "script.data.val++" },
+                { "type": "internal", "command": "label test_1" },
+                { "type": "js", "body": "script.data.val_2++" },
+                { "type": "internal", "command": "goto test_2" },
+                { "type": "js", "body": "script.data.val_2++" }
+              ]
+            },
+            { "type": "js", "body": "script.data.val--" }
+          ]
+        },
+        { "type": "internal", "command": "label test_3" }
+      ]
+    }
+  }
+}
