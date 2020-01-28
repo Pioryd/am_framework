@@ -28,7 +28,7 @@ class Internal {
   }
 
   process(script, root) {
-    logger.debug(`process Type[Internal] ID[${this.id}]`);
+    script.print_debug(`process Type[Internal] ID[${this.id}]`);
 
     if (script._goto_find.enabled) {
       if (

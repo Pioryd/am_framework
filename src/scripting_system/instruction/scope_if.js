@@ -19,7 +19,7 @@ class Scope_IF {
   }
 
   process(script, root) {
-    logger.debug(`process Type[IF] ID[${this.id}]`);
+    script.print_debug(`process Type[IF] ID[${this.id}]`);
 
     // Internal:goto
     if (script._goto_find.enabled) {

@@ -17,7 +17,7 @@ class Scope {
   }
 
   process(script, root) {
-    logger.debug(`process Type[Scope] ID[${this.id}]`);
+    script.print_debug(`process Type[Scope] ID[${this.id}]`);
 
     // Internal:goto
     if (script._goto_find.enabled) {

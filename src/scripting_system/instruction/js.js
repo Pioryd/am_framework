@@ -11,7 +11,7 @@ class JS {
   }
 
   process(script, root) {
-    logger.debug(`process Type[JS] ID[${this.id}]`);
+    script.print_debug(`process Type[JS] ID[${this.id}]`);
 
     if (script._goto_find.enabled)
       return { return_code: RETURN_CODE.PROCESSED };

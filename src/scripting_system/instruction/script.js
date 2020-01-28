@@ -19,9 +19,12 @@ class Script {
     };
 
     this._goto_find = { enabled: false, label_name: "" };
+
+    this._debug_enabled = false;
   }
 
   process(root) {
+    this.print_debug("## Script - process");
     // Internal:sleep
     if (this._sleep_timer.enabled) {
       if (this._sleep_timer.stopwatch.is_elapsed()) {
@@ -54,6 +57,10 @@ class Script {
   goto(label_name) {
     this._goto_find.enabled = true;
     this._goto_find.label_name = label_name;
+  }
+
+  print_debug(...args) {
+    if (this._debug_enabled) console.log(...args);
   }
 }
 

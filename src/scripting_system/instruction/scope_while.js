@@ -18,7 +18,7 @@ class Scope_WHILE {
   }
 
   process(script, root) {
-    logger.debug(`process Type[WHILE] ID[${this.id}]`);
+    script.print_debug(`process Type[WHILE] ID[${this.id}]`);
 
     // Internal:goto
     if (script._goto_find.enabled) {
