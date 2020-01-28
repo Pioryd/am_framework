@@ -3,17 +3,19 @@
     "data": { "val": 0 },
     "root_scope": {
       "type": "scope",
-      "instructions": [{ "type": "js", "body": "script.data.val++" }]
+      "id": 1,
+      "instructions": [{ "type": "js", "id": 2, "body": "script.data.val++" }]
     }
   },
   "Test_scope": {
     "data": { "val": 0 },
     "root_scope": {
       "type": "scope",
+      "id": 1,
       "instructions": [
-        { "type": "js", "body": "script.data.val++" },
-        { "type": "js", "body": "script.data.val++" },
-        { "type": "js", "body": "script.data.val++" }
+        { "type": "js", "id": 2, "body": "script.data.val++" },
+        { "type": "js", "id": 3, "body": "script.data.val++" },
+        { "type": "js", "id": 4, "body": "script.data.val++" }
       ]
     }
   },
@@ -21,18 +23,19 @@
     "data": { "val": 0 },
     "root_scope": {
       "type": "if",
+      "id": 0,
       "conditions": {
         "script.data.val === 0": [
-          { "type": "js", "body": "script.data.val++" },
-          { "type": "js", "body": "script.data.val += 2" }
+          { "type": "js", "id": 1, "body": "script.data.val++" },
+          { "type": "js", "id": 2, "body": "script.data.val += 2" }
         ],
         "script.data.val === 1": [
-          { "type": "js", "body": "script.data.val++" },
-          { "type": "js", "body": "script.data.val += 3" }
+          { "type": "js", "id": 3, "body": "script.data.val++" },
+          { "type": "js", "id": 4, "body": "script.data.val += 3" }
         ],
         "": [
-          { "type": "js", "body": "script.data.val++" },
-          { "type": "js", "body": "script.data.val += 4" }
+          { "type": "js", "id": 5, "body": "script.data.val++" },
+          { "type": "js", "id": 6, "body": "script.data.val += 4" }
         ]
       }
     }
@@ -41,10 +44,11 @@
     "data": { "val": 0 },
     "root_scope": {
       "type": "while",
+      "id": 0,
       "condition": "script.data.val < 3",
       "instructions": [
-        { "type": "js", "body": "script.data.val++" },
-        { "type": "js", "body": "script.data.val++" }
+        { "type": "js", "id": 1, "body": "script.data.val++" },
+        { "type": "js", "id": 2, "body": "script.data.val++" }
       ]
     }
   },
@@ -52,10 +56,11 @@
     "data": { "val": 0 },
     "root_scope": {
       "type": "for",
+      "id": 0,
       "condition": "script.data.i = 0; script.data.i < 2; script.data.i++",
       "instructions": [
-        { "type": "js", "body": "script.data.val++" },
-        { "type": "js", "body": "script.data.val++" }
+        { "type": "js", "id": 1, "body": "script.data.val++" },
+        { "type": "js", "id": 2, "body": "script.data.val++" }
       ]
     }
   },
@@ -63,45 +68,51 @@
     "data": { "val": 0, "val_2": 0 },
     "root_scope": {
       "type": "scope",
+      "id": 0,
       "instructions": [
         {
           "type": "for",
+          "id": 1,
           "condition": "script.data.i = 0; script.data.i < 5; script.data.i++",
           "instructions": [
-            { "type": "js", "body": "script.data.val = 0" },
+            { "type": "js", "id": 2, "body": "script.data.val = 0" },
             {
               "type": "scope",
+              "id": 3,
               "instructions": [
-                { "type": "js", "body": "script.data.val++" },
+                { "type": "js", "id": 4, "body": "script.data.val++" },
                 {
                   "type": "scope",
+                  "id": 5,
                   "instructions": [
-                    { "type": "js", "body": "script.data.val++" },
-                    { "type": "internal", "command": "break" },
-                    { "type": "js", "body": "script.data.val++" }
+                    { "type": "js", "id": 6, "body": "script.data.val++" },
+                    { "type": "internal", "id": 7, "command": "break" },
+                    { "type": "js", "id": 8, "body": "script.data.val++" }
                   ]
                 },
-                { "type": "js", "body": "script.data.val++" }
+                { "type": "js", "id": 9, "body": "script.data.val++" }
               ]
             },
-            { "type": "js", "body": "script.data.val++" }
+            { "type": "js", "id": 10, "body": "script.data.val++" }
           ]
         },
         {
           "type": "while",
+          "id": 11,
           "condition": "script.data.val < 3",
           "instructions": [
-            { "type": "js", "body": "script.data.val++" },
+            { "type": "js", "id": 12, "body": "script.data.val++" },
             {
               "type": "while",
+              "id": 13,
               "condition": "script.data.val_2 < 3",
               "instructions": [
-                { "type": "js", "body": "script.data.val_2++" },
-                { "type": "internal", "command": "break" },
-                { "type": "js", "body": "script.data.val_2++" }
+                { "type": "js", "id": 14, "body": "script.data.val_2++" },
+                { "type": "internal", "id": 15, "command": "break" },
+                { "type": "js", "id": 16, "body": "script.data.val_2++" }
               ]
             },
-            { "type": "js", "body": "script.data.val++" }
+            { "type": "js", "id": 17, "body": "script.data.val++" }
           ]
         }
       ]
@@ -111,37 +122,50 @@
     "data": { "val": 0, "val_2": 0 },
     "root_scope": {
       "type": "scope",
+      "id": 0,
       "instructions": [
         {
           "type": "for",
+          "id": 1,
           "condition": "script.data.i = 0; script.data.i < 2; script.data.i++",
           "instructions": [
-            { "type": "js", "body": "script.data.i = script.data.i" },
+            { "type": "js", "id": 2, "body": "script.data.i = script.data.i" },
             {
               "type": "scope",
+              "id": 3,
               "instructions": [
-                { "type": "js", "body": "script.data.i = script.data.i" },
-                { "type": "internal", "command": "continue" },
-                { "type": "js", "body": "script.data.val++" }
+                {
+                  "type": "js",
+                  "id": 4,
+                  "body": "script.data.i = script.data.i"
+                },
+                { "type": "internal", "id": 5, "command": "continue" },
+                { "type": "js", "id": 6, "body": "script.data.val++" }
               ]
             },
-            { "type": "js", "body": "script.data.i--" }
+            { "type": "js", "id": 7, "body": "script.data.i--" }
           ]
         },
         {
           "type": "while",
+          "id": 8,
           "condition": "script.data.val < 2",
           "instructions": [
-            { "type": "js", "body": "script.data.val = script.data.val" },
+            {
+              "type": "js",
+              "id": 9,
+              "body": "script.data.val = script.data.val"
+            },
             {
               "type": "scope",
+              "id": 10,
               "instructions": [
-                { "type": "js", "body": "script.data.val++" },
-                { "type": "internal", "command": "continue" },
-                { "type": "js", "body": "script.data.val_2++" }
+                { "type": "js", "id": 11, "body": "script.data.val++" },
+                { "type": "internal", "id": 12, "command": "continue" },
+                { "type": "js", "id": 13, "body": "script.data.val_2++" }
               ]
             },
-            { "type": "js", "body": "script.data.val--" }
+            { "type": "js", "id": 14, "body": "script.data.val--" }
           ]
         }
       ]
@@ -151,10 +175,11 @@
     "data": { "val": 0 },
     "root_scope": {
       "type": "scope",
+      "id": 0,
       "instructions": [
-        { "type": "js", "body": "script.data.val++" },
-        { "type": "internal", "command": "sleep 1000" },
-        { "type": "js", "body": "script.data.val++" }
+        { "type": "js", "id": 1, "body": "script.data.val++" },
+        { "type": "internal", "id": 2, "command": "sleep 100" },
+        { "type": "js", "id": 3, "body": "script.data.val++" }
       ]
     }
   },
