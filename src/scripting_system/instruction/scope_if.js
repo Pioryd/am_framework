@@ -1,7 +1,12 @@
 const { RETURN_CODE } = require("./return_code");
+const logger = require("../../logger").create_logger({
+  module_name: "am_framework",
+  file_name: __filename
+});
 
 class Scope_IF {
   constructor() {
+    this.id = null;
     this._conditions = [];
     this._selected_condition_index = -1;
     this._current_child_index = 0;
@@ -14,6 +19,8 @@ class Scope_IF {
   }
 
   process(script, root) {
+    logger.debug(`process Type[IF] ID[${this.id}]`);
+
     // Internal:goto
     if (script._goto_find.enabled) {
       for (
@@ -33,7 +40,7 @@ class Scope_IF {
             this._current_child_index++;
 
           if (!script._goto_find.enabled) {
-            if (this._current_child_index++ < childs.length) {
+            if (this._current_child_index < childs.length) {
               return { return_code: RETURN_CODE.PROCESSING };
             } else {
               this._reset();

@@ -1,7 +1,12 @@
 const { RETURN_CODE } = require("./return_code");
+const logger = require("../../logger").create_logger({
+  module_name: "am_framework",
+  file_name: __filename
+});
 
 class Scope_FOR {
   constructor() {
+    this.id = null;
     this._init = () => {};
     this._condition = () => {};
     this._increment = () => {};
@@ -18,6 +23,8 @@ class Scope_FOR {
   }
 
   process(script, root) {
+    logger.debug(`process Type[FOR] ID[${this.id}]`);
+
     // Internal:goto
     if (script._goto_find.enabled) {
       this._current_child_index = 0;
@@ -30,7 +37,7 @@ class Scope_FOR {
         if (return_code === RETURN_CODE.PROCESSED) this._current_child_index++;
 
         if (!script._goto_find.enabled) {
-          if (this._current_child_index++ < this._childs.length) {
+          if (this._current_child_index < this._childs.length) {
             return { return_code: RETURN_CODE.PROCESSING };
           } else {
             this._reset();

@@ -6,6 +6,10 @@ const Script = require("../../src/scripting_system/instruction/script");
 const {
   RETURN_CODE
 } = require("../../src/scripting_system/instruction/return_code");
+const logger = require("../../src/logger").create_logger({
+  module_name: "am_framework",
+  file_name: __filename
+});
 
 const script_full_name = path.join(__dirname, "script.json");
 
@@ -284,6 +288,7 @@ describe("Scripting system test", () => {
        */
       // Forward
       for (let i = 0; i < 7; i++) {
+        logger.debug("## Forward " + (i + 1));
         const { return_code } = script.process(null);
         expect(return_code).to.deep.equal(
           RETURN_CODE.PROCESSING,
@@ -294,6 +299,7 @@ describe("Scripting system test", () => {
       expect(script.data.val_2).to.deep.equal(0);
       // Backward
       for (let i = 0; i < 3; i++) {
+        logger.debug("## Backward " + (i + 1));
         const { return_code } = script.process(null);
         expect(return_code).to.deep.equal(
           RETURN_CODE.PROCESSING,
@@ -302,82 +308,19 @@ describe("Scripting system test", () => {
       }
       expect(script.data.val).to.deep.equal(0);
       expect(script.data.val_2).to.deep.equal(1);
-      // Forward
-      // for (let i = 0; i < 2; i++) {
-      //   const { return_code } = script.process(null);
-      //   expect(return_code).to.deep.equal(
-      //     RETURN_CODE.PROCESSING,
-      //     `For_Index[${i}]`
-      //   );
-      // }
-      {
+      // Forward;
+      for (let i = 0; i < 2; i++) {
+        logger.debug("## Forward " + (i + 1));
         const { return_code } = script.process(null);
-        expect(return_code).to.deep.equal(RETURN_CODE.PROCESSING);
-      }
-      //expect(script.data.val).to.deep.equal(2);
-      //expect(script.data.val_2).to.deep.equal(1);
-      {
-        const { return_code } = script.process(null);
-        expect(return_code).to.deep.equal(RETURN_CODE.PROCESSING);
-      }
-      {
-        const { return_code } = script.process(null);
-        expect(return_code).to.deep.equal(RETURN_CODE.PROCESSED);
+        expect(return_code).to.deep.equal(
+          RETURN_CODE.PROCESSING,
+          `For_Index[${i}]`
+        );
       }
       expect(script.data.val).to.deep.equal(2);
       expect(script.data.val_2).to.deep.equal(1);
-    });
-    it("label and goto", () => {
-      const script_name = "Test_label_and_goto";
-      const script = new Script({
-        name: script_name,
-        source: source[script_name],
-        root
-      });
-      /**
-       *   TODO
-       *   label/goto have so many cases.
-       *   Currently don't have time to make tests for all cases.
-       */
-      // Forward
-      for (let i = 0; i < 7; i++) {
-        const { return_code } = script.process(null);
-        expect(return_code).to.deep.equal(
-          RETURN_CODE.PROCESSING,
-          `For_Index[${i}]`
-        );
-      }
-      expect(script.data.val).to.deep.equal(0);
-      expect(script.data.val_2).to.deep.equal(0);
-      // Backward
-      for (let i = 0; i < 3; i++) {
-        const { return_code } = script.process(null);
-        expect(return_code).to.deep.equal(
-          RETURN_CODE.PROCESSING,
-          `For_Index[${i}]`
-        );
-      }
-      expect(script.data.val).to.deep.equal(0);
-      expect(script.data.val_2).to.deep.equal(1);
-      // Forward
-      // for (let i = 0; i < 2; i++) {
-      //   const { return_code } = script.process(null);
-      //   expect(return_code).to.deep.equal(
-      //     RETURN_CODE.PROCESSING,
-      //     `For_Index[${i}]`
-      //   );
-      // }
       {
-        const { return_code } = script.process(null);
-        expect(return_code).to.deep.equal(RETURN_CODE.PROCESSING);
-      }
-      //expect(script.data.val).to.deep.equal(2);
-      //expect(script.data.val_2).to.deep.equal(1);
-      {
-        const { return_code } = script.process(null);
-        expect(return_code).to.deep.equal(RETURN_CODE.PROCESSING);
-      }
-      {
+        logger.debug("## Forward " + 3);
         const { return_code } = script.process(null);
         expect(return_code).to.deep.equal(RETURN_CODE.PROCESSED);
       }

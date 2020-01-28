@@ -1,4 +1,8 @@
 const { RETURN_CODE } = require("./return_code");
+const logger = require("../../logger").create_logger({
+  module_name: "am_framework",
+  file_name: __filename
+});
 
 /**
  * Commands:
@@ -18,11 +22,14 @@ const { RETURN_CODE } = require("./return_code");
  */
 class Internal {
   constructor() {
+    this.id = null;
     this._command = "";
     this._arg = "";
   }
 
   process(script, root) {
+    logger.debug(`process Type[Internal] ID[${this.id}]`);
+
     if (script._goto_find.enabled) {
       if (
         this._command === "label" &&

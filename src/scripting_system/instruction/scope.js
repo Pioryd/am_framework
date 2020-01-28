@@ -1,7 +1,12 @@
 const { RETURN_CODE } = require("./return_code");
+const logger = require("../../logger").create_logger({
+  module_name: "am_framework",
+  file_name: __filename
+});
 
 class Scope {
   constructor() {
+    this.id = null;
     this._childs = [];
     this._current_child_index = 0;
     this._debug_info = {};
@@ -12,6 +17,8 @@ class Scope {
   }
 
   process(script, root) {
+    logger.debug(`process Type[Scope] ID[${this.id}]`);
+
     // Internal:goto
     if (script._goto_find.enabled) {
       this._current_child_index = 0;

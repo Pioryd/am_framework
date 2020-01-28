@@ -162,57 +162,70 @@
     "data": { "val": 0, "val_2": 0 },
     "root_scope": {
       "type": "scope",
+      "id": "1",
       "instructions": [
-        { "type": "js", "body": "script.data.val = -1" },
+        { "type": "js", "id": "2", "body": "script.data.val = -1" },
         {
           "type": "if",
+          "id": "3",
           "conditions": {
             "script.data.val === 999": [
-              { "type": "internal", "command": "label test_2" },
-              { "type": "js", "body": "script.data.val += 2" },
-              { "type": "internal", "command": "goto test_3" }
+              { "type": "internal", "id": "4", "command": "label test_2" },
+              { "type": "js", "id": "5", "body": "script.data.val += 2" },
+              { "type": "internal", "id": "6", "command": "goto test_3" }
             ]
           }
         },
-        { "type": "js", "body": "script.data.val = script.data.val" },
+        {
+          "type": "js",
+          "id": "7",
+          "body": "script.data.val = script.data.val"
+        },
         {
           "type": "if",
+          "id": "8",
           "conditions": {
             "script.data.val === 0": [
-              { "type": "js", "body": "script.data.val++" },
-              { "type": "js", "body": "script.data.val += 2" }
+              { "type": "js", "id": "9", "body": "script.data.val++" },
+              { "type": "js", "id": "10", "body": "script.data.val += 2" }
             ],
             "script.data.val === -1": [
-              { "type": "js", "body": "script.data.val++" },
-              { "type": "internal", "command": "goto test_1" },
-              { "type": "js", "body": "script.data.val += 3" }
+              { "type": "js", "id": "11", "body": "script.data.val++" },
+              { "type": "internal", "id": "12", "command": "goto test_1" },
+              { "type": "js", "id": "13", "body": "script.data.val += 3" }
             ],
             "": [
-              { "type": "js", "body": "script.data.val++" },
-              { "type": "js", "body": "script.data.val += 4" }
+              { "type": "js", "id": "14", "body": "script.data.val++" },
+              { "type": "js", "id": "15", "body": "script.data.val += 4" }
             ]
           }
         },
-        { "type": "js", "body": "script.data.val++" },
+        { "type": "js", "id": "16", "body": "script.data.val++" },
         {
           "type": "while",
+          "id": "17",
           "condition": "script.data.val < 10",
           "instructions": [
-            { "type": "js", "body": "script.data.val = script.data.val" },
+            {
+              "type": "js",
+              "id": "18",
+              "body": "script.data.val = script.data.val"
+            },
             {
               "type": "scope",
+              "id": "19",
               "instructions": [
-                { "type": "js", "body": "script.data.val++" },
-                { "type": "internal", "command": "label test_1" },
-                { "type": "js", "body": "script.data.val_2++" },
-                { "type": "internal", "command": "goto test_2" },
-                { "type": "js", "body": "script.data.val_2++" }
+                { "type": "js", "id": "20", "body": "script.data.val++" },
+                { "type": "internal", "id": "21", "command": "label test_1" },
+                { "type": "js", "id": "22", "body": "script.data.val_2++" },
+                { "type": "internal", "id": "23", "command": "goto test_2" },
+                { "type": "js", "id": "24", "body": "script.data.val_2++" }
               ]
             },
-            { "type": "js", "body": "script.data.val--" }
+            { "type": "js", "id": "25", "body": "script.data.val--" }
           ]
         },
-        { "type": "internal", "command": "label test_3" }
+        { "type": "internal", "id": "26", "command": "label test_3" }
       ]
     }
   }

@@ -11,6 +11,13 @@ const Scope_FOR = require("./scope_for");
 const Internal = require("./internal");
 
 function parse(instruction) {
+  if (!("id" in instruction)) {
+    throw logger.error(
+      "Not found ID. Unable to parse_instruction: ",
+      instruction
+    );
+  }
+
   const instructions_map = {
     scope: parse_instruction_scope,
     internal: parse_instruction_internal,
@@ -30,6 +37,7 @@ function parse_instruction_scope(instruction) {
     throw logger.error("Unable to parse_instruction: ", instruction);
 
   const scope = new Scope();
+  scope.id = instruction.id;
   for (const source of instruction.instructions)
     scope._childs.push(parse(source));
 
@@ -43,6 +51,7 @@ function parse_instruction_internal(instruction) {
   const [command, arg] = instruction.command.split(" ");
 
   const internal = new Internal();
+  internal.id = instruction.id;
   internal._command = command;
   internal._arg = arg;
 
@@ -54,23 +63,23 @@ function parse_instruction_js(instruction) {
     throw logger.error("Unable to parse_instruction_js: ", instruction);
 
   const js = new JS();
+  js.id = instruction.id;
   js._fn = Util.string_to_function(`(script, root){${instruction.body};}`);
   return js;
 }
 
 function parse_instruction_api(instruction) {
-  const api_formated_string =
-    "root.api[" +
-    instruction.api.replace(".", "][") +
-    "]" +
-    "(" +
-    "script" +
-    `"${"timeout" in instruction ? instruction.timeout : ""}", ` +
-    `"${"return" in instruction ? instruction.return : ""}", ` +
-    instruction.args.toString() +
-    ")";
-
-  return Util.string_to_function(`(script, root){${api_formated_string};}`);
+  // const api_formated_string =
+  //   "root.api[" +
+  //   instruction.api.replace(".", "][") +
+  //   "]" +
+  //   "(" +
+  //   "script" +
+  //   `"${"timeout" in instruction ? instruction.timeout : ""}", ` +
+  //   `"${"return" in instruction ? instruction.return : ""}", ` +
+  //   instruction.args.toString() +
+  //   ")";
+  // return Util.string_to_function(`(script, root){${api_formated_string};}`);
 }
 
 function parse_instruction_if(instruction) {
@@ -78,6 +87,7 @@ function parse_instruction_if(instruction) {
     throw logger.error("Unable to parse_instruction_if: ", instruction);
 
   const scope_if = new Scope_IF();
+  scope_if.id = instruction.id;
   for (const [fn_source, instructions_source] of Object.entries(
     instruction.conditions
   )) {
@@ -102,6 +112,7 @@ function parse_instruction_while(instruction) {
     throw logger.error("Unable to parse_instruction_while: ", instruction);
 
   const scope_while = new Scope_WHILE();
+  scope_while.id = instruction.id;
   scope_while._condition = Util.string_to_function(
     `(script, root){return ${condition === "" ? "true" : condition};}`
   );
@@ -120,6 +131,7 @@ function parse_instruction_for(instruction) {
     ";"
   );
   const scope_for = new Scope_FOR();
+  scope_for.id = instruction.id;
   if (init_source !== "")
     scope_for._init = Util.string_to_function(
       `(script, root){${init_source};}`
