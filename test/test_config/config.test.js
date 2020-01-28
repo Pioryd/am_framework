@@ -1,7 +1,7 @@
-const assert = require("assert");
+var { expect } = require("chai");
 const fs = require("fs");
-const { Config } = require("../src/config");
-const { Util } = require("../src/util");
+const { Config } = require("../../src/config");
+const { Util } = require("../../src/util");
 const path = require("path");
 
 const config_path_dist_full_name = path.join(__dirname, "config.test.json");
@@ -13,12 +13,6 @@ const config_path_temp_full_name = path.join(
 let config = null;
 
 describe("Config test", () => {
-  function delay(interval) {
-    return it("Delay", done => {
-      setTimeout(() => done(), interval);
-    }).timeout(interval + 100); // The extra 100ms should guarantee the test will not fail due to exceeded timeout
-  }
-
   before(function() {
     fs.copyFileSync(
       config_path_dist_full_name,
@@ -29,17 +23,17 @@ describe("Config test", () => {
     );
 
     if (config != null) config.terminate();
-    config = new Config(config_path_temp_full_name);
+    config = new Config({ file_full_name: config_path_temp_full_name });
   });
 
   it("Is config.data null at start?", () => {
-    assert.equal(config.data, null);
+    expect(config.data).to.equal(null);
   });
 
   it("Load", () => {
     config.load();
-    assert.equal(config.data.port, 3000);
-    assert.equal(config.data.text, "hello");
+    expect(config.data.port).to.equal(3000);
+    expect(config.data.text).to.equal("hello");
   });
 
   it("Change data", () => {
@@ -50,14 +44,15 @@ describe("Config test", () => {
   });
 
   it("Is file watch working?", () => {
-    assert.equal(config.data.port, 4000);
+    expect(config.data.port).to.equal(4000);
   });
 
   it("Terminate config", () => {
-    assert.doesNotThrow(() => {
+    expect(() => {
       config.terminate();
-    }, Error);
+    }).to.not.throw(Error);
 
-    fs.unlinkSync(config_path_temp_full_name);
+    if (fs.existsSync(config_path_temp_full_name))
+      fs.unlinkSync(config_path_temp_full_name);
   });
 });

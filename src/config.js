@@ -3,7 +3,7 @@ const { Util } = require("./util");
 
 // Config i async
 class Config {
-  constructor({ file_full_name, on_update }) {
+  constructor({ file_full_name, on_update = () => {} }) {
     this.file_full_name = file_full_name;
     this.on_update = on_update;
     this.data = null;
@@ -28,7 +28,11 @@ class Config {
   }
 
   terminate() {
-    if (this.watcher != null) this.watcher.close();
+    if (this.watcher != null) {
+      this.watcher.close();
+      this.watcher = null;
+    }
+
     this.save();
   }
 }
