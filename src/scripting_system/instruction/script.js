@@ -17,6 +17,8 @@ class Script {
     this._goto_find = { enabled: false, label_name: "" };
 
     this._debug_enabled = false;
+
+    this._timeout_list = { instructions: {} };
   }
 
   process(script, root) {
@@ -68,6 +70,23 @@ class Script {
   goto(label_name) {
     this._goto_find.enabled = true;
     this._goto_find.label_name = label_name;
+  }
+
+  timeout(timeout, id) {
+    if (timeout == null || timeout == 0) return true;
+
+    if (id in this._timeout_list.instructions) {
+      if (this._timeout_list.instructions[id].stopwatch.is_elapsed()) {
+        delete this._timeout_list.instructions[id];
+        return false;
+      }
+    } else {
+      this._timeout_list.instructions[id] = {
+        stopwatch: new Stopwatch(timeout)
+      };
+    }
+
+    return true;
   }
 
   print_debug(...args) {

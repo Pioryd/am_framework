@@ -68,21 +68,25 @@ class Scope_IF {
     const { childs } = this._conditions[this._selected_condition_index];
 
     if (this._current_child_index < childs.length) {
-      const { return_code, internal } = childs[
-        this._current_child_index
-      ].process(script, root);
+      const child = childs[this._current_child_index];
 
-      if (
-        internal === "goto" ||
-        internal === "break" ||
-        internal === "continue"
-      ) {
-        this._reset();
-        return { return_code: RETURN_CODE.PROCESSING, internal };
-      } else if (return_code === RETURN_CODE.PROCESSED) {
+      if (!script.timeout(child._timeout, child.id)) {
         this._current_child_index++;
-      } else if (return_code === RETURN_CODE.PROCESSING) {
-        return { return_code: RETURN_CODE.PROCESSING };
+      } else {
+        const { return_code, internal } = child.process(script, root);
+
+        if (
+          internal === "goto" ||
+          internal === "break" ||
+          internal === "continue"
+        ) {
+          this._reset();
+          return { return_code: RETURN_CODE.PROCESSING, internal };
+        } else if (return_code === RETURN_CODE.PROCESSED) {
+          this._current_child_index++;
+        } else if (return_code === RETURN_CODE.PROCESSING) {
+          return { return_code: RETURN_CODE.PROCESSING };
+        }
       }
     }
 

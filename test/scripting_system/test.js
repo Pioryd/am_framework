@@ -269,9 +269,57 @@ describe("Scripting system test", () => {
     }).to.throw();
   });
 
+  describe("Timeout", () => {
+    it("timeout - Scope", () => {
+      const script = parse(root, root.scripts["Test_timeout_scope"]);
+
+      // Scope
+      let while_return_code = RETURN_CODE.PROCESSING;
+      while (while_return_code === RETURN_CODE.PROCESSING) {
+        const { return_code } = script.process(null, root);
+        while_return_code = return_code;
+      }
+      expect(script.data.val).to.deep.equal(3);
+    });
+
+    it("timeout - If", () => {
+      const script = parse(root, root.scripts["Test_timeout_if"]);
+
+      // If
+      while_return_code = RETURN_CODE.PROCESSING;
+      while (while_return_code === RETURN_CODE.PROCESSING) {
+        const { return_code } = script.process(null, root);
+        while_return_code = return_code;
+      }
+      expect(script.data.val).to.deep.equal(3);
+    });
+
+    it("timeout - While", () => {
+      const script = parse(root, root.scripts["Test_timeout_while"]);
+
+      // If
+      while_return_code = RETURN_CODE.PROCESSING;
+      while (while_return_code === RETURN_CODE.PROCESSING) {
+        const { return_code } = script.process(null, root);
+        while_return_code = return_code;
+      }
+      expect(script.data.val).to.deep.equal(3);
+    });
+
+    it("timeout - For", () => {
+      const script = parse(root, root.scripts["Test_timeout_for"]);
+
+      // If
+      while_return_code = RETURN_CODE.PROCESSING;
+      while (while_return_code === RETURN_CODE.PROCESSING) {
+        const { return_code } = script.process(null, root);
+        while_return_code = return_code;
+      }
+      expect(script.data.val).to.deep.equal(3);
+    });
+  });
   it("inside script", () => {
     const script = parse(root, root.scripts["Test_inside_script"]);
-    script._debug_enabled = true;
 
     // No timeout - Test_scope
     for (let i = 0; i < 4; i++) {

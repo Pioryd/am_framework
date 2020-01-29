@@ -73,22 +73,26 @@ class Scope_FOR {
     }
 
     if (this._current_child_index < this._childs.length) {
-      const { return_code, internal } = this._childs[
-        this._current_child_index
-      ].process(script, root);
+      const child = this._childs[this._current_child_index];
 
-      if (internal === "goto") {
-        this._reset();
-        return { return_code: RETURN_CODE.PROCESSING };
-      } else if (internal === "break") {
-        this._reset();
-        return { return_code: RETURN_CODE.PROCESSED };
-      } else if (internal === "continue") {
-        this._current_child_index = this._childs.length;
-      } else if (return_code === RETURN_CODE.PROCESSED) {
+      if (!script.timeout(child._timeout, child.id)) {
         this._current_child_index++;
-      } else if (return_code === RETURN_CODE.PROCESSING) {
-        return { return_code: RETURN_CODE.PROCESSING };
+      } else {
+        const { return_code, internal } = child.process(script, root);
+
+        if (internal === "goto") {
+          this._reset();
+          return { return_code: RETURN_CODE.PROCESSING };
+        } else if (internal === "break") {
+          this._reset();
+          return { return_code: RETURN_CODE.PROCESSED };
+        } else if (internal === "continue") {
+          this._current_child_index = this._childs.length;
+        } else if (return_code === RETURN_CODE.PROCESSED) {
+          this._current_child_index++;
+        } else if (return_code === RETURN_CODE.PROCESSING) {
+          return { return_code: RETURN_CODE.PROCESSING };
+        }
       }
     }
 

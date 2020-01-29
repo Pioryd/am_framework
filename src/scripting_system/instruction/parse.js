@@ -32,6 +32,7 @@ function parse_instruction_scope(root, instruction) {
 
   const scope = new Scope();
   scope.id = instruction.id;
+  scope._timeout = instruction.timeout;
   for (const source of instruction.instructions)
     scope._childs.push(parse(root, source));
 
@@ -46,6 +47,7 @@ function parse_instruction_internal(root, instruction) {
 
   const internal = new Internal();
   internal.id = instruction.id;
+  internal._timeout = instruction.timeout;
   internal._command = command;
   internal._arg = arg;
 
@@ -58,6 +60,7 @@ function parse_instruction_js(root, instruction) {
 
   const js = new JS();
   js.id = instruction.id;
+  js._timeout = instruction.timeout;
   js._fn = Util.string_to_function(`(script, root){${instruction.body};}`);
   return js;
 }
@@ -68,6 +71,7 @@ function parse_instruction_if(root, instruction) {
 
   const scope_if = new Scope_IF();
   scope_if.id = instruction.id;
+  scope_if._timeout = instruction.timeout;
   for (const [fn_source, instructions_source] of Object.entries(
     instruction.conditions
   )) {
@@ -96,6 +100,7 @@ function parse_instruction_while(root, instruction) {
 
   const scope_while = new Scope_WHILE();
   scope_while.id = instruction.id;
+  scope_while._timeout = instruction.timeout;
   scope_while._condition = Util.string_to_function(
     `(script, root){return ${
       instruction.condition === "" ? "true" : instruction.condition
@@ -123,6 +128,7 @@ function parse_instruction_for(root, instruction) {
   ] = instruction.condition.split(";");
   const scope_for = new Scope_FOR();
   scope_for.id = instruction.id;
+  scope_for._timeout = instruction.timeout;
   if (init_source !== "")
     scope_for._init = Util.string_to_function(
       `(script, root){${init_source};}`
@@ -161,6 +167,7 @@ function parse_instruction_script(root, instruction) {
   const script = new Script();
   script._source = instruction;
   script._name = instruction.name;
+  script._timeout = instruction.timeout;
   script.data = JSON.parse(JSON.stringify(data));
   script._root_scope = parse(root, root_scope);
   return script;
