@@ -19,15 +19,15 @@ class Stopper {
   }
 
   get_elapsed_milliseconds() {
-    return new Date() - this.start_time;
+    return this.diff_time;
   }
 
   get_elapsed_seconds() {
-    return (new Date() - this.start_time) / 1000;
+    return this.diff_time / 1000;
   }
 
   get_elapsed_hours() {
-    return (new Date() - this.start_time) / 1000 / 60;
+    return this.diff_time / 1000 / 60;
   }
 }
 
