@@ -11,7 +11,7 @@ const Scope_FOR = require("./scope_for");
 const Internal = require("./internal");
 const Script = require("./script");
 
-function parse(instruction) {
+function parse(root, instruction) {
   const instructions_map = {
     scope: parse_instruction_scope,
     internal: parse_instruction_internal,
@@ -23,22 +23,22 @@ function parse(instruction) {
     script: parse_instruction_script
   };
 
-  return instructions_map[instruction.type](instruction);
+  return instructions_map[instruction.type](root, instruction);
 }
 
-function parse_instruction_scope(instruction) {
+function parse_instruction_scope(root, instruction) {
   if (instruction.instructions == null || instruction.id == null)
     throw "Unable to parse_instruction: " + instruction;
 
   const scope = new Scope();
   scope.id = instruction.id;
   for (const source of instruction.instructions)
-    scope._childs.push(parse(source));
+    scope._childs.push(parse(root, source));
 
   return scope;
 }
 
-function parse_instruction_internal(instruction) {
+function parse_instruction_internal(root, instruction) {
   if (instruction.command == null || instruction.id == null)
     throw "Unable to parse_instruction_internal: " + instruction;
 
@@ -52,7 +52,7 @@ function parse_instruction_internal(instruction) {
   return internal;
 }
 
-function parse_instruction_js(instruction) {
+function parse_instruction_js(root, instruction) {
   if (instruction.body == null || instruction.id == null)
     throw "Unable to parse_instruction_js: " + instruction;
 
@@ -62,7 +62,7 @@ function parse_instruction_js(instruction) {
   return js;
 }
 
-function parse_instruction_if(instruction) {
+function parse_instruction_if(root, instruction) {
   if (instruction.conditions == null || instruction.id == null)
     throw "Unable to parse_instruction_if: " + instruction;
 
@@ -73,7 +73,7 @@ function parse_instruction_if(instruction) {
   )) {
     const childs = [];
 
-    for (const source of instructions_source) childs.push(parse(source));
+    for (const source of instructions_source) childs.push(parse(root, source));
 
     scope_if._conditions.push({
       fn: Util.string_to_function(
@@ -86,7 +86,7 @@ function parse_instruction_if(instruction) {
   return scope_if;
 }
 
-function parse_instruction_while(instruction) {
+function parse_instruction_while(root, instruction) {
   if (
     instruction.condition == null ||
     instruction.instructions == null ||
@@ -103,12 +103,12 @@ function parse_instruction_while(instruction) {
   );
 
   for (const source of instruction.instructions)
-    scope_while._childs.push(parse(source));
+    scope_while._childs.push(parse(root, source));
 
   return scope_while;
 }
 
-function parse_instruction_for(instruction) {
+function parse_instruction_for(root, instruction) {
   if (
     instruction.condition == null ||
     instruction.instructions == null ||
@@ -137,24 +137,36 @@ function parse_instruction_for(instruction) {
     );
 
   for (const source of instruction.instructions)
-    scope_for._childs.push(parse(source));
+    scope_for._childs.push(parse(root, source));
 
   return scope_for;
 }
 
-function parse_instruction_script(instruction) {
-  if (instruction.name == null || instruction.data == null)
+function parse_instruction_script(root, instruction) {
+  if (
+    instruction.name == null ||
+    (instruction.id == null &&
+      (instruction.data == null || instruction.root_scope == null))
+  )
     throw "Unable to parse_instruction_script: " + instruction;
+
+  let data = instruction.data;
+  let root_scope = instruction.root_scope;
+  if (data == null || root_scope == null) {
+    const script_source = root.scripts[instruction.name];
+    data = script_source.data;
+    root_scope = script_source.root_scope;
+  }
 
   const script = new Script();
   script._source = instruction;
   script._name = instruction.name;
-  script.data = JSON.parse(JSON.stringify(instruction.data));
-  script._root_scope = parse(instruction.root_scope);
+  script.data = JSON.parse(JSON.stringify(data));
+  script._root_scope = parse(root, root_scope);
   return script;
 }
 
-function parse_instruction_api(instruction) {
+function parse_instruction_api(root, instruction) {
   // const api_formated_string =
   //   "root.api[" +
   //   instruction.api.replace(".", "][") +
