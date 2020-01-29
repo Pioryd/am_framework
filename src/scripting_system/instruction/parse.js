@@ -12,10 +12,7 @@ const Internal = require("./internal");
 
 function parse(instruction) {
   if (!("id" in instruction)) {
-    throw logger.error(
-      "Not found ID. Unable to parse_instruction: ",
-      instruction
-    );
+    throw ("Not found ID. Unable to parse_instruction: ", instruction);
   }
 
   const instructions_map = {
@@ -33,8 +30,8 @@ function parse(instruction) {
 }
 
 function parse_instruction_scope(instruction) {
-  if (!("instructions" in instruction) || instruction.instructions.length === 0)
-    throw logger.error("Unable to parse_instruction: ", instruction);
+  if (!("instructions" in instruction))
+    throw ("Unable to parse_instruction: ", instruction);
 
   const scope = new Scope();
   scope.id = instruction.id;
@@ -46,7 +43,7 @@ function parse_instruction_scope(instruction) {
 
 function parse_instruction_internal(instruction) {
   if (!("command" in instruction))
-    throw logger.error("Unable to parse_instruction_internal: ", instruction);
+    throw ("Unable to parse_instruction_internal: ", instruction);
 
   const [command, arg] = instruction.command.split(" ");
 
@@ -60,7 +57,7 @@ function parse_instruction_internal(instruction) {
 
 function parse_instruction_js(instruction) {
   if (!("body" in instruction))
-    throw logger.error("Unable to parse_instruction_js: ", instruction);
+    throw ("Unable to parse_instruction_js: ", instruction);
 
   const js = new JS();
   js.id = instruction.id;
@@ -84,7 +81,7 @@ function parse_instruction_api(instruction) {
 
 function parse_instruction_if(instruction) {
   if (!("conditions" in instruction))
-    throw logger.error("Unable to parse_instruction_if: ", instruction);
+    throw ("Unable to parse_instruction_if: ", instruction);
 
   const scope_if = new Scope_IF();
   scope_if.id = instruction.id;
@@ -109,7 +106,7 @@ function parse_instruction_if(instruction) {
 function parse_instruction_while(instruction) {
   const { condition, instructions } = instruction;
   if (condition == null || instructions == null)
-    throw logger.error("Unable to parse_instruction_while: ", instruction);
+    throw ("Unable to parse_instruction_while: ", instruction);
 
   const scope_while = new Scope_WHILE();
   scope_while.id = instruction.id;
@@ -125,7 +122,7 @@ function parse_instruction_while(instruction) {
 function parse_instruction_for(instruction) {
   const { condition, instructions } = instruction;
   if (condition == null || instructions == null)
-    throw logger.error("Unable to parse_instruction_for: ", instruction);
+    throw ("Unable to parse_instruction_for: ", instruction);
 
   const [init_source, condition_source, increment_source] = condition.split(
     ";"
