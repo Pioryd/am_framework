@@ -13,17 +13,41 @@ const Script = require("./script");
 
 function parse(root, instruction) {
   const instructions_map = {
-    scope: parse_instruction_scope,
     internal: parse_instruction_internal,
     js: parse_instruction_js,
-    api: parse_instruction_api,
+    scope: parse_instruction_scope,
     if: parse_instruction_if,
     while: parse_instruction_while,
     for: parse_instruction_for,
-    script: parse_instruction_script
+    script: parse_instruction_script,
+    api: parse_instruction_api
   };
 
   return instructions_map[instruction.type](root, instruction);
+}
+
+function parse_instruction_internal(root, instruction) {
+  if (instruction.command == null || instruction.id == null)
+    throw "Unable to parse_instruction_internal: " + instruction;
+
+  const [command, arg] = instruction.command.split(" ");
+
+  const internal = new Internal();
+  internal.id = instruction.id;
+  internal._command = command;
+  internal._arg = arg;
+
+  return internal;
+}
+
+function parse_instruction_js(root, instruction) {
+  if (instruction.body == null || instruction.id == null)
+    throw "Unable to parse_instruction_js: " + instruction;
+
+  const js = new JS();
+  js.id = instruction.id;
+  js._fn = Util.string_to_function(`(script, root){${instruction.body};}`);
+  return js;
 }
 
 function parse_instruction_scope(root, instruction) {
@@ -37,32 +61,6 @@ function parse_instruction_scope(root, instruction) {
     scope._childs.push(parse(root, source));
 
   return scope;
-}
-
-function parse_instruction_internal(root, instruction) {
-  if (instruction.command == null || instruction.id == null)
-    throw "Unable to parse_instruction_internal: " + instruction;
-
-  const [command, arg] = instruction.command.split(" ");
-
-  const internal = new Internal();
-  internal.id = instruction.id;
-  internal._timeout = instruction.timeout;
-  internal._command = command;
-  internal._arg = arg;
-
-  return internal;
-}
-
-function parse_instruction_js(root, instruction) {
-  if (instruction.body == null || instruction.id == null)
-    throw "Unable to parse_instruction_js: " + instruction;
-
-  const js = new JS();
-  js.id = instruction.id;
-  js._timeout = instruction.timeout;
-  js._fn = Util.string_to_function(`(script, root){${instruction.body};}`);
-  return js;
 }
 
 function parse_instruction_if(root, instruction) {

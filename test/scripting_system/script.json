@@ -618,6 +618,33 @@
       ]
     }
   },
+  "Test_timeout_script": {
+    "type": "script",
+    "name": "Test_timeout_script",
+    "data": { "val": 0 },
+    "root_scope": {
+      "type": "scope",
+      "id": "Test_timeout_script_0",
+      "instructions": [
+        {
+          "type": "js",
+          "id": "Test_timeout_script_1",
+          "body": "script.data.val++"
+        },
+        {
+          "type": "script",
+          "timeout": 20,
+          "name": "Test_timeout_scope",
+          "id": "Test_timeout_script_2"
+        },
+        {
+          "type": "js",
+          "id": "Test_timeout_script_3",
+          "body": "script.data.val++"
+        }
+      ]
+    }
+  },
   "Test_inside_script": {
     "type": "script",
     "name": "Test_inside_script",

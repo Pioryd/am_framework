@@ -317,11 +317,21 @@ describe("Scripting system test", () => {
       }
       expect(script.data.val).to.deep.equal(3);
     });
+    it("timeout - Script", () => {
+      const script = parse(root, root.scripts["Test_timeout_script"]);
+
+      // Script inside script inside script
+      while_return_code = RETURN_CODE.PROCESSING;
+      while (while_return_code === RETURN_CODE.PROCESSING) {
+        const { return_code } = script.process(null, root);
+        while_return_code = return_code;
+      }
+      expect(script.data.val).to.deep.equal(4);
+    });
   });
   it("inside script", () => {
     const script = parse(root, root.scripts["Test_inside_script"]);
 
-    // No timeout - Test_scope
     for (let i = 0; i < 4; i++) {
       const { return_code } = script.process(null, root);
       expect(return_code).to.deep.equal(
@@ -330,13 +340,5 @@ describe("Scripting system test", () => {
       );
     }
     expect(script.data.val).to.deep.equal(4);
-
-    //   // Timeout 20 - Test_internal_sleep
-    //   let while_return_code = RETURN_CODE.PROCESSING;
-    //   while (while_return_code === RETURN_CODE.PROCESSING) {
-    //     const { return_code } = script.process(null, root);
-    //     while_return_code = return_code;
-    //   }
-    //   expect(script.data.val).to.deep.equal(6);
   });
 });
