@@ -253,5 +253,23 @@
         { "type": "internal", "id": "26", "command": "label test_3" }
       ]
     }
+  },
+  "Test_unhandled_internal": {
+    "data": { "val": 0 },
+    "root_scope": {
+      "type": "if",
+      "id": "0",
+      "conditions": {
+        "script.data.val === 0": [
+          { "type": "internal", "id": "1", "command": "break" }
+        ],
+        "script.data.val === 1": [
+          { "type": "internal", "id": "2", "command": "continue" }
+        ],
+        "script.data.val === 2": [
+          { "type": "internal", "id": "3", "command": "goto test" }
+        ]
+      }
+    }
   }
 }

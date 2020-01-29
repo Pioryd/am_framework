@@ -45,8 +45,15 @@ class Script {
 
     const { return_code, internal } = this._root_scope.process(this, root);
 
-    if (internal === "goto") return { return_code: RETURN_CODE.PROCESSING };
-    else return { return_code };
+    if (internal === "goto") {
+      return { return_code: RETURN_CODE.PROCESSING };
+    } else if (internal === "break") {
+      throw "Unable to find [break]";
+    } else if (internal === "continue") {
+      throw "Unable to find [continue]";
+    } else {
+      return { return_code };
+    }
   }
 
   sleep(time) {

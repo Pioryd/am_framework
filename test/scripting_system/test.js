@@ -303,4 +303,31 @@ describe("Scripting system test", () => {
       expect(script.data.val_2).to.deep.equal(1);
     });
   });
+  it("unhandled_internal", () => {
+    const script_name = "Test_unhandled_internal";
+    const script = new Script({
+      name: script_name,
+      source: source[script_name],
+      root
+    });
+
+    script.data.val = 0;
+    script.process();
+    expect(() => {
+      script.process();
+    }).to.throw();
+
+    script.data.val = 1;
+    script.process();
+    expect(() => {
+      script.process();
+    }).to.throw();
+
+    script.data.val = 2;
+    script.process();
+    script.process();
+    expect(() => {
+      script.process();
+    }).to.throw();
+  });
 });
