@@ -28,7 +28,7 @@ function parse(instruction) {
 
 function parse_instruction_scope(instruction) {
   if (instruction.instructions == null || instruction.id == null)
-    throw ("Unable to parse_instruction: ", instruction);
+    throw "Unable to parse_instruction: " + instruction;
 
   const scope = new Scope();
   scope.id = instruction.id;
@@ -40,7 +40,7 @@ function parse_instruction_scope(instruction) {
 
 function parse_instruction_internal(instruction) {
   if (instruction.command == null || instruction.id == null)
-    throw ("Unable to parse_instruction_internal: ", instruction);
+    throw "Unable to parse_instruction_internal: " + instruction;
 
   const [command, arg] = instruction.command.split(" ");
 
@@ -54,7 +54,7 @@ function parse_instruction_internal(instruction) {
 
 function parse_instruction_js(instruction) {
   if (instruction.body == null || instruction.id == null)
-    throw ("Unable to parse_instruction_js: ", instruction);
+    throw "Unable to parse_instruction_js: " + instruction;
 
   const js = new JS();
   js.id = instruction.id;
@@ -64,7 +64,7 @@ function parse_instruction_js(instruction) {
 
 function parse_instruction_if(instruction) {
   if (instruction.conditions == null || instruction.id == null)
-    throw ("Unable to parse_instruction_if: ", instruction);
+    throw "Unable to parse_instruction_if: " + instruction;
 
   const scope_if = new Scope_IF();
   scope_if.id = instruction.id;
@@ -92,7 +92,7 @@ function parse_instruction_while(instruction) {
     instruction.instructions == null ||
     instruction.id == null
   )
-    throw ("Unable to parse_instruction_while: ", instruction);
+    throw "Unable to parse_instruction_while: " + instruction;
 
   const scope_while = new Scope_WHILE();
   scope_while.id = instruction.id;
@@ -114,7 +114,7 @@ function parse_instruction_for(instruction) {
     instruction.instructions == null ||
     instruction.id == null
   )
-    throw ("Unable to parse_instruction_for: ", instruction);
+    throw "Unable to parse_instruction_for: " + instruction;
 
   const [
     init_source,
@@ -144,7 +144,7 @@ function parse_instruction_for(instruction) {
 
 function parse_instruction_script(instruction) {
   if (instruction.name == null || instruction.data == null)
-    throw ("Unable to parse_instruction_script: ", instruction);
+    throw "Unable to parse_instruction_script: " + instruction;
 
   const script = new Script();
   script._source = instruction;
