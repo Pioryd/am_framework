@@ -37,9 +37,11 @@ class Script {
     if (this._goto_find.enabled) {
       const { return_code } = this._root_scope.process(current_script, root);
 
-      if (!this._goto_find.enabled) return { return_code };
-      else if (return_code === RETURN_CODE.PROCESSED)
+      if (!this._goto_find.enabled) {
+        return { return_code };
+      } else if (return_code === RETURN_CODE.PROCESSED) {
         throw "Unable to find [goto label]";
+      }
     }
 
     const { return_code, internal } = this._root_scope.process(
