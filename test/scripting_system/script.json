@@ -1,5 +1,7 @@
 {
   "Test_js": {
+    "type": "script",
+    "name": "Test_js",
     "data": { "val": 0 },
     "root_scope": {
       "type": "scope",
@@ -8,6 +10,8 @@
     }
   },
   "Test_scope": {
+    "type": "script",
+    "name": "Test_scope",
     "data": { "val": 0 },
     "root_scope": {
       "type": "scope",
@@ -20,6 +24,8 @@
     }
   },
   "Test_scope_if": {
+    "type": "script",
+    "name": "Test_scope_if",
     "data": { "val": 0 },
     "root_scope": {
       "type": "if",
@@ -41,6 +47,8 @@
     }
   },
   "Test_scope_while": {
+    "type": "script",
+    "name": "Test_scope_while",
     "data": { "val": 0 },
     "root_scope": {
       "type": "while",
@@ -53,6 +61,8 @@
     }
   },
   "Test_scope_for": {
+    "type": "script",
+    "name": "Test_scope_for",
     "data": { "val": 0 },
     "root_scope": {
       "type": "for",
@@ -65,6 +75,8 @@
     }
   },
   "Test_internal_break": {
+    "type": "script",
+    "name": "Test_internal_break",
     "data": { "val": 0, "val_2": 0 },
     "root_scope": {
       "type": "scope",
@@ -119,6 +131,8 @@
     }
   },
   "Test_internal_continue": {
+    "type": "script",
+    "name": "Test_internal_continue",
     "data": { "val": 0, "val_2": 0 },
     "root_scope": {
       "type": "scope",
@@ -172,6 +186,8 @@
     }
   },
   "Test_internal_sleep": {
+    "type": "script",
+    "name": "Test_internal_sleep",
     "data": { "val": 0 },
     "root_scope": {
       "type": "scope",
@@ -184,6 +200,8 @@
     }
   },
   "Test_label_and_goto": {
+    "type": "script",
+    "name": "Test_label_and_goto",
     "data": { "val": 0, "val_2": 0 },
     "root_scope": {
       "type": "scope",
@@ -255,6 +273,8 @@
     }
   },
   "Test_unhandled_internal": {
+    "type": "script",
+    "name": "Test_unhandled_internal",
     "data": { "val": 0 },
     "root_scope": {
       "type": "if",
@@ -270,6 +290,24 @@
           { "type": "internal", "id": "3", "command": "goto test" }
         ]
       }
+    }
+  },
+  "Test_script": {
+    "type": "script",
+    "name": "Test_script",
+    "data": { "val": 0, "max": 10 },
+    "root_scope": {
+      "type": "scope",
+      "id": 1,
+      "instructions": [
+        {
+          "type": "api",
+          "id": 2,
+          "name": "std.upgrade_number",
+          "args": ["min:5", "max:script.data.max"],
+          "return": "script.data.val"
+        }
+      ]
     }
   }
 }
