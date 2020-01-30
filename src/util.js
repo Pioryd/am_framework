@@ -97,7 +97,11 @@ class Util {
       string.lastIndexOf("}")
     );
 
-    return new Function(...params_names, body);
+    try {
+      return new Function(...params_names, body);
+    } catch (e) {
+      console.log({ ...params_names, body }, "Exception:", e);
+    }
   }
 }
 
