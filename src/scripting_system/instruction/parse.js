@@ -160,6 +160,7 @@ function parse_instruction_script(root, instruction) {
 
   const script = new Script();
   script._source = instruction;
+  script.id = instruction.id;
   script._name = instruction.name;
   script._timeout = instruction.timeout;
   script.data = JSON.parse(JSON.stringify(data));
@@ -172,16 +173,20 @@ function parse_instruction_api(root, instruction) {
     throw "Unable to parse_instruction_api: " + instruction;
 
   const timeout = instruction.timeout != null ? instruction.timeout : "null";
-  const return_value =
-    instruction.return_value != null ? instruction.return_value : "null";
+  const return_value = instruction.return != null ? instruction.return : "null";
   let args =
     "{" + (instruction.args != null ? instruction.args.toString() : "") + "}";
   let body =
-    `root.api.${instruction.name}` + `(${timeout}, ${return_value}, ${args})`;
+    `const query_id = root.generate_id();` +
+    `script.add_return_value(query_id, ${timeout});` +
+    `root.api.${instruction.name}` +
+    `(script.id, query_id, ${timeout}, ${JSON.stringify(
+      return_value
+    )}, ${args})`;
 
   const api = new Api();
   api.id = instruction.id;
-  api._fun = Util.string_to_function(`(script, root){${body};}`);
+  api._fn = Util.string_to_function(`(script, root){${body};}`);
   return api;
 }
 

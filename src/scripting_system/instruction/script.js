@@ -18,13 +18,15 @@ class Script {
 
     this._debug_enabled = false;
 
-    this._timeout_list = { instructions: {} };
+    this._timeout_list = { instructions: {}, return_values_list: [] };
   }
 
   process(script, root) {
     const current_script = script != null ? script : this;
 
     this.print_debug("## Script - process");
+
+    if (current_script == this) this.check_return_values(current_script, root);
 
     // Internal:sleep
     if (this._sleep_timer.enabled) {
@@ -57,6 +59,9 @@ class Script {
       throw "Unable to find [break]";
     } else if (internal === "continue") {
       throw "Unable to find [continue]";
+    } else if (return_code === RETURN_CODE.PROCESSED) {
+      this.clear_return_values();
+      return { return_code };
     } else {
       return { return_code };
     }
@@ -87,6 +92,30 @@ class Script {
     }
 
     return true;
+  }
+
+  add_return_value(query_id, timeout) {
+    this._timeout_list.return_values_list[query_id] = {
+      stopwatch: new Stopwatch(timeout)
+    };
+  }
+
+  check_return_values(script, root) {
+    const new_return_values = root.pop_return_values(script.id);
+
+    for (const return_value of new_return_values) {
+      const { query_id, set } = return_value;
+
+      if (query_id in script._timeout_list.return_values_list) {
+        const return_value = script._timeout_list.return_values_list[query_id];
+        if (!return_value.stopwatch.is_elapsed()) set(script, root);
+        delete script._timeout_list.return_values_list[query_id];
+      }
+    }
+  }
+
+  clear_return_values() {
+    this._timeout_list.return_values_list = [];
   }
 
   print_debug(...args) {
