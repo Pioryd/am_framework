@@ -8,7 +8,16 @@ const {
 } = require("../../src/scripting_system/instruction/return_code");
 
 const script_full_name = path.join(__dirname, "script.json");
-const root = { scripts: {} };
+const root = {
+  scripts: {},
+  api: {
+    std: {
+      add_min_max: (timeout, return_value, args) => {
+        const { min, max } = args;
+      }
+    }
+  }
+};
 
 describe("Scripting system test", () => {
   before(() => {
@@ -245,28 +254,38 @@ describe("Scripting system test", () => {
       expect(script.data.val).to.deep.equal(2);
       expect(script.data.val_2).to.deep.equal(1);
     });
+    it("unhandled_internal", () => {
+      const script = parse(root, root.scripts["Test_unhandled_internal"]);
+
+      script.data.val = 0;
+      script.process(null, root);
+      expect(() => {
+        script.process(null, root);
+      }).to.throw();
+
+      script.data.val = 1;
+      script.process(null, root);
+      expect(() => {
+        script.process(null, root);
+      }).to.throw();
+
+      script.data.val = 2;
+      script.process(null, root);
+      script.process(null, root);
+      expect(() => {
+        script.process(null, root);
+      }).to.throw();
+    });
   });
-  it("unhandled_internal", () => {
-    const script = parse(root, root.scripts["Test_unhandled_internal"]);
+  it("Test instruction - Api", () => {
+    const script = parse(root, root.scripts["Test_api"]);
 
-    script.data.val = 0;
-    script.process(null, root);
-    expect(() => {
-      script.process(null, root);
-    }).to.throw();
-
-    script.data.val = 1;
-    script.process(null, root);
-    expect(() => {
-      script.process(null, root);
-    }).to.throw();
-
-    script.data.val = 2;
-    script.process(null, root);
-    script.process(null, root);
-    expect(() => {
-      script.process(null, root);
-    }).to.throw();
+    while_return_code = RETURN_CODE.PROCESSING;
+    while (while_return_code === RETURN_CODE.PROCESSING) {
+      const { return_code } = script.process(null, root);
+      while_return_code = return_code;
+    }
+    expect(script.data.val).to.deep.equal(2);
   });
 
   describe("Timeout", () => {
@@ -328,17 +347,5 @@ describe("Scripting system test", () => {
       }
       expect(script.data.val).to.deep.equal(4);
     });
-  });
-  it("inside script", () => {
-    const script = parse(root, root.scripts["Test_inside_script"]);
-
-    for (let i = 0; i < 4; i++) {
-      const { return_code } = script.process(null, root);
-      expect(return_code).to.deep.equal(
-        RETURN_CODE.PROCESSING,
-        `For_Index[${i}]`
-      );
-    }
-    expect(script.data.val).to.deep.equal(4);
   });
 });

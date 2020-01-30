@@ -6,6 +6,7 @@ const Scope_WHILE = require("./scope_while");
 const Scope_FOR = require("./scope_for");
 const Internal = require("./internal");
 const Script = require("./script");
+const Api = require("./api");
 
 function parse(root, instruction) {
   const instructions_map = {
@@ -167,17 +168,21 @@ function parse_instruction_script(root, instruction) {
 }
 
 function parse_instruction_api(root, instruction) {
-  // const api_formated_string =
-  //   "root.api[" +
-  //   instruction.api.replace(".", "][") +
-  //   "]" +
-  //   "(" +
-  //   "script" +
-  //   `"${"timeout" in instruction ? instruction.timeout : ""}", ` +
-  //   `"${"return" in instruction ? instruction.return : ""}", ` +
-  //   instruction.args.toString() +
-  //   ")";
-  // return Util.string_to_function(`(script, root){${api_formated_string};}`);
+  if (instruction.name == null || instruction.id == null)
+    throw "Unable to parse_instruction_api: " + instruction;
+
+  const timeout = instruction.timeout != null ? instruction.timeout : "null";
+  const return_value =
+    instruction.return_value != null ? instruction.return_value : "null";
+  let args =
+    "{" + (instruction.args != null ? instruction.args.toString() : "") + "}";
+  let body =
+    `root.api.${instruction.name}` + `(${timeout}, ${return_value}, ${args})`;
+
+  const api = new Api();
+  api.id = instruction.id;
+  api._fun = Util.string_to_function(`(script, root){${body};}`);
+  return api;
 }
 
 module.exports = parse;
