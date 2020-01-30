@@ -1,7 +1,3 @@
-const logger = require("../../logger").create_logger({
-  module_name: "am_framework",
-  file_name: __filename
-});
 const { Util } = require("../../util");
 const Scope = require("./scope");
 const JS = require("./js");
@@ -147,11 +143,7 @@ function parse_instruction_for(root, instruction) {
 }
 
 function parse_instruction_script(root, instruction) {
-  if (
-    instruction.name == null ||
-    (instruction.id == null &&
-      (instruction.data == null || instruction.root_scope == null))
-  )
+  if (instruction.name == null || instruction.id == null)
     throw "Unable to parse_instruction_script: " + instruction;
 
   let data = instruction.data;
@@ -161,6 +153,9 @@ function parse_instruction_script(root, instruction) {
     data = script_source.data;
     root_scope = script_source.root_scope;
   }
+
+  if (data == null || root_scope == null)
+    throw "Unable to parse_instruction_script: " + instruction;
 
   const script = new Script();
   script._source = instruction;
