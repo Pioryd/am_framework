@@ -1,3 +1,72 @@
-{
-  "Test": {}
-}
+[
+  {
+    "name": "Test_1",
+    "id": "Test_1_ID",
+    "rules": [
+      {
+        "triggers": {
+          "run_script": "test_script_N1"
+        },
+        "actions": {
+          "run_script": "test_script_N2"
+        }
+      }
+    ],
+    "signals": [
+      {
+        "triggers": {
+          "energy": "0-80"
+        },
+        "actions": {
+          "run_script": "script_name"
+        }
+      }
+    ],
+    "events": [
+      {
+        "triggers": {
+          "time": "1580926960000-1580934160000"
+        },
+        "actions": {
+          "run_script": "script_name"
+        }
+      }
+    ],
+    "scripts": [
+      {
+        "type": "script",
+        "name": "test_script_N1",
+        "id": "test_script_N1_ID",
+        "data": { "val": 0 },
+        "root_scope": {
+          "type": "scope",
+          "id": "test_script_N1_0",
+          "instructions": [
+            {
+              "type": "js",
+              "id": "test_script_N1_1",
+              "body": "script.data.val++"
+            }
+          ]
+        }
+      },
+      {
+        "type": "script",
+        "name": "test_script_N2",
+        "id": "test_script_N2_ID",
+        "data": { "val": 0 },
+        "root_scope": {
+          "type": "scope",
+          "id": "test_script_N2_0",
+          "instructions": [
+            {
+              "type": "js",
+              "id": "test_script_N2_1",
+              "body": "script.data.val++"
+            }
+          ]
+        }
+      }
+    ]
+  }
+]
