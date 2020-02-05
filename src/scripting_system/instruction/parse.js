@@ -8,7 +8,7 @@ const Internal = require("./internal");
 const Script = require("./script");
 const Api = require("./api");
 
-function parse(root, instruction) {
+function parse(form, instruction) {
   const instructions_map = {
     internal: parse_instruction_internal,
     js: parse_instruction_js,
@@ -20,10 +20,10 @@ function parse(root, instruction) {
     api: parse_instruction_api
   };
 
-  return instructions_map[instruction.type](root, instruction);
+  return instructions_map[instruction.type](form, instruction);
 }
 
-function parse_instruction_internal(root, instruction) {
+function parse_instruction_internal(form, instruction) {
   if (instruction.command == null || instruction.id == null)
     throw "Unable to parse_instruction_internal: " + instruction;
 
@@ -37,7 +37,7 @@ function parse_instruction_internal(root, instruction) {
   return internal;
 }
 
-function parse_instruction_js(root, instruction) {
+function parse_instruction_js(form, instruction) {
   if (instruction.body == null || instruction.id == null)
     throw "Unable to parse_instruction_js: " + instruction;
 
@@ -47,7 +47,7 @@ function parse_instruction_js(root, instruction) {
   return js;
 }
 
-function parse_instruction_scope(root, instruction) {
+function parse_instruction_scope(form, instruction) {
   if (instruction.instructions == null || instruction.id == null)
     throw "Unable to parse_instruction: " + instruction;
 
@@ -55,12 +55,12 @@ function parse_instruction_scope(root, instruction) {
   scope.id = instruction.id;
   scope._timeout = instruction.timeout;
   for (const source of instruction.instructions)
-    scope._childs.push(parse(root, source));
+    scope._childs.push(parse(form, source));
 
   return scope;
 }
 
-function parse_instruction_if(root, instruction) {
+function parse_instruction_if(form, instruction) {
   if (instruction.conditions == null || instruction.id == null)
     throw "Unable to parse_instruction_if: " + instruction;
 
@@ -72,7 +72,7 @@ function parse_instruction_if(root, instruction) {
   )) {
     const childs = [];
 
-    for (const source of instructions_source) childs.push(parse(root, source));
+    for (const source of instructions_source) childs.push(parse(form, source));
 
     scope_if._conditions.push({
       fn: Util.string_to_function(
@@ -85,7 +85,7 @@ function parse_instruction_if(root, instruction) {
   return scope_if;
 }
 
-function parse_instruction_while(root, instruction) {
+function parse_instruction_while(form, instruction) {
   if (
     instruction.condition == null ||
     instruction.instructions == null ||
@@ -103,12 +103,12 @@ function parse_instruction_while(root, instruction) {
   );
 
   for (const source of instruction.instructions)
-    scope_while._childs.push(parse(root, source));
+    scope_while._childs.push(parse(form, source));
 
   return scope_while;
 }
 
-function parse_instruction_for(root, instruction) {
+function parse_instruction_for(form, instruction) {
   if (
     instruction.condition == null ||
     instruction.instructions == null ||
@@ -138,37 +138,40 @@ function parse_instruction_for(root, instruction) {
     );
 
   for (const source of instruction.instructions)
-    scope_for._childs.push(parse(root, source));
+    scope_for._childs.push(parse(form, source));
 
   return scope_for;
 }
 
-function parse_instruction_script(root, instruction) {
+function parse_instruction_script(form, instruction) {
   if (instruction.name == null || instruction.id == null)
     throw "Unable to parse_instruction_script: " + instruction;
 
   let data = instruction.data;
   let root_scope = instruction.root_scope;
   if (data == null || root_scope == null) {
-    const script_source = root.scripts[instruction.name];
-    data = script_source.data;
-    root_scope = script_source.root_scope;
+    for (const script_source of form._source.scripts) {
+      if (script_source.name === instruction.name) {
+        data = script_source.data;
+        root_scope = script_source.root_scope;
+        break;
+      }
+    }
   }
 
   if (data == null || root_scope == null)
     throw "Unable to parse_instruction_script: " + instruction;
 
   const script = new Script();
-  script._source = instruction;
   script.id = instruction.id;
   script._name = instruction.name;
   script._timeout = instruction.timeout;
-  script.data = JSON.parse(JSON.stringify(data));
-  script._root_scope = parse(root, root_scope);
+  script.data = JSON.parse(JSON.stringify(data)); // Can be shared
+  script._root_scope = parse(form, root_scope);
   return script;
 }
 
-function parse_instruction_api(root, instruction) {
+function parse_instruction_api(form, instruction) {
   if (instruction.name == null || instruction.id == null)
     throw "Unable to parse_instruction_api: " + instruction;
 
