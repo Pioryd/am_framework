@@ -16,7 +16,7 @@ class Form {
     this.event_emitter = new EventEmitter();
 
     this._parse();
-    this.event_emitter.emit("form_init");
+    this.event_emitter.emit("form_init", this._name);
   }
 
   process(root) {
@@ -35,10 +35,17 @@ class Form {
   _run_script(name) {
     if (name in this._running_scripts) return;
 
-    const script = Object.entries(this._source.scripts)[name];
+    let script = null;
+    for (const script_object of this._source.scripts) {
+      if (script_object.name === name) {
+        script = script_object;
+        break;
+      }
+    }
+
     if (script == null) throw "Unable to run script: " + name;
 
-    this._running_scripts[name] = parse(script);
+    this._running_scripts[name] = parse(this, script);
 
     this.event_emitter.emit("script_run", name);
   }
@@ -66,15 +73,18 @@ class Form {
       for (const [trigger_name, trigger_value] of Object.entries(
         rule.triggers
       )) {
-        const internal_rules = ["form_init", "script_run"];
-        if (internal_rules.includes(trigger_name)) {
+        const internal_text_rules = [
+          "form_init",
+          "script_run",
+          "script_processed"
+        ];
+        if (internal_text_rules.includes(trigger_name)) {
           this.event_emitter.on(trigger_name, value => {
-            if (value > trigger_value) process_actions(rule.actions);
+            if (value === trigger_value) process_actions(rule.actions);
           });
         } else {
-          this.root.rules_event_emitter.on(trigger_name, value => {
-            if (value > trigger_value) process_actions(rule.actions);
-          });
+          throw `Wrong trigger[${trigger_name}] value: ${trigger_value}` +
+            ` of rule[${rule}]`;
         }
       }
     }
@@ -85,7 +95,7 @@ class Form {
       )) {
         if ("min" in trigger_value && "max" in trigger_value) {
           this.root.signals_event_emitter.on(trigger_name, value => {
-            if (value > trigger_value.min && value < trigger_value.min)
+            if (value >= trigger_value.min && value <= trigger_value.max)
               process_actions(signal.actions);
           });
         } else if ("value") {
@@ -105,7 +115,7 @@ class Form {
       )) {
         if ("min" in trigger_value && "max" in trigger_value) {
           this.root.events_event_emitter.on(trigger_name, value => {
-            if (value > trigger_value.min && value < trigger_value.min)
+            if (value >= trigger_value.min && value <= trigger_value.max)
               process_actions(event.actions);
           });
         } else if ("value") {
