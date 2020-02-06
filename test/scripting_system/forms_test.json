@@ -5,30 +5,38 @@
     "rules": [
       {
         "triggers": {
-          "run_script": "test_script_N1"
+          "form_init": "test_script_N1"
         },
         "actions": {
-          "run_script": "test_script_N2"
+          "script_run": "test_script_N2"
+        }
+      },
+      {
+        "triggers": {
+          "script_run": "test_script_N1"
+        },
+        "actions": {
+          "script_run": "test_script_N2"
         }
       }
     ],
     "signals": [
       {
         "triggers": {
-          "energy": "0-80"
+          "energy": { "min": "0", "max": "80" }
         },
         "actions": {
-          "run_script": "script_name"
+          "script_run": "test_script_N1"
         }
       }
     ],
     "events": [
       {
         "triggers": {
-          "time": "1580926960000-1580934160000"
+          "time": { "min": "1580926960000", "max": "1580934160000" }
         },
         "actions": {
-          "run_script": "script_name"
+          "script_run": "test_script_N2"
         }
       }
     ],
