@@ -31,7 +31,7 @@ describe("Forms test", () => {
     expect(form.id).to.equal("Test_1_ID");
     expect(form._name).to.equal("Test_1");
     expect(form._rules.length).to.equal(3);
-    expect(form._signals.length).to.equal(1);
+    expect(form._signals.length).to.equal(3);
     expect(form._events.length).to.equal(1);
     expect(Object.keys(form._running_scripts).length).to.equal(1);
   });
@@ -88,5 +88,18 @@ describe("Forms test", () => {
     expect(Object.keys(form._running_scripts).length).to.equal(1);
     root.events_event_emitter.emit("time", 1580928360000);
     expect(Object.keys(form._running_scripts).length).to.equal(2);
+  });
+  it("Actions", () => {
+    const form = new Form(root, root.forms_source["Test_1"]);
+
+    // script_terminate
+    expect(Object.keys(form._running_scripts).length).to.equal(1);
+    root.signals_event_emitter.emit("stres", 85);
+    expect(Object.keys(form._running_scripts).length).to.equal(0);
+
+    // script_set_data
+    root.signals_event_emitter.emit("choice", 10);
+    expect(Object.keys(form._running_scripts).length).to.equal(1);
+    expect(form._running_scripts["test_script_N2"].data.val).to.equal(10);
   });
 });

@@ -36,6 +36,26 @@
         "actions": {
           "script_run": "test_script_N1"
         }
+      },
+      {
+        "triggers": {
+          "stres": { "value": 85 }
+        },
+        "actions": {
+          "script_terminate": "test_script_N2"
+        }
+      },
+      {
+        "triggers": {
+          "choice": { "any": {} }
+        },
+        "actions": {
+          "script_run": "test_script_N2",
+          "script_set_data": {
+            "script": "test_script_N2",
+            "data": "val"
+          }
+        }
       }
     ],
     "events": [
