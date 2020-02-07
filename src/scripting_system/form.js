@@ -12,7 +12,6 @@ class Form {
     this._events = [];
     this._running_scripts = {};
 
-    this.root = root;
     this.event_emitter = new EventEmitter();
 
     this._parse();
@@ -53,7 +52,7 @@ class Form {
     this.event_emitter.emit("script_processed", name);
   }
 
-  _parse() {
+  _parse(root) {
     const source = this._source;
     if (source.name == null || source.id == null)
       throw "Unable to parse form: " + source;
@@ -105,17 +104,17 @@ class Form {
         signal.triggers
       )) {
         if ("min" in trigger_value && "max" in trigger_value) {
-          this.root.signals_event_emitter.on(trigger_name, value => {
+          root.signals_event_emitter.on(trigger_name, value => {
             if (value >= trigger_value.min && value <= trigger_value.max)
               process_actions(signal.actions, value);
           });
         } else if ("value" in trigger_value) {
-          this.root.signals_event_emitter.on(trigger_name, value => {
+          root.signals_event_emitter.on(trigger_name, value => {
             if (value === trigger_value.value)
               process_actions(signal.actions, value);
           });
         } else if ("any" in trigger_value) {
-          this.root.signals_event_emitter.on(trigger_name, value => {
+          root.signals_event_emitter.on(trigger_name, value => {
             process_actions(signal.actions, value);
           });
         } else {
@@ -130,12 +129,12 @@ class Form {
         event.triggers
       )) {
         if ("min" in trigger_value && "max" in trigger_value) {
-          this.root.events_event_emitter.on(trigger_name, value => {
+          root.events_event_emitter.on(trigger_name, value => {
             if (value >= trigger_value.min && value <= trigger_value.max)
               process_actions(event.actions, value);
           });
         } else if ("value") {
-          this.root.events_event_emitter.on(trigger_name, value => {
+          root.events_event_emitter.on(trigger_name, value => {
             if (value === trigger_value.value)
               process_actions(event.actions, value);
           });
