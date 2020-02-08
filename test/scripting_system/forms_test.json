@@ -5,7 +5,7 @@
     "rules": [
       {
         "triggers": {
-          "form_init": "Test_1"
+          "form_init": { "value": "Test_1" }
         },
         "actions": {
           "script_run": "test_script_N2"
@@ -13,7 +13,7 @@
       },
       {
         "triggers": {
-          "script_run": "test_script_N1"
+          "script_run": { "value": "test_script_N1" }
         },
         "actions": {
           "script_run": "test_script_N2"
@@ -21,7 +21,7 @@
       },
       {
         "triggers": {
-          "script_processed": "test_script_N3"
+          "script_processed": { "value": "test_script_N3" }
         },
         "actions": {
           "script_run": "test_script_N2"

@@ -28,7 +28,7 @@ describe("Forms test", () => {
   it("Parse", () => {
     const form = new Form(root, root.forms_source["Test_1"]);
 
-    expect(form.id).to.equal("Test_1_ID");
+    expect(form._id).to.equal("Test_1_ID");
     expect(form._name).to.equal("Test_1");
     expect(form._rules.length).to.equal(3);
     expect(form._signals.length).to.equal(3);
