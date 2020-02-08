@@ -22,13 +22,13 @@ const logger = require("../../logger").create_logger({
  */
 class Internal {
   constructor() {
-    this.id = null;
+    this._id = null;
     this._command = "";
     this._arg = "";
   }
 
   process(script, root) {
-    script.print_debug(`process Type[Internal] ID[${this.id}]`);
+    script.print_debug(`process Type[Internal] ID[${this._id}]`);
 
     if (script._goto_find.enabled) {
       if (

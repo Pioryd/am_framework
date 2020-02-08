@@ -6,7 +6,7 @@ const logger = require("../../logger").create_logger({
 
 class Scope_FOR {
   constructor() {
-    this.id = null;
+    this._id = null;
     this._init = () => {};
     this._condition = () => {};
     this._increment = () => {};
@@ -23,7 +23,7 @@ class Scope_FOR {
   }
 
   process(script, root) {
-    script.print_debug(`process Type[FOR] ID[${this.id}]`);
+    script.print_debug(`process Type[FOR] ID[${this._id}]`);
 
     // Internal:goto
     if (script._goto_find.enabled) {

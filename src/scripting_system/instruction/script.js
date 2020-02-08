@@ -3,7 +3,7 @@ const { RETURN_CODE } = require("./return_code");
 
 class Script {
   constructor() {
-    this.id = null;
+    this._id = null;
     this._name = "";
     this._root_scope = {};
     this.data = {};

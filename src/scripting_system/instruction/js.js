@@ -6,12 +6,12 @@ const logger = require("../../logger").create_logger({
 
 class JS {
   constructor() {
-    this.id = null;
+    this._id = null;
     this._fn = () => {};
   }
 
   process(script, root) {
-    script.print_debug(`process Type[JS] ID[${this.id}]`);
+    script.print_debug(`process Type[JS] ID[${this._id}]`);
 
     if (script._goto_find.enabled)
       return { return_code: RETURN_CODE.PROCESSED };
