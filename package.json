@@ -9,6 +9,7 @@
   "author": "Piotr Rydwański",
   "license": "ISC",
   "dependencies": {
+    "bson-objectid": "^1.3.0",
     "chai": "^4.2.0",
     "mocha": "^6.2.2",
     "mongoose": "^5.8.3",
