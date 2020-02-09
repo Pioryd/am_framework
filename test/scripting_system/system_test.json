@@ -1,0 +1,14 @@
+{
+  "id": "Test_system_ID",
+  "name": "Test_system",
+  "programs": [
+    {
+      "id": "Test_program_ID",
+      "name": "Test_program",
+      "rules": [],
+      "signals": [],
+      "events": [],
+      "forms": []
+    }
+  ]
+}
