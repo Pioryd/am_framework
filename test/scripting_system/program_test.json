@@ -1,0 +1,65 @@
+{
+  "programs": {
+    "Test_1": {
+      "id": "Test_1_ID",
+      "name": "Test_1",
+      "rules": [
+        {
+          "triggers": {
+            "forms_count": { "value": 0 }
+          },
+          "actions": {
+            "form_run": "Test_form_1"
+          }
+        }
+      ],
+      "signals": [
+        {
+          "triggers": {
+            "energy": { "min": 0, "max": 10 }
+          },
+          "actions": {
+            "form_run": "Test_form_2"
+          }
+        },
+        {
+          "triggers": {
+            "energy": { "min": 0, "max": 10 }
+          },
+          "actions": {
+            "form_terminate": "Test_form_1"
+          }
+        }
+      ],
+      "events": [
+        {
+          "triggers": {
+            "unknown_event": { "value": 0 }
+          },
+          "actions": {
+            "form_terminate": "unknown_form"
+          }
+        }
+      ],
+      "forms": ["Test_form_1", "Test_form_2"]
+    }
+  },
+  "forms": {
+    "Test_form_1": {
+      "name": "Test_form_1",
+      "id": "Test_form_1_ID",
+      "rules": [],
+      "signals": [],
+      "events": [],
+      "scripts": []
+    },
+    "Test_form_2": {
+      "name": "Test_form_2",
+      "id": "Test_form_2_ID",
+      "rules": [],
+      "signals": [],
+      "events": [],
+      "scripts": []
+    }
+  }
+}
