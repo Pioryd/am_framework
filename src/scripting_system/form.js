@@ -34,7 +34,6 @@ class Form {
         this._process_actions(...args);
       }
     );
-
     this._signals_manager = new RulesManager(
       this._signals,
       this._root.signals_event_emitter,
