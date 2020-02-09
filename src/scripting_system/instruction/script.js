@@ -100,7 +100,7 @@ class Script {
   }
 
   check_return_values(script, root) {
-    const new_return_values = root.pop_return_values(script.id);
+    const new_return_values = root.return_values.pop(script.id);
 
     for (const return_value of new_return_values) {
       const { query_id, set } = return_value;

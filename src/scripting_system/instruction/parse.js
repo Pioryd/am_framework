@@ -180,7 +180,7 @@ function parse_instruction_api(form, instruction) {
   let args =
     "{" + (instruction.args != null ? instruction.args.toString() : "") + "}";
   let body =
-    `const query_id = root.generate_id();` +
+    `const query_id = root.generate_unique_id();` +
     `script.add_return_value(query_id, ${timeout});` +
     `root.api.${instruction.name}` +
     `(script.id, query_id, ${timeout}, ${JSON.stringify(
