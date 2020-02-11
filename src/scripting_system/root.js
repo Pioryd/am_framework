@@ -12,7 +12,7 @@ const EventEmitter = require("events");
 
 class Root {
   constructor() {
-    this.system = {};
+    this.system = null;
     this.forms = {};
     this.api = {};
     this.data = {};
@@ -30,11 +30,11 @@ class Root {
   }
 
   process() {
-    this.system.process();
+    if (this.system != null) this.system.process();
   }
 
   terminate() {
-    this.system.terminate();
+    if (this.system != null) this.system.terminate();
   }
 
   install_system(source) {
