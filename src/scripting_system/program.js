@@ -1,6 +1,10 @@
 const EventEmitter = require("events");
 const RulesManager = require("./rules_manager");
 const Form = require("./form");
+const logger = require("../logger").create_logger({
+  module_name: "am_framework",
+  file_name: __filename
+});
 
 class Program {
   constructor(root, source) {
@@ -52,7 +56,11 @@ class Program {
   }
 
   process() {
-    if (this._current_form != null) this._current_form.process();
+    if (this._current_form != null) {
+      this._current_form.process();
+    } else {
+      this._event_emitter.emit("forms_count", 0);
+    }
   }
 
   _run_form(name) {
@@ -67,7 +75,10 @@ class Program {
       }
     }
 
-    if (form_source == null) throw "Unable to run form: " + name;
+    if (form_source == null) {
+      logger.error(`Unable to run form[${name}]. Source[${form_source}]`);
+      return;
+    }
 
     this._current_form = new Form(this._root, form_source);
     this._event_emitter.emit("forms_count", 1);
