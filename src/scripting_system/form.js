@@ -103,7 +103,7 @@ class Form {
           action_value.data
         ] = value;
       } else {
-        throw `Unknown action: ${action_name} of form[${this._name}]`;
+        throw `Unknown action[${action_name}] of form[${this._name}]`;
       }
     }
   }

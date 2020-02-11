@@ -8,7 +8,7 @@ class Program {
     this._source = source;
 
     if (source.name == null || source.id == null)
-      throw "Unable to parse form: " + source;
+      throw "Unable to parse program: " + source;
 
     this._id = source.id;
     this._name = source.name;
@@ -88,7 +88,7 @@ class Program {
       } else if (action_name === "form_terminate") {
         this._terminate_form(action_value);
       } else {
-        throw `Unknown action: ${action_name} of form[${this._name}]`;
+        throw `Unknown action[${action_name}] of program[${this._name}]`;
       }
     }
   }
