@@ -176,16 +176,14 @@ function parse_instruction_api(form, instruction) {
     throw "Unable to parse_instruction_api: " + instruction;
 
   const timeout = instruction.timeout != null ? instruction.timeout : "null";
-  const return_value = instruction.return != null ? instruction.return : "null";
+  const return_value = instruction.return != null ? instruction.return : "";
   let args =
     "{" + (instruction.args != null ? instruction.args.toString() : "") + "}";
   let body =
     `const query_id = root.generate_unique_id();` +
     `script.add_return_value(query_id, ${timeout});` +
     `root.api.${instruction.name}` +
-    `(script.id, query_id, ${timeout}, ${JSON.stringify(
-      return_value
-    )}, ${args})`;
+    `(script.id, query_id, ${timeout}, "${return_value}", ${args})`;
 
   const api = new Api();
   api.id = instruction.id;
