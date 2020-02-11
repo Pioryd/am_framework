@@ -119,7 +119,7 @@ class Script {
   }
 
   print_debug(...args) {
-    if (this._debug_enabled) console.log(...args);
+    if (this._debug_enabled || this._root._debug_enabled) console.log(...args);
   }
 }
 

@@ -18,6 +18,8 @@ class Root {
     this.data = {};
     this.ext = {};
 
+    this._debug_enabled = false;
+
     this.return_values = new ReturnValues();
     this.signals_event_emitter = new EventEmitter();
     this.events_event_emitter = new EventEmitter();
