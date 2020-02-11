@@ -164,6 +164,7 @@ function parse_instruction_script(form, instruction) {
 
   const script = new Script();
   script._id = instruction.id;
+  script._root = form._root;
   script._name = instruction.name;
   script._timeout = instruction.timeout;
   script.data = JSON.parse(JSON.stringify(data)); // Can be shared
@@ -183,7 +184,7 @@ function parse_instruction_api(form, instruction) {
     `const query_id = root.generate_unique_id();` +
     `script.add_return_value(query_id, ${timeout});` +
     `root.api.${instruction.name}` +
-    `(script.id, query_id, ${timeout}, "${return_value}", ${args})`;
+    `(root, script._id, query_id, ${timeout}, "${return_value}", ${args})`;
 
   const api = new Api();
   api.id = instruction.id;

@@ -22,7 +22,7 @@ describe("Scripting system test", () => {
   before(() => {
     const scripts_source = Util.read_from_json(scripts_full_name);
 
-    root.forms = { Test_form: { _source: { scripts: [] } } };
+    root.forms = { Test_form: { _source: { scripts: [] }, _root: root } };
     root.api = { std: {}, ...root.api };
     root.generate_unique_id = () => {
       return "1";
@@ -332,7 +332,7 @@ describe("Scripting system test", () => {
         returned_value: {}
       };
       const Test_api = {
-        send: (script_id, query_id, timeout, return_value, args) => {
+        send: (root, script_id, query_id, timeout, return_value, args) => {
           Test_api_data.return_value_string = return_value;
           Test_api_data.returned_value = Number(args.min) + Number(args.max);
         },
@@ -366,8 +366,8 @@ describe("Scripting system test", () => {
       // Query is received before script begin processed.
       if (i === 1) {
         root.api.std.add_min_max = (...args) => {
-          const script_id = args[0];
-          const query_id = args[1];
+          const script_id = args[1];
+          const query_id = args[2];
           Test_api.send(...args);
           Test_api.receive(script_id, query_id);
         };
