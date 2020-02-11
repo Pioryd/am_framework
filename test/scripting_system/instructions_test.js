@@ -394,7 +394,7 @@ describe("Scripting system test", () => {
         }
         expect(script.data.val).to.deep.equal(2);
         expect(script.data.added_min_max).to.deep.equal(undefined);
-        Test_api.receive(script.id, "1");
+        Test_api.receive(script._id, "1");
         {
           const { return_code } = script.process(null, root);
           expect(return_code).to.deep.equal(RETURN_CODE.PROCESSING);
@@ -422,7 +422,7 @@ describe("Scripting system test", () => {
           expect(return_code).to.deep.equal(RETURN_CODE.PROCESSING);
         }
         while (!stopwatch.is_elapsed()) {}
-        Test_api.receive(script.id, "1");
+        Test_api.receive(script._id, "1");
 
         let while_return_code = RETURN_CODE.PROCESSING;
         while (while_return_code === RETURN_CODE.PROCESSING) {
@@ -452,7 +452,7 @@ describe("Scripting system test", () => {
           expect(return_code).to.deep.equal(RETURN_CODE.PROCESSING);
         }
         while (!stopwatch.is_elapsed()) {}
-        Test_api.receive(script.id, "1");
+        Test_api.receive(script._id, "1");
 
         let while_return_code = RETURN_CODE.PROCESSING;
         while (while_return_code === RETURN_CODE.PROCESSING) {

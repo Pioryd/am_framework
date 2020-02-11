@@ -30,7 +30,7 @@ function parse_instruction_internal(form, instruction) {
   const [command, arg] = instruction.command.split(" ");
 
   const internal = new Internal();
-  internal.id = instruction.id;
+  internal._id = instruction.id;
   internal._command = command;
   internal._arg = arg;
 
@@ -42,7 +42,7 @@ function parse_instruction_js(form, instruction) {
     throw "Unable to parse_instruction_js: " + instruction;
 
   const js = new JS();
-  js.id = instruction.id;
+  js._id = instruction.id;
   js._fn = Util.string_to_function(`(script, root){${instruction.body};}`);
   return js;
 }
@@ -52,7 +52,7 @@ function parse_instruction_scope(form, instruction) {
     throw "Unable to parse_instruction: " + instruction;
 
   const scope = new Scope();
-  scope.id = instruction.id;
+  scope._id = instruction.id;
   scope._timeout = instruction.timeout;
   for (const source of instruction.instructions)
     scope._childs.push(parse(form, source));
@@ -65,7 +65,7 @@ function parse_instruction_if(form, instruction) {
     throw "Unable to parse_instruction_if: " + instruction;
 
   const scope_if = new Scope_IF();
-  scope_if.id = instruction.id;
+  scope_if._id = instruction.id;
   scope_if._timeout = instruction.timeout;
   for (const [fn_source, instructions_source] of Object.entries(
     instruction.conditions
@@ -94,7 +94,7 @@ function parse_instruction_while(form, instruction) {
     throw "Unable to parse_instruction_while: " + instruction;
 
   const scope_while = new Scope_WHILE();
-  scope_while.id = instruction.id;
+  scope_while._id = instruction.id;
   scope_while._timeout = instruction.timeout;
   scope_while._condition = Util.string_to_function(
     `(script, root){return ${
@@ -122,7 +122,7 @@ function parse_instruction_for(form, instruction) {
     increment_source
   ] = instruction.condition.split(";");
   const scope_for = new Scope_FOR();
-  scope_for.id = instruction.id;
+  scope_for._id = instruction.id;
   scope_for._timeout = instruction.timeout;
   if (init_source !== "")
     scope_for._init = Util.string_to_function(
@@ -163,7 +163,7 @@ function parse_instruction_script(form, instruction) {
     throw "Unable to parse_instruction_script: " + instruction;
 
   const script = new Script();
-  script.id = instruction.id;
+  script._id = instruction.id;
   script._name = instruction.name;
   script._timeout = instruction.timeout;
   script.data = JSON.parse(JSON.stringify(data)); // Can be shared
@@ -187,6 +187,7 @@ function parse_instruction_api(form, instruction) {
 
   const api = new Api();
   api.id = instruction.id;
+  api._id = instruction.id;
   api._fn = Util.string_to_function(`(script, root){${body};}`);
   return api;
 }
