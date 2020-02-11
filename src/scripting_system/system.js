@@ -15,6 +15,11 @@ class System {
     this._programs_list = [];
     for (const program of this._programs)
       this._programs_list.push(new Program(this._root, program));
+
+    // TODO
+    // For now only one programs works only
+    this._current_program =
+      this._programs_list.length > 0 ? this._programs_list[0] : null;
   }
 
   terminate() {
@@ -22,7 +27,7 @@ class System {
   }
 
   process() {
-    for (const program of source._programs_list) program.process();
+    this._current_program.process();
   }
 }
 
