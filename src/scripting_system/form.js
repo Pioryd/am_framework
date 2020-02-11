@@ -2,7 +2,10 @@ const { RETURN_CODE } = require("./instruction/return_code");
 const parse = require("./instruction/parse");
 const EventEmitter = require("events");
 const RulesManager = require("./rules_manager");
-
+const logger = require("../logger").create_logger({
+  module_name: "am_framework",
+  file_name: __filename
+});
 /**
  * NOTE!
  *  Very important is [terminate()] form. Not terminated form have still
@@ -80,7 +83,10 @@ class Form {
       }
     }
 
-    if (script == null) throw "Unable to run script: " + name;
+    if (script == null) {
+      logger.error("Unable to run script: " + name);
+      return;
+    }
 
     this._running_scripts[name] = parse(this, script);
 
