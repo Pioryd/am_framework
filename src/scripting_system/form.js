@@ -30,27 +30,26 @@ class Form {
 
     this._event_emitter = new EventEmitter();
 
-    this._rules_manager = new RulesManager(
-      this._rules,
-      this._event_emitter,
-      (...args) => {
-        this._process_actions(...args);
-      }
-    );
-    this._signals_manager = new RulesManager(
-      this._signals,
+    this._rules_manager = new RulesManager();
+
+    this._rules_manager.add_rule("system", this._event_emitter, (...args) => {
+      this._process_actions(...args);
+    });
+    this._rules_manager.add_rule(
+      "signal",
       this._root.signals_event_emitter,
       (...args) => {
         this._process_actions(...args);
       }
     );
-    this._events_manager = new RulesManager(
-      this._events,
+    this._rules_manager.add_rule(
+      "event",
       this._root.events_event_emitter,
       (...args) => {
         this._process_actions(...args);
       }
     );
+    this._rules_manager.parse(this._rules);
 
     this._event_emitter.emit("form_init", this._name);
   }

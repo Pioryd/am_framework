@@ -21,9 +21,7 @@ describe("Forms test", () => {
 
     expect(form._id).to.equal("Test_1_ID");
     expect(form._name).to.equal("Test_1");
-    expect(form._rules.length).to.equal(3);
-    expect(form._signals.length).to.equal(3);
-    expect(form._events.length).to.equal(1);
+    expect(form._rules.length).to.equal(7);
     expect(Object.keys(form._running_scripts).length).to.equal(1);
   });
   it("Process", () => {

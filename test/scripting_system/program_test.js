@@ -19,9 +19,7 @@ describe("Program test", () => {
 
     expect(program._id).to.equal("Test_1_ID");
     expect(program._name).to.equal("Test_1");
-    expect(program._rules.length).to.equal(1);
-    expect(program._signals.length).to.equal(2);
-    expect(program._events.length).to.equal(1);
+    expect(program._rules.length).to.equal(4);
     expect(program._forms.length).to.equal(2);
     expect(program._current_form._name).equal("Test_form_1");
   });

@@ -4,6 +4,7 @@
     "id": "Test_1_ID",
     "rules": [
       {
+        "type": "system",
         "triggers": {
           "form_init": { "value": "Test_1" }
         },
@@ -12,6 +13,7 @@
         }
       },
       {
+        "type": "system",
         "triggers": {
           "script_run": { "value": "test_script_N1" }
         },
@@ -20,16 +22,16 @@
         }
       },
       {
+        "type": "system",
         "triggers": {
           "script_processed": { "value": "test_script_N3" }
         },
         "actions": {
           "script_run": "test_script_N2"
         }
-      }
-    ],
-    "signals": [
+      },
       {
+        "type": "signal",
         "triggers": {
           "energy": { "min": "0", "max": "80" }
         },
@@ -38,6 +40,7 @@
         }
       },
       {
+        "type": "signal",
         "triggers": {
           "stres": { "value": 85 }
         },
@@ -46,6 +49,7 @@
         }
       },
       {
+        "type": "signal",
         "triggers": {
           "choice": { "any": {} }
         },
@@ -56,10 +60,9 @@
             "data": "val"
           }
         }
-      }
-    ],
-    "events": [
+      },
       {
+        "type": "event",
         "triggers": {
           "time": { "min": "1580926960000", "max": "1580934160000" }
         },
