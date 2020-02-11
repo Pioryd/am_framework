@@ -187,7 +187,6 @@ function parse_instruction_api(form, instruction) {
     `(root, script._id, query_id, ${timeout}, "${return_value}", ${args})`;
 
   const api = new Api();
-  api.id = instruction.id;
   api._id = instruction.id;
   api._fn = Util.string_to_function(`(script, root){${body};}`);
   return api;

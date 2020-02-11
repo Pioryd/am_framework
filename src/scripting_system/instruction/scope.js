@@ -73,11 +73,6 @@ class Scope {
       return { return_code: RETURN_CODE.PROCESSED };
     }
   }
-
-  _debug(arg) {
-    console.log();
-    return arg;
-  }
 }
 
 module.exports = Scope;
