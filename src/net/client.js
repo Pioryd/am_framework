@@ -84,7 +84,7 @@ class Client {
         }, this.options.send_delay);
       } else this.socket.emit(packet_id, data);
     } catch (e) {
-      logger.error(e.stack);
+      logger.error(e, e.stack);
     }
   }
 
@@ -105,6 +105,7 @@ class Client {
         "Exception:",
         { packet_id, date, data },
         this.parse_packet_dict,
+        e,
         e.stack
       );
     }

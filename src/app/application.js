@@ -75,7 +75,7 @@ class Application extends EventEmitter {
           );
           script(modules, app);
         } catch (e) {
-          logger.error(e.stack);
+          logger.error(e, e.stack);
         }
       },
       ...command_map
@@ -109,7 +109,7 @@ class Application extends EventEmitter {
         logger.info(`Process command: ${command}`);
         this._commands_map[command](argument);
       } catch (e) {
-        logger.error(e.stack);
+        logger.error(e, e.stack);
       }
     });
   }

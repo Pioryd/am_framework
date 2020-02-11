@@ -160,6 +160,7 @@ class Server {
           date,
           data
         },
+        e,
         e.stack
       );
     }
@@ -194,6 +195,7 @@ class Server {
           packet_id,
           data
         },
+        e,
         e.stack
       );
     }
