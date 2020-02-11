@@ -6,7 +6,7 @@ const { Config } = require("./src/config");
 const { Database } = require("./src/database");
 const { Stopwatch } = require("./src/stopwatch");
 const { create_logger } = require("./src/logger");
-const { ScriptingSystem } = require("./src/logger");
+const { ScriptingSystem } = require("./src/scripting_system");
 
 module.exports = {
   Util,
