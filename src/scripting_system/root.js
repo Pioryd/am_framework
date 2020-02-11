@@ -42,7 +42,7 @@ class Root {
   }
 
   install_forms(source) {
-    for (const form of source) this.forms[form.name] = new Form(this, source);
+    for (const form of source) this.forms[form.name] = form;
   }
 
   install_api(source) {
