@@ -33,6 +33,8 @@ class Rule {
 class RulesManager {
   constructor() {
     this._rules = {};
+
+    this._current_locked_trigger = { trigger_name: "", priority: 0 };
   }
 
   terminate() {
@@ -52,6 +54,19 @@ class RulesManager {
     }
   }
 
+  _check_trigger_priority(trigger_name, priority) {
+    if (this._current_locked_trigger.trigger_name === trigger_name) {
+      this._current_locked_trigger.priority = priority;
+      return true;
+    }
+    if (this._current_locked_trigger.priority <= priority) {
+      this._current_locked_trigger = { trigger_name, priority };
+      return true;
+    }
+
+    return false;
+  }
+
   parse(source_rules_list) {
     for (const rule_source of source_rules_list) {
       if (!(rule_source.type in this._rules))
@@ -62,19 +77,31 @@ class RulesManager {
       for (const [trigger_name, trigger_value] of Object.entries(
         rule_source.triggers
       )) {
+        const priority =
+          "priority" in trigger_value ? trigger_value.priority : 0;
+
         if ("min" in trigger_value && "max" in trigger_value) {
           selected_rule.add_listener(trigger_name, value => {
-            if (value >= trigger_value.min && value <= trigger_value.max)
-              selected_rule.process_actions(rule_source.actions, value);
+            if (value >= trigger_value.min && value <= trigger_value.max) {
+              if (this._check_trigger_priority(trigger_name, priority))
+                selected_rule.process_actions(rule_source.actions, value);
+            } else {
+              this._check_trigger_priority(trigger_name, 0);
+            }
           });
         } else if ("value" in trigger_value) {
           selected_rule.add_listener(trigger_name, value => {
-            if (value === trigger_value.value)
-              selected_rule.process_actions(rule_source.actions, value);
+            if (value === trigger_value.value) {
+              if (this._check_trigger_priority(trigger_name, priority))
+                selected_rule.process_actions(rule_source.actions, value);
+            } else {
+              this._check_trigger_priority(trigger_name, 0);
+            }
           });
         } else if ("any" in trigger_value) {
           selected_rule.add_listener(trigger_name, value => {
-            selected_rule.process_actions(rule_source.actions, value);
+            if (this._check_trigger_priority(trigger_name, priority))
+              selected_rule.process_actions(rule_source.actions, value);
           });
         } else {
           throw `Wrong trigger[${trigger_name}] value: ${trigger_value}` +
