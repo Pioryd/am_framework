@@ -147,5 +147,6 @@ describe("Validator", () => {
           " with of rule key[:arr:value] contains disallowed value." +
           " [allowed_values]"
       ));
+    it("19d", () => expect(() => validate("19", "19d")).to.not.throw(Error));
   });
 });
