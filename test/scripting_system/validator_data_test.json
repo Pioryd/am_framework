@@ -86,5 +86,12 @@
       { "second": { "id": 3 } },
       { "first": { "value": "new_text" } }
     ]
+  },
+  "19d": {
+    "arr": [
+      { "first": { "value": "go" } },
+      { "second": {} },
+      { "first": { "value": "go" } }
+    ]
   }
 }
