@@ -74,9 +74,10 @@ class RulesManager {
 
       const selected_rule = this._rules[rule_source.type];
 
-      for (const [trigger_name, trigger_value] of Object.entries(
-        rule_source.triggers
-      )) {
+      for (const trigger of rule_source.triggers) {
+        const trigger_name = Object.keys(trigger)[0];
+        const trigger_value = trigger[trigger_name];
+
         const priority =
           "priority" in trigger_value ? trigger_value.priority : 0;
 

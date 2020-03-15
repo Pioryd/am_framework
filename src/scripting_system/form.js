@@ -98,11 +98,14 @@ class Form {
   }
 
   _process_actions(actions, value) {
-    for (const [action_name, action_value] of Object.entries(actions)) {
+    for (const action of actions) {
+      const action_name = Object.keys(action)[0];
+      const action_value = action[action_name];
+
       if (action_name === "script_run") {
-        this._run_script(action_value);
+        this._run_script(action_value.value);
       } else if (action_name === "script_terminate") {
-        this._terminate_script(action_value);
+        this._terminate_script(action_value.value);
       } else if (action_name === "script_set_data") {
         this._running_scripts[action_value.script].data[
           action_value.data

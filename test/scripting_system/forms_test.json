@@ -5,70 +5,100 @@
     "rules": [
       {
         "type": "system",
-        "triggers": {
-          "form_init": { "value": "Test_1" }
-        },
-        "actions": {
-          "script_run": "test_script_N2"
-        }
-      },
-      {
-        "type": "system",
-        "triggers": {
-          "script_run": { "value": "test_script_N1" }
-        },
-        "actions": {
-          "script_run": "test_script_N2"
-        }
-      },
-      {
-        "type": "system",
-        "triggers": {
-          "script_processed": { "value": "test_script_N3" }
-        },
-        "actions": {
-          "script_run": "test_script_N2"
-        }
-      },
-      {
-        "type": "signal",
-        "triggers": {
-          "energy": { "min": "0", "max": "80" }
-        },
-        "actions": {
-          "script_run": "test_script_N1"
-        }
-      },
-      {
-        "type": "signal",
-        "triggers": {
-          "stres": { "value": 85 }
-        },
-        "actions": {
-          "script_terminate": "test_script_N2"
-        }
-      },
-      {
-        "type": "signal",
-        "triggers": {
-          "choice": { "any": {} }
-        },
-        "actions": {
-          "script_run": "test_script_N2",
-          "script_set_data": {
-            "script": "test_script_N2",
-            "data": "val"
+        "triggers": [
+          {
+            "form_init": { "value": "Test_1" }
           }
-        }
+        ],
+        "actions": [
+          {
+            "script_run": { "value": "test_script_N2" }
+          }
+        ]
+      },
+      {
+        "type": "system",
+        "triggers": [
+          {
+            "script_run": { "value": "test_script_N1" }
+          }
+        ],
+        "actions": [
+          {
+            "script_run": { "value": "test_script_N2" }
+          }
+        ]
+      },
+      {
+        "type": "system",
+        "triggers": [
+          {
+            "script_processed": { "value": "test_script_N3" }
+          }
+        ],
+        "actions": [
+          {
+            "script_run": { "value": "test_script_N2" }
+          }
+        ]
+      },
+      {
+        "type": "signal",
+        "triggers": [
+          {
+            "energy": { "min": "0", "max": "80" }
+          }
+        ],
+        "actions": [
+          {
+            "script_run": { "value": "test_script_N1" }
+          }
+        ]
+      },
+      {
+        "type": "signal",
+        "triggers": [
+          {
+            "stres": { "value": 85 }
+          }
+        ],
+        "actions": [
+          {
+            "script_terminate": { "value": "test_script_N2" }
+          }
+        ]
+      },
+      {
+        "type": "signal",
+        "triggers": [
+          {
+            "choice": { "any": {} }
+          }
+        ],
+        "actions": [
+          {
+            "script_run": { "value": "test_script_N2" }
+          },
+          {
+            "script_set_data": {
+              "script": "test_script_N2",
+              "data": "val"
+            }
+          }
+        ]
       },
       {
         "type": "event",
-        "triggers": {
-          "time": { "min": "1580926960000", "max": "1580934160000" }
-        },
-        "actions": {
-          "script_run": "test_script_N1"
-        }
+        "triggers": [
+          {
+            "time": { "min": "1580926960000", "max": "1580934160000" }
+          }
+        ],
+        "actions": [
+          {
+            "script_run": { "value": "test_script_N1" }
+          }
+        ]
       }
     ],
     "scripts": [

@@ -6,40 +6,55 @@
       "rules": [
         {
           "type": "system",
-          "triggers": {
-            "forms_count": { "value": 0 }
-          },
-          "actions": {
-            "form_run": "Test_form_1"
-          }
+          "triggers": [
+            {
+              "forms_count": { "value": 0 }
+            }
+          ],
+          "actions": [
+            {
+              "form_run": { "value": "Test_form_1" }
+            }
+          ]
         },
         {
           "type": "signal",
-          "triggers": {
-            "energy": { "min": 0, "max": 10 }
-          },
-          "actions": {
-            "form_run": "Test_form_2"
-          }
+          "triggers": [
+            {
+              "energy": { "min": 0, "max": 10 }
+            }
+          ],
+          "actions": [
+            {
+              "form_run": { "value": "Test_form_2" }
+            }
+          ]
         },
         {
           "type": "signal",
-
-          "triggers": {
-            "energy": { "min": 0, "max": 10 }
-          },
-          "actions": {
-            "form_terminate": "Test_form_1"
-          }
+          "triggers": [
+            {
+              "energy": { "min": 0, "max": 10 }
+            }
+          ],
+          "actions": [
+            {
+              "form_terminate": { "value": "Test_form_1" }
+            }
+          ]
         },
         {
           "type": "event",
-          "triggers": {
-            "unknown_event": { "value": 0 }
-          },
-          "actions": {
-            "form_terminate": "unknown_form"
-          }
+          "triggers": [
+            {
+              "unknown_event": { "value": 0 }
+            }
+          ],
+          "actions": [
+            {
+              "form_terminate": { "value": "unknown_form" }
+            }
+          ]
         }
       ],
       "forms": ["Test_form_1", "Test_form_2"]
