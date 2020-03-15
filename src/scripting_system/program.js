@@ -90,11 +90,14 @@ class Program {
   }
 
   _process_actions(actions, value) {
-    for (const [action_name, action_value] of Object.entries(actions)) {
+    for (const action of actions) {
+      const action_name = Object.keys(action)[0];
+      const action_value = action[action_name];
+
       if (action_name === "form_run") {
-        this._run_form(action_value);
+        this._run_form(action_value.value);
       } else if (action_name === "form_terminate") {
-        this._terminate_form(action_value);
+        this._terminate_form(action_value.value);
       } else {
         throw `Unknown action[${action_name}] of program[${this._name}]`;
       }
