@@ -176,6 +176,8 @@ class Validator {
                 `of rule key[${data_rule.full_key}] cannot be empty.`
             );
 
+        if (Object.keys(data_rule.value["object_rules"]).length === 0) return;
+
         // check if "object_rules" contains array object key
         if (
           !Object.keys(data_rule.value["object_rules"]).includes(

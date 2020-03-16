@@ -163,5 +163,12 @@
         "second": { "id": { "type": "number", "disallowed_values": [4, 7, 9] } }
       }
     }
+  },
+  "20": {
+    "arr": {
+      "type": "array",
+      "object_type": "object",
+      "object_rules": {}
+    }
   }
 }
