@@ -148,5 +148,6 @@ describe("Validator", () => {
           " [allowed_values]"
       ));
     it("19d", () => expect(() => validate("19", "19d")).to.not.throw(Error));
+    it("20a", () => expect(() => validate("20", "20a")).to.not.throw(Error));
   });
 });

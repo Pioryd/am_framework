@@ -93,5 +93,8 @@
       { "second": {} },
       { "first": { "value": "go" } }
     ]
+  },
+  "20a": {
+    "arr": [{ "first": { "value": "go" } }]
   }
 }
