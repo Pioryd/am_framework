@@ -1,0 +1,99 @@
+{
+  "Test": {
+    "id": "test_script_ID",
+    "name": "test_script",
+    "data": { "al": 0, "val_2": "test_1", "val_3": {} },
+    "root_scope": {
+      "type": "scope",
+      "id": "id",
+      "instructions": [
+        { "type": "js", "id": "id", "body": "script.data.val++" },
+        { "type": "internal", "id": "id", "command": "label test" },
+        {
+          "type": "if",
+          "id": "id",
+          "conditions": {
+            "script.data.val_2 === 'test_1'": [
+              {
+                "type": "js",
+                "id": "id",
+                "body": "script.data.val++"
+              },
+              { "type": "internal", "id": "id", "command": "sleep 50" },
+              {
+                "type": "js",
+                "id": "id",
+                "body": "script.data.val += 2"
+              }
+            ],
+            "script.data.val_2 === 'test_2'": [
+              {
+                "type": "js",
+                "id": "id",
+                "body": "script.data.val = 0"
+              },
+              {
+                "type": "for",
+                "id": "id",
+                "condition": "script.data.i = 0; script.data.i < 2; script.data.i++",
+                "instructions": [
+                  { "type": "js", "id": "id", "body": "script.data.val++" },
+                  { "type": "internal", "id": "id", "command": "continue" }
+                ]
+              }
+            ],
+            "": [
+              {
+                "type": "js",
+                "id": "id",
+                "body": "script.data.val = 0"
+              },
+              {
+                "type": "while",
+                "id": "id",
+                "condition": "script.data.val < 3",
+                "instructions": [
+                  {
+                    "type": "js",
+                    "id": "id",
+                    "body": "script.data.val += 2"
+                  },
+                  {
+                    "type": "js",
+                    "id": "id",
+                    "body": "script.data.val--; script.data.val--"
+                  },
+                  { "type": "internal", "id": "id", "command": "break" },
+                  {
+                    "type": "for",
+                    "id": "id",
+                    "condition": "script.data.i = 0; script.data.i < 2; script.data.i++",
+                    "instructions": [
+                      {
+                        "type": "api",
+                        "timeout": "1000",
+                        "id": "Test_api_2",
+                        "name": "std.add_min_max",
+                        "args": ["min:script.data.min", "max:5"],
+                        "return": "script.data.val_2"
+                      }
+                    ]
+                  }
+                ]
+              },
+              { "type": "internal", "id": "id", "command": "goto test" },
+              {
+                "type": "api",
+                "timeout": "20",
+                "id": "id",
+                "name": "std.add_min_max",
+                "args": ["min:script.data.min", "max:5"],
+                "return": "script.data.val_3"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}
