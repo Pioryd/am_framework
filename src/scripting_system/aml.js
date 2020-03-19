@@ -94,6 +94,8 @@ function parse_header(start_index, lines) {
       break;
   }
 
+  eval(`parsed_header.data = {${parsed_header.data}}`);
+
   if (
     header_data_found.id === false ||
     header_data_found.name === false ||
@@ -107,113 +109,189 @@ function parse_header(start_index, lines) {
   return { instructions_start_index: index, parsed_header };
 }
 
+function _parse_api_source(source) {
+  const parsed_api = {};
+  const splitted = source.replace(/  +/g, " ").split(" ");
+
+  let index = 0;
+  if (["-r", "-t"].includes(splitted[index])) {
+    if (splitted[index] === "-r") {
+      parsed_api.return = splitted[index + 1];
+      index += 2;
+    } else if (splitted[index] === "-t") {
+      parsed_api.timeout = splitted[index + 1];
+      index += 2;
+    }
+    if (["-r", "-t"].includes(splitted[index])) {
+      if (splitted[index] === "-r") {
+        parsed_api.return = splitted[index + 1];
+        index += 2;
+      } else if (splitted[index] === "-t") {
+        parsed_api.timeout = splitted[index + 1];
+        index += 2;
+      }
+    }
+  }
+
+  parsed_api.name = splitted[index];
+  index++;
+  parsed_api.args = source;
+
+  for (let i = 0; i < index; i++)
+    parsed_api.args = parsed_api.args.replace(splitted[i], "");
+
+  parsed_api.args = parsed_api.args.trim();
+  return parsed_api;
+}
+
+function parse_source(source) {
+  let parsed_source = {};
+  const words = source.trim().split(" ");
+  const instruction_type = words[0] != null ? words[0].trim() : words[0];
+
+  const instruction_body = source.replace(instruction_type, "").trim();
+
+  if (instruction_type === "js") {
+    parsed_source = { type: instruction_type, body: instruction_body };
+  } else if (
+    ["label", "goto", "sleep", "continue", "break"].includes(instruction_type)
+  ) {
+    parsed_source = { type: "internal", command: source };
+  } else if (
+    ["if", "elif", "else", "for", "while"].includes(instruction_type)
+  ) {
+    parsed_source = { type: instruction_type, condition: instruction_body };
+  } else if (instruction_type === "api") {
+    parsed_source = {
+      ..._parse_api_source(instruction_body),
+      type: instruction_type
+    };
+  } else {
+    throw `Unknown type. Unable to parse source[${source}].`;
+  }
+
+  return parsed_source;
+}
+
+function merge_if_statements(parsed_instructions_list) {
+  const merge = list => {
+    const statement_if_merger = {
+      _current_if_object: null,
+      _current_elif_object_list: [],
+      handle: function(object, parent_list) {
+        try {
+          if (object.type === "if") {
+            object.conditions = {};
+            object.conditions[`${object.condition}`] = [...object.instructions];
+            delete object.condition;
+            delete object.instructions;
+            this._current_if_object = object;
+          } else if (object.type === "elif") {
+            this._current_if_object.conditions[`${object.condition}`] = [
+              ...object.instructions
+            ];
+            this._current_elif_object_list.push(object);
+          } else if (object.type === "else") {
+            this._current_if_object.conditions[""] = [...object.instructions];
+            this._current_elif_object_list.push(object);
+            for (var i = parent_list.length - 1; i >= 0; i--)
+              if (this._current_elif_object_list.includes(parent_list[i]))
+                parent_list.splice(i, 1);
+            this._current_if_object = null;
+            this._current_elif_object_list = [];
+          }
+        } catch (e) {
+          throw new Error(
+            `Unable to merge object[${stringify(object, null, 2)}` +
+              `\n${e.stack}\n${e.message}`
+          );
+        }
+      }
+    };
+
+    for (const object of list) {
+      if ("instructions" in object) merge(object["instructions"]);
+      statement_if_merger.handle(object, list);
+    }
+  };
+
+  merge(parsed_instructions_list);
+}
+
 function parse_instructions(start_index, lines) {
-  const parsed_instructions = {
-    root_scope: {
-      type: "scope",
-      id: ObjectID().toHexString(),
-      instructions: []
-    }
-  };
   const instructions_info = {
-    _instruction_info_list: [],
-    _get_instruction_info: function(instruction) {
-      for (const instruction_info of this._instruction_info_list)
-        if (instruction_info.instruction === instruction)
-          return instruction_info;
+    _info_list: [],
+    get: function(object) {
+      for (const info of this._info_list)
+        if (info.object === object) return info.data;
     },
-    add_instruction: function(instruction) {
-      if (this._get_instruction_info(instruction) == null)
-        this._instruction_info_list.push({ instruction });
-    },
-    add_parent: function(instruction, parent) {
-      const instruction_info = this._get_instruction_info(instruction);
-      if (instruction_info) instruction_info.parent = parent;
-    },
-    get_parent: function(instruction) {
-      const instruction_info = this._get_instruction_info(instruction);
-      if (
-        instruction_info != null &&
-        instruction_info.instruction === instruction
-      )
-        return instruction_info.parent;
+    set: function(object, data) {
+      if (this.get(object) == null) this._info_list.push({ object, data });
     }
   };
-  const instructions_list = [
-    { index_list: [], indent_level: -1, source: "", instructions: [] }
-  ];
-  let current_root_instruction = instructions_list[0];
+  const root_scope = { id: 0, type: "scope", instructions: [] };
+  let current_root_instruction = root_scope;
   let index = start_index;
 
-  instructions_info.add_instruction(current_root_instruction);
+  instructions_info.set(current_root_instruction, {
+    index_list: [],
+    indent_level: -1
+  });
 
   while (index < lines.length) {
     const instruction_data = get_instruction_source(index, lines);
-
-    if (instruction_data.source !== "") {
-      if (
-        instruction_data.indent_level === current_root_instruction.indent_level
-      ) {
-        current_root_instruction = instructions_info.get_parent(
-          current_root_instruction
-        );
-      } else if (
-        instruction_data.indent_level < current_root_instruction.indent_level
-      ) {
-        while (
-          instruction_data.indent_level < current_root_instruction.indent_level
-        )
-          current_root_instruction = instructions_info.get_parent(
-            current_root_instruction
-          );
-      }
-
-      const instruction = {
-        ...instruction_data,
-        instructions: []
-      };
-
-      instructions_info.add_instruction(instruction);
-
-      if (["if", "while", "for"].includes(instruction_data.type)) {
-        current_root_instruction.instructions.push(instruction);
-        instructions_info.add_parent(instruction, current_root_instruction);
-        current_root_instruction = instruction;
-      } else if (["elif", "else"].includes(instruction_data.type)) {
-        while (
-          instruction.indent_level <= current_root_instruction.indent_level
-        )
-          current_root_instruction = instructions_info.get_parent(
-            current_root_instruction
-          );
-        current_root_instruction.instructions.push(instruction);
-        instructions_info.add_parent(instruction, current_root_instruction);
-
-        current_root_instruction = instruction;
-      } else {
-        current_root_instruction.instructions.push(instruction);
-
-        instructions_info.add_parent(instruction, current_root_instruction);
-      }
-    }
-
     index =
       instruction_data.index_list[instruction_data.index_list.length - 1] + 1;
+
+    if (instruction_data.source === "") continue;
+
+    if (
+      instruction_data.indent_level ===
+      instructions_info.get(current_root_instruction).indent_level
+    ) {
+      current_root_instruction = instructions_info.get(current_root_instruction)
+        .parent;
+    } else if (
+      instruction_data.indent_level <
+      instructions_info.get(current_root_instruction).indent_level
+    ) {
+      while (
+        instruction_data.indent_level <
+        instructions_info.get(current_root_instruction).indent_level
+      )
+        current_root_instruction = instructions_info.get(
+          current_root_instruction
+        ).parent;
+    }
+
+    const scopes_list = ["if", "while", "for", "elif", "else"];
+    const instruction = {
+      id: instruction_data.index_list[0] + 1,
+      ...parse_source(instruction_data.source)
+    };
+
+    if (scopes_list.includes(instruction_data.type))
+      instruction.instructions = [];
+
+    instructions_info.set(instruction, instruction_data);
+
+    while (
+      instructions_info.get(instruction).indent_level <=
+      instructions_info.get(current_root_instruction).indent_level
+    )
+      current_root_instruction = instructions_info.get(current_root_instruction)
+        .parent;
+
+    current_root_instruction.instructions.push(instruction);
+    instructions_info.get(instruction).parent = current_root_instruction;
+
+    if (scopes_list.includes(instruction_data.type))
+      current_root_instruction = instruction;
   }
 
-  Util.write_to_json(
-    "aml_parsed_log.json",
-    JSON.parse(stringify(instructions_list))
-  );
+  merge_if_statements(root_scope.instructions);
 
-  // Create parsed instructions format (JSON - script)
-
-  Util.write_to_json(
-    "aml_parsed_instructions.json",
-    JSON.parse(stringify(parsed_instructions))
-  );
-
-  return { parsed_instructions };
+  return { root_scope };
 }
 
 module.exports = {
@@ -226,12 +304,9 @@ module.exports = {
       lines
     );
 
-    const { parsed_instructions } = parse_instructions(
-      instructions_start_index,
-      lines
-    );
+    const { root_scope } = parse_instructions(instructions_start_index, lines);
 
-    return { ...parsed_header, ...parsed_instructions };
+    return { ...parsed_header, root_scope };
   },
   validate: () => {}
 };

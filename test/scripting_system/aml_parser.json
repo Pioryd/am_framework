@@ -1,0 +1,307 @@
+{
+  "01": {
+    "id": "01",
+    "name": "test_script",
+    "data": {
+      "val": 0,
+      "val_2": "test_1",
+      "val_3": {}
+    },
+    "root_scope": {
+      "id": 0,
+      "type": "scope",
+      "instructions": [
+        {
+          "id": 6,
+          "type": "js",
+          "body": "script.data.val++"
+        },
+        {
+          "id": 7,
+          "type": "internal",
+          "command": "label test"
+        },
+        {
+          "id": 8,
+          "type": "if",
+          "conditions": {
+            "script.data.val_2 === \"test_1\"": [
+              {
+                "id": 9,
+                "type": "js",
+                "body": "script.data.val++"
+              },
+              {
+                "id": 10,
+                "type": "internal",
+                "command": "sleep 50"
+              },
+              {
+                "id": 11,
+                "type": "js",
+                "body": "script.data.val += 2"
+              }
+            ],
+            "script.data.val_2 === \"test_2\"": [
+              {
+                "id": 13,
+                "type": "js",
+                "body": "script.data.val = 0"
+              },
+              {
+                "id": 14,
+                "type": "for",
+                "condition": "script.data.i = 0; script.data.i < 2; script.data.i++",
+                "instructions": [
+                  {
+                    "id": 15,
+                    "type": "js",
+                    "body": "script.data.val++"
+                  },
+                  {
+                    "id": 16,
+                    "type": "internal",
+                    "command": "continue"
+                  }
+                ]
+              }
+            ],
+            "": [
+              {
+                "id": 18,
+                "type": "js",
+                "body": "script.data.val = 0;"
+              },
+              {
+                "id": 19,
+                "type": "while",
+                "condition": "script.data.val < 3",
+                "instructions": [
+                  {
+                    "id": 20,
+                    "type": "js",
+                    "body": "script.data.val += 2"
+                  },
+                  {
+                    "id": 21,
+                    "type": "js",
+                    "body": "script.data.val--; script.data.val--"
+                  },
+                  {
+                    "id": 22,
+                    "type": "internal",
+                    "command": "break"
+                  },
+                  {
+                    "id": 23,
+                    "type": "for",
+                    "condition": "script.data.i = 0; script.data.i < 2; script.data.i++",
+                    "instructions": [
+                      {
+                        "id": 25,
+                        "return": "script.data.val_2",
+                        "timeout": "1000",
+                        "name": "Namespace.DoSomething",
+                        "args": "min:script.data.min, max:5",
+                        "type": "api"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": 26,
+          "type": "internal",
+          "command": "goto test"
+        },
+        {
+          "id": 28,
+          "timeout": "20",
+          "return": "script.data.val_3",
+          "name": "SomeFun.DoIt",
+          "args": "min:script.data.min, max:\"some    text\"",
+          "type": "api"
+        }
+      ]
+    }
+  },
+  "02": {
+    "id": "02",
+    "name": "test_script",
+    "data": {
+      "val": 0,
+      "val_2": "test_1",
+      "val_3": {}
+    },
+    "root_scope": {
+      "id": 0,
+      "type": "scope",
+      "instructions": [
+        {
+          "id": 7,
+          "type": "if",
+          "conditions": {
+            "script.data.val_2 === \"test_1\"": [
+              {
+                "id": 8,
+                "type": "js",
+                "body": "script.data.val++"
+              },
+              {
+                "id": 9,
+                "type": "if",
+                "conditions": {
+                  "script.data.val_2 === \"test_1\"": [
+                    {
+                      "id": 10,
+                      "type": "js",
+                      "body": "script.data.val++"
+                    },
+                    {
+                      "id": 11,
+                      "type": "internal",
+                      "command": "sleep 50"
+                    },
+                    {
+                      "id": 12,
+                      "type": "js",
+                      "body": "script.data.val += 2"
+                    }
+                  ],
+                  "script.data.val_2 === \"test_2\"": [
+                    {
+                      "id": 14,
+                      "type": "js",
+                      "body": "script.data.val++"
+                    },
+                    {
+                      "id": 15,
+                      "type": "if",
+                      "conditions": {
+                        "script.data.val_2 === \"test_1\"": [
+                          {
+                            "id": 16,
+                            "type": "js",
+                            "body": "script.data.val++"
+                          },
+                          {
+                            "id": 17,
+                            "type": "internal",
+                            "command": "sleep 50"
+                          },
+                          {
+                            "id": 18,
+                            "type": "js",
+                            "body": "script.data.val += 2"
+                          }
+                        ],
+                        "script.data.val_2 === \"test_2\"": [
+                          {
+                            "id": 20,
+                            "type": "js",
+                            "body": "script.data.val++"
+                          },
+                          {
+                            "id": 21,
+                            "type": "internal",
+                            "command": "sleep 50"
+                          },
+                          {
+                            "id": 22,
+                            "type": "js",
+                            "body": "script.data.val += 3"
+                          }
+                        ],
+                        "": [
+                          {
+                            "id": 24,
+                            "type": "js",
+                            "body": "script.data.val++"
+                          },
+                          {
+                            "id": 25,
+                            "type": "internal",
+                            "command": "sleep 50"
+                          },
+                          {
+                            "id": 26,
+                            "type": "js",
+                            "body": "script.data.val += 4"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "id": 27,
+                      "type": "js",
+                      "body": "script.data.val += 3"
+                    }
+                  ],
+                  "": [
+                    {
+                      "id": 29,
+                      "type": "js",
+                      "body": "script.data.val++"
+                    },
+                    {
+                      "id": 30,
+                      "type": "internal",
+                      "command": "sleep 50"
+                    },
+                    {
+                      "id": 31,
+                      "type": "js",
+                      "body": "script.data.val += 4"
+                    }
+                  ]
+                }
+              },
+              {
+                "id": 32,
+                "type": "js",
+                "body": "script.data.val += 2"
+              }
+            ],
+            "script.data.val_2 === \"test_2\"": [
+              {
+                "id": 34,
+                "type": "js",
+                "body": "script.data.val++"
+              },
+              {
+                "id": 35,
+                "type": "internal",
+                "command": "sleep 50"
+              },
+              {
+                "id": 36,
+                "type": "js",
+                "body": "script.data.val += 3"
+              }
+            ],
+            "": [
+              {
+                "id": 38,
+                "type": "js",
+                "body": "script.data.val++"
+              },
+              {
+                "id": 39,
+                "type": "internal",
+                "command": "sleep 50"
+              },
+              {
+                "id": 40,
+                "type": "js",
+                "body": "script.data.val += 4"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}
