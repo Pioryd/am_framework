@@ -19,13 +19,15 @@ else
   while script.data.val < 3
     js script.data.val += 2
     js script.data.val--; script.data.val--
-    break;
+    break
     for \
         script.data.i = 0; script.data.i < 2; script.data.i++
-      api -r script.data.val_2 -t 1000  min:script.data.min, max:5
+      api -r script.data.val_2 -t 1000    Namespace.DoSomething min:script.data.min, max:5
 goto \
     test
 api -t 20 -r \
     script.data.val_3 \
+    SomeFun.DoIt \
     min:script.
-    data.min, max:5
+    data.min, max:"some    text"
+
