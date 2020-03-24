@@ -13,6 +13,7 @@
     "chai": "^4.2.0",
     "json-stringify-safe": "^5.0.1",
     "minimist": "^1.2.5",
+    "acorn": ">=7.1.1",
     "mocha": "^7.1.1",
     "mongoose": "^5.8.3",
     "socket.io": "^2.3.0",
