@@ -1,4 +1,5 @@
 const path = require("path");
+const Ajv = require("ajv");
 const { Util } = require("../util.js");
 const logger = require("../logger").create_logger({
   module_name: "am_framework",
@@ -83,6 +84,18 @@ class ModulesManager {
   }
 
   load_module(module_name, module_path) {
+    const valid_config = (config_data, config_schema_file_full_name) => {
+      const config_schema = Util.read_from_json(config_schema_file_full_name);
+      const ajv = new Ajv({ allErrors: true });
+      const validate = ajv.compile(config_schema);
+      const valid = validate(config_data);
+      if (!valid)
+        throw new Error(
+          `Fail to load config[${module_name}]: Invalid: ${ajv.errorsText(
+            validate.errors
+          )}`
+        );
+    };
     if (this.disabled_modules.includes(module_name)) return;
 
     const module_full_path = path.join(
@@ -91,14 +104,21 @@ class ModulesManager {
       module_name
     );
 
+    const module_config_schema_full_name = path.join(
+      module_full_path,
+      "config.json"
+    );
+
     if (Util.is_path_exist(module_full_path)) {
       let fw_module = require(module_full_path);
       let fw_module_class_name = Object.entries(fw_module)
         .values()
         .next().value[0];
+      const module_config = this.config[module_name];
+      valid_config(module_config, module_config_schema_full_name);
       this.modules_list[module_name] = new fw_module[fw_module_class_name]({
         event_emitter: this.event_emitter,
-        config: this.config
+        config: module_config
       });
       this.init_module(module_name);
     } else {
