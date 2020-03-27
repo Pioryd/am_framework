@@ -12,12 +12,7 @@ class Program {
     this._source = source;
 
     if (source.name == null || source.id == null)
-      throw "Unable to parse program: " + source;
-
-    this._id = source.id;
-    this._name = source.name;
-    this._rules = source.rules;
-    this._forms = source.forms;
+      throw new Error("Unable to parse program: " + source);
 
     this._current_form = null;
 
@@ -42,7 +37,7 @@ class Program {
         this._process_actions(...args);
       }
     );
-    this._rules_manager.parse(this._rules);
+    this._rules_manager.parse(this._source.rules);
 
     this._event_emitter.emit("forms_count", 0);
   }
@@ -60,14 +55,26 @@ class Program {
     }
   }
 
+  get_id() {
+    return this._source.id;
+  }
+
+  get_name() {
+    return this._source.name;
+  }
+
   _run_form(name) {
     if (this._current_form != null)
-      if (name === this._current_form._name) return;
+      if (name === this._current_form.get_name()) return;
 
     let form_source = null;
-    for (const form_name of this._forms) {
-      if (name === form_name) {
-        if (name in this._root.forms) form_source = this._root.forms[name];
+
+    for (const id of this._source.forms) {
+      if (!(id in this._root.source.forms))
+        throw new Error(`Program[${this._source.id}] not found form[${id}]`);
+
+      if (name === this._root.source.forms[id].name) {
+        form_source = this._root.source.forms[id];
         break;
       }
     }
@@ -82,7 +89,7 @@ class Program {
   }
 
   _terminate_form(name) {
-    if (name === this._current_form._name) {
+    if (name === this._current_form.get_name()) {
       form.terminate();
       this._current_form = null;
       this._event_emitter.emit("forms_count", 0);
@@ -99,7 +106,9 @@ class Program {
       } else if (action_name === "form_terminate") {
         this._terminate_form(action_value.value);
       } else {
-        throw `Unknown action[${action_name}] of program[${this._name}]`;
+        throw new Error(
+          `Unknown action[${action_name}] of program[${this.get_name()}]`
+        );
       }
     }
   }

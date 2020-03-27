@@ -1,7 +1,7 @@
 const { expect, config } = require("chai");
 const path = require("path");
 const { Util } = require("../../src/util");
-const Validator = require("../../src/scripting_system/validator");
+const Validator = require("../../src/scripting_system/instruction/validator");
 
 const validator_rules_full_name = path.join(
   __dirname,

@@ -1,10 +1,10 @@
 const Root = require("./root");
-const Validator = require("./validator");
+const Validator = require("./instruction/validator");
 const AML = require("./aml");
 module.exports = {
   ScriptingSystem: {
     Root,
-    Validator,
+    Instruction: { Validator },
     AML
   }
 };

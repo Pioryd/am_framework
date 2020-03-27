@@ -17,13 +17,7 @@ class Form {
     this._source = source;
 
     if (source.name == null || source.id == null)
-      throw "Unable to parse form: " + source;
-
-    this._id = source.id;
-    this._name = source.name;
-    this._rules = source.rules;
-    this._signals = source.signals;
-    this._events = source.events;
+      throw new Error("Unable to parse form: " + source);
 
     this._running_scripts = {};
     this._listeners_list = [];
@@ -49,9 +43,9 @@ class Form {
         this._process_actions(...args);
       }
     );
-    this._rules_manager.parse(this._rules);
+    this._rules_manager.parse(this._source.rules);
 
-    this._event_emitter.emit("form_init", this._name);
+    this._event_emitter.emit("form_init", this.get_id());
   }
 
   terminate() {
@@ -62,39 +56,37 @@ class Form {
 
   process() {
     // Proces running scripts
-    for (const [name, script] of Object.entries(this._running_scripts)) {
+    for (const [id, script] of Object.entries(this._running_scripts)) {
       const return_value = script.process(null, this._root);
       if (return_value.return_code === RETURN_CODE.PROCESSED)
-        this._terminate_script(name);
+        this._terminate_script(id);
     }
 
     return { return_code: RETURN_CODE.PROCESSED };
   }
 
-  _run_script(name) {
-    if (name in this._running_scripts) return;
-
-    let script = null;
-    for (const script_object of this._source.scripts) {
-      if (script_object.name === name) {
-        script = script_object;
-        break;
-      }
-    }
-
-    if (script == null) {
-      logger.error("Unable to run script: " + name);
-      return;
-    }
-
-    this._running_scripts[name] = parse(this, script);
-
-    this._event_emitter.emit("script_run", name);
+  get_id() {
+    return this._source.id;
   }
 
-  _terminate_script(name) {
-    delete this._running_scripts[name];
-    this._event_emitter.emit("script_processed", name);
+  get_name() {
+    return this._source.name;
+  }
+
+  _run_script(id) {
+    if (id in this._running_scripts) return;
+
+    if (!(id in this._root.source.scripts))
+      throw new Error(`Unable to run script[${id}]`);
+
+    this._running_scripts[id] = parse(this, this._root.source.scripts[id]);
+
+    this._event_emitter.emit("script_run", id);
+  }
+
+  _terminate_script(id) {
+    delete this._running_scripts[id];
+    this._event_emitter.emit("script_processed", id);
   }
 
   _process_actions(actions, value) {
@@ -111,7 +103,9 @@ class Form {
           action_value.data
         ] = value;
       } else {
-        throw `Unknown action[${action_name}] of form[${this._name}]`;
+        throw new Error(
+          `Unknown action[${action_name}] of form[${this.get_name()}]`
+        );
       }
     }
   }

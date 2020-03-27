@@ -1,168 +1,108 @@
-[
-  {
-    "name": "Test_1",
-    "id": "Test_1_ID",
-    "rules": [
-      {
-        "type": "system",
-        "triggers": [
-          {
-            "form_init": { "value": "Test_1" }
-          }
-        ],
-        "actions": [
-          {
-            "script_run": { "value": "test_script_N2" }
-          }
-        ]
-      },
-      {
-        "type": "system",
-        "triggers": [
-          {
-            "script_run": { "value": "test_script_N1" }
-          }
-        ],
-        "actions": [
-          {
-            "script_run": { "value": "test_script_N2" }
-          }
-        ]
-      },
-      {
-        "type": "system",
-        "triggers": [
-          {
-            "script_processed": { "value": "test_script_N3" }
-          }
-        ],
-        "actions": [
-          {
-            "script_run": { "value": "test_script_N2" }
-          }
-        ]
-      },
-      {
-        "type": "signal",
-        "triggers": [
-          {
-            "energy": { "min": "0", "max": "80" }
-          }
-        ],
-        "actions": [
-          {
-            "script_run": { "value": "test_script_N1" }
-          }
-        ]
-      },
-      {
-        "type": "signal",
-        "triggers": [
-          {
-            "stres": { "value": 85 }
-          }
-        ],
-        "actions": [
-          {
-            "script_terminate": { "value": "test_script_N2" }
-          }
-        ]
-      },
-      {
-        "type": "signal",
-        "triggers": [
-          {
-            "choice": { "any": {} }
-          }
-        ],
-        "actions": [
-          {
-            "script_run": { "value": "test_script_N2" }
-          },
-          {
-            "script_set_data": {
-              "script": "test_script_N2",
-              "data": "val"
-            }
-          }
-        ]
-      },
-      {
-        "type": "event",
-        "triggers": [
-          {
-            "time": { "min": "1580926960000", "max": "1580934160000" }
-          }
-        ],
-        "actions": [
-          {
-            "script_run": { "value": "test_script_N1" }
-          }
-        ]
-      }
-    ],
-    "scripts": [
-      {
-        "type": "script",
-        "name": "test_script_N1",
-        "id": "test_script_N1_ID",
-        "data": { "val": 0 },
-        "root_scope": {
-          "type": "scope",
-          "id": "test_script_N1_0",
-          "instructions": [
+{
+  "forms": {
+    "Test_1_ID": {
+      "name": "Test_1",
+      "id": "Test_1_ID",
+      "rules": [
+        {
+          "type": "system",
+          "triggers": [
             {
-              "type": "js",
-              "id": "test_script_N1_1",
-              "body": "script.data.val++"
+              "form_init": { "value": "Test_1_ID" }
+            }
+          ],
+          "actions": [
+            {
+              "script_run": { "value": "test_script_N2_ID" }
+            }
+          ]
+        },
+        {
+          "type": "system",
+          "triggers": [
+            {
+              "script_run": { "value": "test_script_N1_ID" }
+            }
+          ],
+          "actions": [
+            {
+              "script_run": { "value": "test_script_N2_ID" }
+            }
+          ]
+        },
+        {
+          "type": "system",
+          "triggers": [
+            {
+              "script_processed": { "value": "test_script_N3_ID" }
+            }
+          ],
+          "actions": [
+            {
+              "script_run": { "value": "test_script_N2_ID" }
+            }
+          ]
+        },
+        {
+          "type": "signal",
+          "triggers": [
+            {
+              "energy": { "min": "0", "max": "80" }
+            }
+          ],
+          "actions": [
+            {
+              "script_run": { "value": "test_script_N1_ID" }
+            }
+          ]
+        },
+        {
+          "type": "signal",
+          "triggers": [
+            {
+              "stres": { "value": 85 }
+            }
+          ],
+          "actions": [
+            {
+              "script_terminate": { "value": "test_script_N2_ID" }
+            }
+          ]
+        },
+        {
+          "type": "signal",
+          "triggers": [
+            {
+              "choice": { "any": {} }
+            }
+          ],
+          "actions": [
+            {
+              "script_run": { "value": "test_script_N2_ID" }
             },
             {
-              "type": "js",
-              "id": "test_script_N1_2",
-              "body": "script.data.val++"
+              "script_set_data": {
+                "script": "test_script_N2_ID",
+                "data": "val"
+              }
+            }
+          ]
+        },
+        {
+          "type": "event",
+          "triggers": [
+            {
+              "time": { "min": "1580926960000", "max": "1580934160000" }
+            }
+          ],
+          "actions": [
+            {
+              "script_run": { "value": "test_script_N1_ID" }
             }
           ]
         }
-      },
-      {
-        "type": "script",
-        "name": "test_script_N2",
-        "id": "test_script_N2_ID",
-        "data": { "val": 0 },
-        "root_scope": {
-          "type": "scope",
-          "id": "test_script_N2_0",
-          "instructions": [
-            {
-              "type": "js",
-              "id": "test_script_N2_1",
-              "body": "script.data.val++"
-            },
-            {
-              "type": "js",
-              "id": "test_script_N2_2",
-              "body": "script.data.val++"
-            }
-          ]
-        }
-      },
-      {
-        "type": "script",
-        "name": "test_script_N3",
-        "id": "test_script_N3_ID",
-        "data": { "val": 0 },
-        "root_scope": {
-          "type": "scope",
-          "id": "test_script_N3_0",
-          "instructions": [
-            {
-              "type": "js",
-              "id": "test_script_N3_1",
-              "body": "script.data.val++"
-            }
-          ]
-        }
-      }
-    ]
+      ],
+      "scripts": ["test_script_N1_ID", "test_script_N2_ID", "test_script_N3_ID"]
+    }
   }
-]
+}

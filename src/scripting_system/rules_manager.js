@@ -13,6 +13,10 @@ class Rule {
     this._listeners_list = [];
   }
 
+  get_name() {
+    this._name;
+  }
+
   terminate() {
     this._remove_all_listeners();
   }

@@ -10,17 +10,17 @@ const root = new Root();
 
 describe("Program test", () => {
   before(() => {
-    const programs_source = Util.read_from_json(programs_full_name);
-    root.forms = programs_source.forms;
-    root.programs = programs_source.programs;
+    const program_test_json = Util.read_from_json(programs_full_name);
+    root.source.forms = program_test_json.forms;
+    root.source.programs = program_test_json.programs;
   });
   it("Parse", () => {
-    const program = new Program(root, root.programs["Test_1"]);
+    const program = new Program(root, root.source.programs["Test_1_ID"]);
 
-    expect(program._id).to.equal("Test_1_ID");
-    expect(program._name).to.equal("Test_1");
-    expect(program._rules.length).to.equal(4);
-    expect(program._forms.length).to.equal(2);
-    expect(program._current_form._name).equal("Test_form_1");
+    expect(program.get_id()).to.equal("Test_1_ID");
+    expect(program.get_name()).to.equal("Test_1");
+    expect(program._source.rules.length).to.equal(4);
+    expect(program._source.forms.length).to.equal(2);
+    expect(program._current_form.get_name()).equal("Test_form_1");
   });
 });
