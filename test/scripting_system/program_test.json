@@ -1,6 +1,6 @@
 {
   "programs": {
-    "Test_1": {
+    "Test_1_ID": {
       "id": "Test_1_ID",
       "name": "Test_1",
       "rules": [
@@ -57,11 +57,11 @@
           ]
         }
       ],
-      "forms": ["Test_form_1", "Test_form_2"]
+      "forms": ["Test_form_1_ID", "Test_form_2_ID"]
     }
   },
   "forms": {
-    "Test_form_1": {
+    "Test_form_1_ID": {
       "name": "Test_form_1",
       "id": "Test_form_1_ID",
       "rules": [],
@@ -69,7 +69,7 @@
       "events": [],
       "scripts": []
     },
-    "Test_form_2": {
+    "Test_form_2_ID": {
       "name": "Test_form_2",
       "id": "Test_form_2_ID",
       "rules": [],

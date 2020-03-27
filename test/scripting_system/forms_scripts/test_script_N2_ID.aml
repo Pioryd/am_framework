@@ -1,0 +1,6 @@
+id test_script_N2_ID
+name test_script_N2
+data "val": 0 
+
+js script.data.val++
+js script.data.val++

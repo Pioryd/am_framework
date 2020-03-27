@@ -20,7 +20,10 @@ function parse(form, instruction) {
     api: parse_instruction_api
   };
 
-  return instructions_map[instruction.type](form, instruction);
+  let type = instruction.type;
+  if (type == null && "root_scope" in instruction) type = "script";
+
+  return instructions_map[type](form, instruction);
 }
 
 function parse_instruction_internal(form, instruction) {

@@ -13,7 +13,7 @@ const EventEmitter = require("events");
 class Root {
   constructor() {
     this.system = null;
-    this.forms = {};
+    this.source = { systems: {}, programs: {}, forms: {}, scripts: {} };
     this.api = {};
     this.data = {};
     this.ext = {};

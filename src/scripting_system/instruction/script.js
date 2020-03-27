@@ -21,6 +21,14 @@ class Script {
     this._timeout_list = { instructions: {}, return_values_list: [] };
   }
 
+  get_name() {
+    return this._name;
+  }
+
+  get_id() {
+    this._id = null;
+  }
+
   process(script, root) {
     const current_script = script != null ? script : this;
 

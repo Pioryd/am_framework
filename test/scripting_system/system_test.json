@@ -1,8 +1,13 @@
 {
-  "id": "Test_system_ID",
-  "name": "Test_system",
-  "programs": [
-    {
+  "systems": {
+    "Test_system_ID": {
+      "id": "Test_system_ID",
+      "name": "Test_system",
+      "programs": ["Test_program_ID"]
+    }
+  },
+  "programs": {
+    "Test_program_ID": {
       "id": "Test_program_ID",
       "name": "Test_program",
       "rules": [],
@@ -10,5 +15,5 @@
       "events": [],
       "forms": []
     }
-  ]
+  }
 }

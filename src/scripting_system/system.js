@@ -5,17 +5,17 @@ class System {
     this._root = root;
     this._source = source;
 
-    if (source.name == null || source.id == null)
-      throw "Unable to parse system: " + source;
-
-    this._id = source.id;
-    this._name = source.name;
-    this._programs = source.programs;
+    if (this._source.name == null || this._source.id == null)
+      throw new Error("Unable to parse system: " + this._source);
 
     this._programs_list = [];
-    for (const program of this._programs)
-      this._programs_list.push(new Program(this._root, program));
-
+    for (const id of this._source.programs) {
+      if (!(id in this._root.source.programs))
+        throw new Error(`System[${this._source.id}] not found program[${id}]`);
+      this._programs_list.push(
+        new Program(this._root, this._root.source.programs[id])
+      );
+    }
     // TODO
     // For now only one programs works only
     this._current_program =
@@ -28,6 +28,14 @@ class System {
 
   process() {
     this._current_program.process();
+  }
+
+  get_id() {
+    return this._source.id;
+  }
+
+  get_name() {
+    return this._source.name;
   }
 }
 
