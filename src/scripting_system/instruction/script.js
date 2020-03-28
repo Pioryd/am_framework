@@ -21,18 +21,18 @@ class Script {
     this._timeout_list = { instructions: {}, return_values_list: [] };
   }
 
-  get_name() {
-    return this._name;
+  get_id() {
+    return this._id;
   }
 
-  get_id() {
-    this._id = null;
+  get_name() {
+    return this._name;
   }
 
   process(script, root) {
     const current_script = script != null ? script : this;
 
-    this.print_debug("## Script - process");
+    this.print_debug(`## Script[${current_script.get_id()}] - process`);
 
     if (current_script == this) this.check_return_values(current_script, root);
 

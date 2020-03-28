@@ -1,0 +1,9 @@
+id 03
+name test_script_3
+data 
+
+if root.data.character_data.land_id !== root.data.character_data.default_land_id
+  api character.change_land land_id:root.data.character_data.default_land_id
+elif root.data.character_data.energy < 100
+  api character.use_object id:"test"
+ 

@@ -38,5 +38,15 @@ describe("AML Parser", () => {
         JSON.stringify(AML.parse(aml_parser_aml_scripts_map["02"]))
       ).to.equal(JSON.stringify(aml_parser_json_source["02"]));
     });
+    it("03", () => {
+      expect(
+        JSON.stringify(AML.parse(aml_parser_aml_scripts_map["03"]))
+      ).to.equal(JSON.stringify(aml_parser_json_source["03"]));
+    });
+    it("04", () => {
+      expect(
+        JSON.stringify(AML.parse(aml_parser_aml_scripts_map["04"]))
+      ).to.equal(JSON.stringify(aml_parser_json_source["04"]));
+    });
   });
 });

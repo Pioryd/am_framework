@@ -63,33 +63,23 @@ class Program {
     return this._source.name;
   }
 
-  _run_form(name) {
+  _run_form(id) {
     if (this._current_form != null)
-      if (name === this._current_form.get_name()) return;
+      if (id === this._current_form.get_id()) return;
 
-    let form_source = null;
+    if (!(id in this._root.source.forms))
+      throw new Error(`Program[${this._source.id}] not found form[${id}]`);
+    if (!this._source.forms.includes(id))
+      throw new Error(
+        `Program[${this._source.id}] do not contains form[${id}]`
+      );
 
-    for (const id of this._source.forms) {
-      if (!(id in this._root.source.forms))
-        throw new Error(`Program[${this._source.id}] not found form[${id}]`);
-
-      if (name === this._root.source.forms[id].name) {
-        form_source = this._root.source.forms[id];
-        break;
-      }
-    }
-
-    if (form_source == null) {
-      logger.error(`Unable to run form[${name}]. Source[${form_source}]`);
-      return;
-    }
-
-    this._current_form = new Form(this._root, form_source);
+    this._current_form = new Form(this._root, this._root.source.forms[id]);
     this._event_emitter.emit("forms_count", 1);
   }
 
-  _terminate_form(name) {
-    if (name === this._current_form.get_name()) {
+  _terminate_form(id) {
+    if (name === this._current_form.get_id()) {
       form.terminate();
       this._current_form = null;
       this._event_emitter.emit("forms_count", 0);
@@ -107,7 +97,7 @@ class Program {
         this._terminate_form(action_value.value);
       } else {
         throw new Error(
-          `Unknown action[${action_name}] of program[${this.get_name()}]`
+          `Unknown action[${action_name}] of program[${this.get_id()}]`
         );
       }
     }
