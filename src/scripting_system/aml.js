@@ -181,24 +181,22 @@ function merge_if_statements(parsed_instructions_list) {
       handle: function(object, parent_list) {
         try {
           if (object.type === "if") {
+            this._close_if_statement(parent_list);
+
             object.conditions = {};
             object.conditions[`${object.condition}`] = [...object.instructions];
+
             delete object.condition;
             delete object.instructions;
+
             this._current_if_object = object;
-          } else if (object.type === "elif") {
-            this._current_if_object.conditions[`${object.condition}`] = [
+            this._current_elif_object_list = [];
+          } else if (["elif", "else"].includes(object.type)) {
+            const condition = object.type === "elif" ? object.condition : "";
+            this._current_if_object.conditions[condition] = [
               ...object.instructions
             ];
             this._current_elif_object_list.push(object);
-          } else if (object.type === "else") {
-            this._current_if_object.conditions[""] = [...object.instructions];
-            this._current_elif_object_list.push(object);
-            for (var i = parent_list.length - 1; i >= 0; i--)
-              if (this._current_elif_object_list.includes(parent_list[i]))
-                parent_list.splice(i, 1);
-            this._current_if_object = null;
-            this._current_elif_object_list = [];
           }
         } catch (e) {
           throw new Error(
@@ -206,6 +204,13 @@ function merge_if_statements(parsed_instructions_list) {
               `\n${e.stack}\n${e.message}`
           );
         }
+      },
+      _close_if_statement: function(parent_list) {
+        for (let i = parent_list.length - 1; i >= 0; i--)
+          if (this._current_elif_object_list.includes(parent_list[i]))
+            parent_list.splice(i, 1);
+        this._current_if_object = null;
+        this._current_elif_object_list = [];
       }
     };
 
@@ -213,6 +218,9 @@ function merge_if_statements(parsed_instructions_list) {
       if ("instructions" in object) merge(object["instructions"]);
       statement_if_merger.handle(object, list);
     }
+
+    // When there is not next "IF"
+    statement_if_merger._close_if_statement(list);
   };
 
   merge(parsed_instructions_list);

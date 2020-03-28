@@ -41,12 +41,20 @@ class Root {
     this.system = new System(this, source);
   }
 
-  install_forms(source) {
-    for (const form of source) this.forms[form.name] = form;
+  install_programs(programs_source) {
+    this.source.programs = programs_source;
   }
 
-  install_api(source) {
-    this.api = source;
+  install_forms(forms_source) {
+    this.source.forms = forms_source;
+  }
+
+  install_scripts(scripts_source) {
+    this.source.scripts = scripts_source;
+  }
+
+  install_api(api_source) {
+    this.api = { ...api_source, ...this.api };
   }
 
   install_data(source) {

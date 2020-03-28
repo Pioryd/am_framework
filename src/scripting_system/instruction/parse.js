@@ -23,6 +23,18 @@ function parse(form, instruction) {
   let type = instruction.type;
   if (type == null && "root_scope" in instruction) type = "script";
 
+  if (!(type in instructions_map)) {
+    throw new Error(
+      `Unknown type[${type}].` +
+        ` Unable to parse instruction[${JSON.stringify(
+          instruction,
+          null,
+          2
+        )}]` +
+        ` of form[${form.get_id()}]`
+    );
+  }
+
   return instructions_map[type](form, instruction);
 }
 

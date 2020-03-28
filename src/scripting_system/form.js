@@ -104,7 +104,7 @@ class Form {
         ] = value;
       } else {
         throw new Error(
-          `Unknown action[${action_name}] of form[${this.get_name()}]`
+          `Unknown action[${action_name}] of form[${this.get_id()}]`
         );
       }
     }

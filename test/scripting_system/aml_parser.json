@@ -303,5 +303,103 @@
         }
       ]
     }
+  },
+  "03": {
+    "id": "03",
+    "name": "test_script_3",
+    "data": {},
+    "root_scope": {
+      "id": 0,
+      "type": "scope",
+      "instructions": [
+        {
+          "id": 5,
+          "type": "if",
+          "conditions": {
+            "root.data.character_data.land_id !== root.data.character_data.default_land_id": [
+              {
+                "id": 6,
+                "name": "character.change_land",
+                "args": "land_id:root.data.character_data.default_land_id",
+                "type": "api"
+              }
+            ],
+            "root.data.character_data.energy < 100": [
+              {
+                "id": 8,
+                "name": "character.use_object",
+                "args": "id:\"test\"",
+                "type": "api"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "04": {
+    "id": "04",
+    "name": "test_script_4",
+    "data": {},
+    "root_scope": {
+      "id": 0,
+      "type": "scope",
+      "instructions": [
+        {
+          "id": 5,
+          "type": "if",
+          "conditions": {
+            "root.data.character_data.land_id !== root.data.character_data.default_land_id": [
+              {
+                "id": 6,
+                "name": "character.change_land",
+                "args": "land_id:root.data.character_data.default_land_id",
+                "type": "api"
+              }
+            ],
+            "root.data.character_data.energy < 100": [
+              {
+                "id": 8,
+                "type": "if",
+                "conditions": {
+                  "root.data.character_data.land_id !== root.data.character_data.default_land_id": [
+                    {
+                      "id": 9,
+                      "name": "character.change_land",
+                      "args": "land_id:root.data.character_data.default_land_id",
+                      "type": "api"
+                    }
+                  ],
+                  "": [
+                    {
+                      "id": 11,
+                      "type": "if",
+                      "conditions": {
+                        "root.data.character_data.land_id !== root.data.character_data.default_land_id": [
+                          {
+                            "id": 12,
+                            "name": "character.change_land",
+                            "args": "land_id:root.data.character_data.default_land_id",
+                            "type": "api"
+                          }
+                        ],
+                        "": [
+                          {
+                            "id": 14,
+                            "name": "character.use_object",
+                            "args": "id:\"test\"",
+                            "type": "api"
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
   }
 }

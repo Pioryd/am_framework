@@ -13,7 +13,7 @@
           ],
           "actions": [
             {
-              "form_run": { "value": "Test_form_1" }
+              "form_run": { "value": "Test_form_1_ID" }
             }
           ]
         },
@@ -26,7 +26,7 @@
           ],
           "actions": [
             {
-              "form_run": { "value": "Test_form_2" }
+              "form_run": { "value": "Test_form_2_ID" }
             }
           ]
         },
@@ -39,7 +39,7 @@
           ],
           "actions": [
             {
-              "form_terminate": { "value": "Test_form_1" }
+              "form_terminate": { "value": "Test_form_1_ID" }
             }
           ]
         },
