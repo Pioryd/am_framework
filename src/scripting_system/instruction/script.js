@@ -32,7 +32,7 @@ class Script {
   process(script, root) {
     const current_script = script != null ? script : this;
 
-    this.print_debug(`## Script[${current_script.get_id()}] - process`);
+    this.print_debug();
 
     if (current_script == this) this.check_return_values(current_script, root);
 
@@ -126,8 +126,17 @@ class Script {
     this._timeout_list.return_values_list = [];
   }
 
-  print_debug(...args) {
-    if (this._debug_enabled || this._root._debug_enabled) console.log(...args);
+  print_debug(line_number) {
+    if (!this._debug_enabled && !this._root._debug_enabled) return;
+
+    const program_id = this._root.system._current_program.get_id();
+    const form_id = this._root.system._current_program._current_form.get_id();
+
+    console.log(
+      `Program[${program_id}]->Form[${form_id}]->` +
+        `Script[${this.get_id()}]->` +
+        (line_number != null ? `Line[${line_number}]` : `start process`)
+    );
   }
 }
 
