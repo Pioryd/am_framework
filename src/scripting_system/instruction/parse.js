@@ -198,8 +198,8 @@ function parse_instruction_api(form, instruction) {
   let body =
     `const query_id = root.generate_unique_id();` +
     `script.add_return_value(query_id, ${timeout});` +
-    `root.api.${instruction.name}` +
-    `(root, script._id, query_id, ${timeout}, "${return_value}", ${args})`;
+    `root.api("${instruction.name}", ` +
+    `root, script._id, query_id, ${timeout}, "${return_value}", ${args})`;
 
   const api = new Api();
   api._id = instruction.id;
