@@ -23,7 +23,7 @@ describe("Scripting system test", () => {
     const scripts_source = Util.read_from_json(scripts_full_name);
 
     root.forms = { Test_form: { _source: { scripts: [] }, _root: root } };
-    root.api = { std: {}, ...root.api };
+    root.api_list = { std: {} };
     root.generate_unique_id = () => {
       return "1";
     };
@@ -350,7 +350,7 @@ describe("Scripting system test", () => {
 
       // Query is not received
       if (i === 0) {
-        root.api.std.add_min_max = (...args) => {
+        root.api_list.std.add_min_max = (...args) => {
           Test_api.send(...args);
         };
 
@@ -365,7 +365,7 @@ describe("Scripting system test", () => {
 
       // Query is received before script begin processed.
       if (i === 1) {
-        root.api.std.add_min_max = (...args) => {
+        root.api_list.std.add_min_max = (...args) => {
           const script_id = args[1];
           const query_id = args[2];
           Test_api.send(...args);
@@ -383,7 +383,7 @@ describe("Scripting system test", () => {
 
       // Query is received after script begin processed.
       if (i === 2) {
-        root.api.std.add_min_max = (...args) => {
+        root.api_list.std.add_min_max = (...args) => {
           Test_api.send(...args);
         };
 
@@ -404,7 +404,7 @@ describe("Scripting system test", () => {
 
       // Query is received before timeout.
       if (i === 3) {
-        root.api.std.add_min_max = (...args) => {
+        root.api_list.std.add_min_max = (...args) => {
           Test_api.send(...args);
         };
         const stopwatch = new Stopwatch(15);
@@ -434,7 +434,7 @@ describe("Scripting system test", () => {
 
       // Query is received after timeout and before script begin processed.
       if (i === 4) {
-        root.api.std.add_min_max = (...args) => {
+        root.api_list.std.add_min_max = (...args) => {
           Test_api.send(...args);
         };
         const stopwatch = new Stopwatch(25);

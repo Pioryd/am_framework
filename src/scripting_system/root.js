@@ -14,7 +14,23 @@ class Root {
   constructor() {
     this.system = null;
     this.source = { systems: {}, programs: {}, forms: {}, scripts: {} };
-    this.api = {};
+    this.api_list = {};
+    this.api = function(
+      instruction_name,
+      root,
+      script_id,
+      query_id,
+      timeout,
+      return_value,
+      args
+    ) {
+      eval(`this.api_list.${instruction_name}(root,
+        script_id,
+        query_id,
+        timeout,
+        return_value,
+        args)`);
+    };
     this.data = {};
     this.ext = {};
 
