@@ -9,11 +9,12 @@ const { Util } = require("../util");
 const { Config } = require("../config");
 const { ModulesManager } = require("./modules_manager");
 const { setup_exit_handlers } = require("./signal_handler");
+
 class Application extends EventEmitter {
   constructor({
     root_full_name,
-    config_file_rel_name,
-    scripts_folder_rel_name,
+    config_file_rel_name = "config.json",
+    scripts_folder_rel_name = "scripts",
     command_map
   }) {
     super();
