@@ -8,6 +8,7 @@ const { Database } = require("./src/database");
 const { Stopwatch } = require("./src/stopwatch");
 const { create_logger } = require("./src/logger");
 const { ScriptingSystem } = require("./src/scripting_system");
+const Managers = require("./src/managers");
 
 module.exports = {
   Util,
@@ -19,5 +20,6 @@ module.exports = {
   Database,
   Stopwatch,
   create_logger,
-  ScriptingSystem
+  ScriptingSystem,
+  Managers
 };
