@@ -1,39 +1,21 @@
-const logger = require("../../logger").create_logger({
+const ServerManager = require("./server");
+
+const logger = require("../logger").create_logger({
   module_name: "am_framework",
   file_name: __filename
 });
-const { AML } = require("../../scripting_system").ScriptingSystem;
+const { AML } = require("../scripting_system").ScriptingSystem;
 const ObjectID = require("bson-objectid");
 const Ajv = require("ajv");
 
-/*
-NOTE!
-Classes instances like: [Character], [Land], etc use only as read only. 
-To change any data of them use [managers] methods.
-*/
 function validate_json(rule, object) {
   const ajv = new Ajv({ allErrors: true });
   const validate = ajv.compile(rule);
   const valid = validate(object);
   if (!valid) throw new Error("AJV: " + ajv.errorsText(validate.errors));
 }
-function handle_error(connection, received_data, managers, message) {
-  if (message != null) logger.error("Error:", message);
-  logger.error(
-    "Connection ID:",
-    connection.get_id(),
-    "Received_data:",
-    received_data
-  );
 
-  managers.admin_server.send(connection.get_id(), "error", {
-    connection_id: connection.get_id(),
-    received_data: received_data,
-    error: message != null ? message : ""
-  });
-}
-
-module.exports = {
+const parse_packet = {
   accept_connection: (connection, received_data, managers) => {
     const login = received_data.login;
     const password = received_data.password;
@@ -42,10 +24,10 @@ module.exports = {
     if (
       login == null ||
       password == null ||
-      config.admin_server.login.toLowerCase() !== login.toLowerCase() ||
-      config.admin_server.password !== password.toLowerCase()
+      config.login.toLowerCase() !== login.toLowerCase() ||
+      config.password !== password.toLowerCase()
     ) {
-      handle_error(
+      managers.admin_server.handle_error(
         connection,
         received_data,
         managers,
@@ -347,3 +329,16 @@ module.exports = {
     });
   }
 };
+
+/**
+ * Need managers:
+ *  - admin_server
+ *  - virtual_world_server
+ */
+class AdminServerManager extends ServerManager {
+  constructor({ root_module, config, DefaultObjectClass }) {
+    super({ root_module, config, parse_packet, DefaultObjectClass });
+  }
+}
+
+module.exports = AdminServerManager;
