@@ -14,10 +14,9 @@ const logger = require("../logger").create_logger({
  * if id exist, then checking connection will work wrong.
  */
 class Server {
-  constructor({ port = 0, options, socket_io_options }) {
+  constructor({ options, socket_io_options }) {
     this.logger = logger;
 
-    this.port = port;
     this.options = {
       send_delay: 0,
       packet_timeout: 25 * 1000, // Not including internal ping
@@ -213,7 +212,7 @@ class Server {
   }
 
   start() {
-    this.socket = io(this.port, this.socket_io_options);
+    this.socket = io(this.options.port, this.socket_io_options);
 
     this.socket.on("connection", socket => {
       this.pending_add_connections_queue_async.push(new Connection(socket));

@@ -22,7 +22,10 @@ class ModuleBase extends EventEmitter {
 
   // The order is important for logic
   setup_managers({ managers, order }) {
-    this.managers = managers;
+    // this.managers is used before setup_managers, object cannot be overwritten
+    for (const [key, value] of Object.entries(managers))
+      this.managers[key] = value;
+
     this.__order = order;
   }
   // Async
