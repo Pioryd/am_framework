@@ -31,9 +31,12 @@ module.exports = [
       const root_module = app.modules_manager.modules_list[module_name];
 
       const enabled_msg = enabled === true;
-      let server_logger = root_module.managers[manager_name].server.logger;
-      server_logger.options = {
-        ...server_logger.options,
+      const manager = root_module.managers[manager_name];
+
+      const net_logger = "server" in manager ? manager.server : manager.client;
+
+      net_logger.options = {
+        ...net_logger.options,
         print_log: enabled_msg,
         print_info: enabled_msg,
         print_error: enabled_msg,
