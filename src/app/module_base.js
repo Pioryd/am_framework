@@ -15,7 +15,7 @@ class ModuleBase extends EventEmitter {
     this.managers = {};
 
     this._ready = false;
-    this._terminate = false;
+    this._terminated = false;
 
     this.__order = {};
   }
@@ -30,7 +30,7 @@ class ModuleBase extends EventEmitter {
   }
   // Async
   on_initialize() {
-    this._terminate = false;
+    this._terminated = false;
     try {
       for (const manager_name of this.__order.initialize)
         this.managers[manager_name].initialize();
@@ -43,7 +43,7 @@ class ModuleBase extends EventEmitter {
 
   // Async
   on_force_terminate() {
-    if (this._terminate) return;
+    if (this._terminated) return;
 
     logger.error(
       "Closing forced, unexpected behavior.\n" +
@@ -55,9 +55,9 @@ class ModuleBase extends EventEmitter {
 
   // Async
   on_terminate() {
-    if (this._terminate) return;
+    if (this._terminated) return;
 
-    this._terminate = true;
+    this._terminated = true;
   }
 
   on_run() {
@@ -69,7 +69,7 @@ class ModuleBase extends EventEmitter {
     if (!_this._ready) return;
 
     try {
-      if (_this._terminate) {
+      if (_this._terminated) {
         _this._terminate(_this);
         return;
       }
