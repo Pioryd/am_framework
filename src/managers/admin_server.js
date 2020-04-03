@@ -72,7 +72,7 @@ const parse_packet = {
   scripts_list: (connection, received_data, managers) => {
     const app = managers.admin_server.root_module.application;
 
-    const scripts_list = app.get_scripts_list();
+    const scripts_list = Object.keys(app.scripts_manager.scripts_map);
 
     managers.admin_server.send(connection.get_id(), "scripts_list", {
       scripts_list
