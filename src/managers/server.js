@@ -67,7 +67,7 @@ class ServerManager {
       received_data
     );
 
-    managers.virtual_world_server.send(connection.get_id(), "error", {
+    this.send(connection.get_id(), "error", {
       received_data,
       error: message != null ? message : ""
     });
