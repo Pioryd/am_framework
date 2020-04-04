@@ -45,12 +45,12 @@ const parse_packet = {
   },
   module_info: (connection, received_data, managers) => {
     const { root_module } = managers.admin_server;
-    const modules_list = Object.keys(
-      root_module.application.modules_manager.modules_list
+    const modules_map = Object.keys(
+      root_module.application.modules_manager.modules_map
     );
-    const root_module_name = modules_list[0];
+    const root_module_name = modules_map[0];
 
-    const json = { root_module_name, modules_list };
+    const json = { root_module_name, modules_map };
     managers.admin_server.send(connection.get_id(), "module_info", { json });
   },
   module_data: (connection, received_data, managers) => {

@@ -18,28 +18,28 @@ class ModulesManager {
     config,
     event_emitter,
     root_path,
-    modules_map,
+    modules_full_name_map,
     paths_auto_find,
     disabled_modules
   }) {
     this.config = config;
     this.event_emitter = event_emitter;
     this.root_path = root_path;
-    this.modules_map = modules_map;
+    this.modules_full_name_map = modules_full_name_map;
     this.paths_auto_find = paths_auto_find;
     this.disabled_modules = disabled_modules;
-    this.modules_list = {};
+    this.modules_map = {};
     this.event_module_bounds = {};
   }
 
   add_event(event_name, module_name) {
-    if (!(event_name in this.modules_list[module_name])) return;
+    if (!(event_name in this.modules_map[module_name])) return;
 
     if (event_name in this.event_module_bounds[module_name])
       this.remove_event(event_name, module_name);
 
     this.event_module_bounds[module_name][event_name] = (...args) => {
-      this.modules_list[module_name][event_name](...args);
+      this.modules_map[module_name][event_name](...args);
     };
     this.event_emitter.on(
       event_name,
@@ -48,7 +48,7 @@ class ModulesManager {
   }
 
   remove_event(event_name, module_name) {
-    if (!(event_name in this.modules_list[module_name])) return;
+    if (!(event_name in this.modules_map[module_name])) return;
     if (!(event_name in this.event_module_bounds[module_name])) return;
 
     this.event_emitter.off(
@@ -66,7 +66,7 @@ class ModulesManager {
 
   terminate_module(module_name) {
     for (const event_name of EVENTS_LIST) {
-      if (event_name in this.modules_list[module_name])
+      if (event_name in this.modules_map[module_name])
         this.remove_event(event_name, module_name);
     }
   }
@@ -79,7 +79,9 @@ class ModulesManager {
         this.load_module(module_name, modules_path);
     }
 
-    for (const [module_name, module_path] of Object.entries(this.modules_map))
+    for (const [module_name, module_path] of Object.entries(
+      this.modules_full_name_map
+    ))
       this.load_module(module_name, module_path);
   }
 
@@ -116,7 +118,7 @@ class ModulesManager {
         .next().value[0];
       const module_config = this.config[module_name];
       valid_config(module_config, module_config_schema_full_name);
-      this.modules_list[module_name] = new fw_module[fw_module_class_name]({
+      this.modules_map[module_name] = new fw_module[fw_module_class_name]({
         event_emitter: this.event_emitter,
         config: module_config
       });

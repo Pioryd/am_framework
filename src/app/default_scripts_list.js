@@ -28,7 +28,7 @@ module.exports = [
     args: ["module name", "manager(server) name", "enabled[true/false]"],
     fn: (app, args) => {
       const [module_name, manager_name, enabled] = args;
-      const root_module = app.modules_manager.modules_list[module_name];
+      const root_module = app.modules_manager.modules_map[module_name];
 
       const enabled_msg = enabled === true;
       const manager = root_module.managers[manager_name];
