@@ -1,12 +1,13 @@
-const ServerManager = require("./server");
+const stringify = require("json-stringify-safe");
+const ObjectID = require("bson-objectid");
+const Ajv = require("ajv");
 
 const logger = require("../logger").create_logger({
   module_name: "am_framework",
   file_name: __filename
 });
 const { AML } = require("../scripting_system").ScriptingSystem;
-const ObjectID = require("bson-objectid");
-const Ajv = require("ajv");
+const ServerManager = require("./server");
 
 function validate_json(rule, object) {
   const ajv = new Ajv({ allErrors: true });
@@ -43,12 +44,17 @@ const parse_packet = {
     return true;
   },
   module_info: (connection, received_data, managers) => {
-    const json = { "Module name": "?", "Connected count": "?" };
+    const { root_module } = managers.admin_server;
+    const modules_list = Object.keys(
+      root_module.application.modules_manager.modules_list
+    );
+    const root_module_name = modules_list[0];
+
+    const json = { root_module_name, modules_list };
     managers.admin_server.send(connection.get_id(), "module_info", { json });
   },
   module_data: (connection, received_data, managers) => {
-    // TODO custom additional data
-    const json = managers.admin_server.root_module.data;
+    const json = JSON.parse(stringify(managers.admin_server.root_module.data));
     managers.admin_server.send(connection.get_id(), "module_data", { json });
   },
   process_script: (connection, received_data, managers) => {
