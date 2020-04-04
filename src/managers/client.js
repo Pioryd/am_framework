@@ -8,8 +8,8 @@ class ClientManager {
     this.on_connected = on_connected;
 
     this.client = new Client({
-      url: config.url,
-      options: config.options
+      options: this.config.options,
+      socket_io_options: this.config.socket_io_options
     });
   }
 

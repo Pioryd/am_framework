@@ -10,10 +10,9 @@ const { Stopwatch } = require("../stopwatch");
  * is using own reconnect.
  */
 class Client {
-  constructor({ url = "", options = {}, socket_io_options = {} }) {
+  constructor({ options = {}, socket_io_options = {} }) {
     this.logger = logger;
 
-    this.url = url;
     this.options = {
       send_delay: 0,
       packet_timeout: 25 * 1000, // Not including internal ping
@@ -143,7 +142,7 @@ class Client {
   }
 
   connect() {
-    this.socket = io(this.url, this.socket_io_options);
+    this.socket = io(this.options.url, this.socket_io_options);
     this.last_packet_time = new Date();
 
     for (const [event_id, event_fun] of Object.entries(
