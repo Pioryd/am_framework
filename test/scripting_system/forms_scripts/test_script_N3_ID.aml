@@ -1,5 +1,5 @@
 id test_script_N3_ID
 name test_script_N3
-data "val": 0 
+data val:0 
 
 js script.data.val++

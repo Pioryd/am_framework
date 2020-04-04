@@ -94,7 +94,11 @@ function parse_header(start_index, lines) {
       break;
   }
 
-  eval(`parsed_header.data = {${parsed_header.data}}`);
+  eval(
+    `parsed_header.data = {${Util.command_args_to_array(
+      parsed_header.data
+    ).join()}}`
+  );
 
   if (
     header_data_found.id === false ||

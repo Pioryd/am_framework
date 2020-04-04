@@ -37,29 +37,6 @@ class ScriptsManager {
       }
       return { script_name, arguments_as_string };
     };
-    const command_args_to_array = function(text) {
-      const re = /^"[^"]*"$/; // Check if argument is surrounded with double-quotes
-      const re2 = /^([^"]|[^"].*?[^"])$/; // Check if argument is NOT surrounded with double-quotes
-
-      let arr = [];
-      let argPart = null;
-
-      text &&
-        text.split(" ").forEach(function(arg) {
-          if ((re.test(arg) || re2.test(arg)) && !argPart) {
-            arr.push(arg);
-          } else {
-            argPart = argPart ? argPart + " " + arg : arg;
-            // If part is complete (ends with a double quote), we can add it to the array
-            if (/"$/.test(argPart)) {
-              arr.push(argPart);
-              argPart = null;
-            }
-          }
-        });
-
-      return arr;
-    };
 
     if (command != null) {
       const parsed = parse(command);
@@ -68,7 +45,7 @@ class ScriptsManager {
     }
 
     if (arguments_as_list == null)
-      arguments_as_list = command_args_to_array(arguments_as_string);
+      arguments_as_list = Util.command_args_to_array(arguments_as_string);
 
     let script_fn = null;
     try {
