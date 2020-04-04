@@ -175,7 +175,7 @@ class Server {
 
   _send(socket, packet_id, data) {
     try {
-      if (!socket.connected) return;
+      if (socket == null || !socket.connected) return;
 
       logger.debug("Send", packet_id);
 

@@ -27,7 +27,7 @@ class Client {
 
     this.last_packet_time = new Date();
     this.parse_packet_dict = {};
-    this.socket = undefined;
+    this.socket = null;
 
     this.pending_parse_packets_queue_async = [];
     this.pending_send_packets_queue = [];
@@ -65,6 +65,8 @@ class Client {
   }
 
   send(packet_id, data) {
+    if (this.socket == null || !this.is_connected()) return;
+
     this.pending_send_packets_queue.push({
       packet_id,
       data
@@ -179,6 +181,9 @@ class Client {
 
     this.socket.removeAllListeners();
     this.socket = null;
+    this.last_packet_time = new Date();
+    this.pending_parse_packets_queue_async = [];
+    this.pending_send_packets_queue = [];
   }
 
   poll() {
