@@ -41,7 +41,7 @@ class Application extends EventEmitter {
       config: this.config.data,
       event_emitter: this,
       root_path: root_full_name,
-      modules_map: this.config.data.app.modules.map,
+      modules_full_name_map: this.config.data.app.modules.map,
       paths_auto_find: this.config.data.app.modules.paths_auto_find,
       disabled_modules: this.config.data.app.modules.disabled
     });
