@@ -1,7 +1,6 @@
 const ObjectID = require("bson-objectid");
 const ReturnValues = require("./return_values");
 const System = require("./system");
-const Form = require("./form");
 const EventEmitter = require("events");
 
 /**
@@ -24,12 +23,20 @@ class Root {
       return_value,
       args
     ) {
-      eval(`this.api_map.${instruction_name}(root,
+      try {
+        eval(`this.api_map.${instruction_name}(root,
         script_id,
         query_id,
         timeout,
         return_value,
         args)`);
+      } catch (e) {
+        let string_function = "";
+        eval(`string_function = this.api_map.${instruction_name}.toString()`);
+        throw new Error(
+          `API - unable to call function(${e.message}): ${string_function}`
+        );
+      }
     };
     this.data = {};
     this.ext = {};
