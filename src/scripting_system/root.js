@@ -14,7 +14,7 @@ class Root {
   constructor() {
     this.system = null;
     this.source = { systems: {}, programs: {}, forms: {}, scripts: {} };
-    this.api_list = {};
+    this.api_map = {};
     this.api = function(
       instruction_name,
       root,
@@ -24,7 +24,7 @@ class Root {
       return_value,
       args
     ) {
-      eval(`this.api_list.${instruction_name}(root,
+      eval(`this.api_map.${instruction_name}(root,
         script_id,
         query_id,
         timeout,
