@@ -104,6 +104,12 @@ class Util {
     }
   }
 
+  static string_to_function_ex(string) {
+    let fn = null;
+    eval(`fn = ${string}`);
+    return fn;
+  }
+
   static command_args_to_array(text) {
     const re = /^"[^"]*"$/; // Check if argument is surrounded with double-quotes
     const re2 = /^([^"]|[^"].*?[^"])$/; // Check if argument is NOT surrounded with double-quotes

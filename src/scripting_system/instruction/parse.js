@@ -192,15 +192,15 @@ function parse_instruction_api(form, instruction) {
     throw "Unable to parse_instruction_api: " + instruction;
 
   const timeout = instruction.timeout != null ? instruction.timeout : "null";
-  const return_value = instruction.return != null ? instruction.return : "";
+  const return_data_key = instruction.return != null ? instruction.return : "";
   let args =
     "{" + (instruction.args != null ? instruction.args.toString() : "") + "}";
   let body =
     `const query_id = root.generate_unique_id();` +
-    `script.add_return_value(query_id, ${timeout});` +
-    `root.api("${instruction.name}", ` +
-    `root, script._id, query_id, ${timeout}, "${return_value}", ${args})`;
-
+    `script.add_return_data(` +
+    `  {query_id, timeout: ${timeout}, key: "${return_data_key}"});` +
+    `root.api(` +
+    `  "${instruction.name}", script._id, query_id, ${timeout}, ${args});`;
   const api = new Api();
   api._id = instruction.id;
   api._fn = Util.string_to_function(`(script, root){${body};}`);
