@@ -1,5 +1,5 @@
 const ObjectID = require("bson-objectid");
-const ReturnValues = require("./return_values");
+const ReturnData = require("./return_data");
 const System = require("./system");
 const EventEmitter = require("events");
 
@@ -14,38 +14,50 @@ class Root {
     this.system = null;
     this.source = { systems: {}, programs: {}, forms: {}, scripts: {} };
     this.api_map = {};
-    this.api = function(
-      instruction_name,
-      root,
-      script_id,
-      query_id,
-      timeout,
-      return_value,
-      args
-    ) {
-      try {
-        eval(`this.api_map.${instruction_name}(root,
-        script_id,
-        query_id,
-        timeout,
-        return_value,
-        args)`);
-      } catch (e) {
-        let string_function = "";
-        eval(`string_function = this.api_map.${instruction_name}.toString()`);
-        throw new Error(
-          `API - unable to call function(${e.message}): ${string_function}`
-        );
-      }
-    };
     this.data = {};
     this.ext = {};
 
     this._debug_enabled = false;
 
-    this.return_values = new ReturnValues();
+    this.return_data = new ReturnData();
     this.signals_event_emitter = new EventEmitter();
     this.events_event_emitter = new EventEmitter();
+  }
+
+  api(fn_full_name, script_id, query_id, timeout, args) {
+    let debug_fn = "Not found api fn";
+    try {
+      let api = null;
+      eval(`api = this.api_map.${fn_full_name}`);
+      if (api == null) return;
+
+      if ("remote_fn" in api) {
+        debug_fn = api.remote_fn;
+        api.remote_fn({ fn_full_name, script_id, query_id, timeout, args });
+      } else if ("local_fn" in api) {
+        debug_fn = api.local_fn;
+        const value = api.local_fn({
+          root: this,
+          timeout,
+          args
+        });
+        this.return_data.insert({ script_id, query_id, value });
+      } else {
+        throw new Error();
+      }
+    } catch (e) {
+      throw new Error(
+        `API - unable to call function(${e.message}): ${debug_fn.toString()}.` +
+          ` Args[${JSON.stringify({
+            fn_full_name,
+            script_id,
+            query_id,
+            timeout,
+            args
+          })}]` +
+          `ApiMap[${JSON.stringify(this.api_map)}]`
+      );
+    }
   }
 
   generate_unique_id() {

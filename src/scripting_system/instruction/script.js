@@ -18,7 +18,7 @@ class Script {
 
     this._debug_enabled = false;
 
-    this._timeout_list = { instructions: {}, return_values_list: [] };
+    this._timeout_list = { instructions: {}, return_data_list: [] };
   }
 
   get_id() {
@@ -34,7 +34,7 @@ class Script {
 
     this.print_debug();
 
-    if (current_script == this) this.check_return_values(current_script, root);
+    if (current_script == this) this.check_return_data(current_script, root);
 
     // Internal:sleep
     if (this._sleep_timer.enabled) {
@@ -68,7 +68,7 @@ class Script {
     } else if (internal === "continue") {
       throw "Unable to find [continue]";
     } else if (return_code === RETURN_CODE.PROCESSED) {
-      this.clear_return_values();
+      this.clear_return_data();
       return { return_code };
     } else {
       return { return_code };
@@ -102,28 +102,34 @@ class Script {
     return true;
   }
 
-  add_return_value(query_id, timeout) {
-    this._timeout_list.return_values_list[query_id] = {
-      stopwatch: new Stopwatch(timeout)
+  add_return_data({ query_id, timeout, key }) {
+    this._timeout_list.return_data_list[query_id] = {
+      stopwatch: new Stopwatch(timeout),
+      key
     };
   }
 
-  check_return_values(script, root) {
-    const new_return_values = root.return_values.pop(script._id);
+  check_return_data(script, root) {
+    const received_return_data_list = root.return_data.pop(script._id);
 
-    for (const return_value of new_return_values) {
-      const { query_id, set } = return_value;
+    for (const received_return_data of received_return_data_list) {
+      const script_return_data =
+        script._timeout_list.return_data_list[received_return_data.query_id];
+      if (script_return_data == null) continue;
 
-      if (query_id in script._timeout_list.return_values_list) {
-        const return_value = script._timeout_list.return_values_list[query_id];
-        if (!return_value.stopwatch.is_elapsed()) set(script, root);
-        delete script._timeout_list.return_values_list[query_id];
-      }
+      if (!script_return_data.stopwatch.is_elapsed())
+        eval(
+          `this.data.${script_return_data.key} = ${received_return_data.value}`
+        );
+
+      delete script._timeout_list.return_data_list[
+        received_return_data.query_id
+      ];
     }
   }
 
-  clear_return_values() {
-    this._timeout_list.return_values_list = [];
+  clear_return_data() {
+    this._timeout_list.return_data_list = [];
   }
 
   print_debug(line_number) {

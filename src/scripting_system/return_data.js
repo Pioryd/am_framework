@@ -1,12 +1,12 @@
-class ReturnValues {
+class ReturnData {
   constructor() {
     this.queues = {};
   }
 
-  insert(script_id, { query_id, set }) {
+  insert({ script_id, query_id, value }) {
     if (!(script_id in this.queues)) this.queues[script_id] = [];
 
-    this.queues[script_id].push({ query_id, set });
+    this.queues[script_id].push({ query_id, value });
   }
 
   pop(script_id) {
@@ -21,4 +21,4 @@ class ReturnValues {
   }
 }
 
-module.exports = ReturnValues;
+module.exports = ReturnData;
