@@ -107,7 +107,11 @@ class Application extends EventEmitter {
             ? ` with arguments ${JSON.stringify(arguments_as_list)}`
             : "")
       );
-      this.scripts_manager.run_script({ script_name, arguments_as_list });
+      try {
+        this.scripts_manager.run_script({ script_name, arguments_as_list });
+      } catch (e) {
+        logger.error(e, e.stack);
+      }
     }
   }
 }

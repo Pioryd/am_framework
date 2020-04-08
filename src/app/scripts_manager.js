@@ -17,13 +17,12 @@ class ScriptsManager {
   }
 
   run_script({
-    command,
-    script_name,
+    command = "",
+    script_name = "",
     arguments_as_string = "",
-    arguments_as_list
+    arguments_as_list = []
   }) {
     const parse = function(command) {
-      command = command.trim();
       if (command === "") command = "help";
       const command_end_index = command.indexOf(" ");
       let script_name = "";
@@ -38,32 +37,28 @@ class ScriptsManager {
       return { script_name, arguments_as_string };
     };
 
-    if (command != null) {
+    if (command != "") {
+      command = command.trim();
       const parsed = parse(command);
       script_name = parsed.script_name;
       arguments_as_string = parsed.arguments_as_string;
     }
 
-    if (arguments_as_list == null)
+    if (arguments_as_list.length === 0)
       arguments_as_list = Util.command_args_to_array(arguments_as_string);
 
     let script_fn = null;
-    try {
-      if ([";", "}"].includes(arguments_as_string.slice(-1)))
-        script_fn = Util.string_to_function(
-          `(app, args)=>{${arguments_as_string}}`
-        );
-      else if (script_name in this.scripts_map)
-        script_fn = this.scripts_map[script_name].fn;
-      else
-        throw new Error(
-          `Unable to parse command$[${command}] or script[${script_name}]`
-        );
 
-      script_fn(this.application, arguments_as_list);
-    } catch (e) {
-      logger.error(e, e.stack);
-    }
+    if ([";", "}"].includes(command.slice(-1)))
+      script_fn = Util.string_to_function(`(app, args)=>{${command}}`);
+    else if (script_name in this.scripts_map)
+      script_fn = this.scripts_map[script_name].fn;
+    else
+      throw new Error(
+        `Unable to parse command$[${command}] or script[${script_name}]`
+      );
+
+    return script_fn(this.application, arguments_as_list);
   }
 
   _initialize() {

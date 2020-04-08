@@ -58,27 +58,50 @@ const parse_packet = {
     managers.admin_server.send(connection.get_id(), "module_data", { json });
   },
   process_script: (connection, received_data, managers) => {
-    const { script } = received_data;
-    const command = "script";
-    const commands_map =
-      managers.admin_server.root_module.application._commands_map;
+    const {
+      action_id,
+      command,
+      script_name,
+      arguments_as_string
+    } = received_data;
+    const { scripts_manager } = managers.admin_server.root_module.application;
 
-    if (!(command in commands_map)) {
-      logger.error("Command does not exist:", command, "with args:", args);
-      return false;
+    let ret_val = null;
+    let error_data = null;
+
+    try {
+      if (command != null) ret_val = scripts_manager.run_script({ command });
+      else if (script_name != null)
+        ret_val = scripts_manager.run_script({
+          script_name,
+          arguments_as_string
+        });
+      else
+        throw new Error(
+          `Wrong scripts data[${{ command, script_name, arguments_as_string }}]`
+        );
+    } catch (e) {
+      error_data = { error: e.message, stack: e.stack };
     }
 
-    logger.log(
-      `Executing command[${command}] with arg[${
-        script.length >= 10 ? `${script.substr(0, 10)}...` : script
-      }]`
-    );
-    commands_map[command](script);
+    if (ret_val != null) {
+      managers.admin_server.send(connection.get_id(), "process_script", {
+        json: { action_id, ret_val }
+      });
+    } else if (error_data != null) {
+      managers.admin_server.send(connection.get_id(), "process_script", {
+        json: { action_id, ...error_data }
+      });
+    }
   },
   scripts_list: (connection, received_data, managers) => {
     const app = managers.admin_server.root_module.application;
 
-    const scripts_list = Object.keys(app.scripts_manager.scripts_map);
+    const scripts_list = [];
+    for (const script of Object.values(app.scripts_manager.scripts_map)) {
+      const { name, desc, args } = script;
+      scripts_list.push({ name, desc, args });
+    }
 
     managers.admin_server.send(connection.get_id(), "scripts_list", {
       scripts_list
