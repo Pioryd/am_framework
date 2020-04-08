@@ -1,6 +1,7 @@
 const stringify = require("json-stringify-safe");
 const ObjectID = require("bson-objectid");
 const Ajv = require("ajv");
+const { Database } = require("../database");
 
 const logger = require("../logger").create_logger({
   module_name: "am_framework",

@@ -10,7 +10,7 @@ const logger = create_logger({
   file_name: __filename
 });
 
-class DatabaseManager {
+class DatabaseStaticManager {
   constructor({
     root_module,
     config,
@@ -100,4 +100,4 @@ class DatabaseManager {
   }
 }
 
-module.exports = DatabaseManager;
+module.exports = DatabaseStaticManager;
