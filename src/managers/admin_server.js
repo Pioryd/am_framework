@@ -10,7 +10,9 @@ const logger = require("../logger").create_logger({
 const { AML } = require("../scripting_system").ScriptingSystem;
 const ServerManager = require("./server");
 
-function validate_json(rule, object) {
+function validate_json(object, managers, var_ext_name) {
+  const rule =
+    managers.admin_server.root_module.config.am_data_rules[var_ext_name];
   const ajv = new Ajv({ allErrors: true });
   const validate = ajv.compile(rule);
   const valid = validate(object);
@@ -21,7 +23,7 @@ function data_parse_and_send(
   connection,
   received_data,
   managers,
-  { packet_ext_name, data_name, rule_name }
+  var_ext_name
 ) {
   if (managers.admin_server.DefaultObjectClass == null)
     throw new Error("DefaultObjectClass is not set");
@@ -31,13 +33,13 @@ function data_parse_and_send(
 
   const db_objects_list = [];
 
-  for (const value of Object.values(module_data[data_name]))
+  for (const value of Object.values(module_data[`${var_ext_name}s_map`]))
     db_objects_list.push(value._data);
 
-  managers.admin_server.send(connection.get_id(), `data_${packet_ext_name}`, {
+  managers.admin_server.send(connection.get_id(), `data_${var_ext_name}`, {
     action_id,
     db_objects_list,
-    rules: managers.admin_server.root_module.config.am_data_rules[rule_name]
+    rules: managers.admin_server.root_module.config.am_data_rules[var_ext_name]
   });
 }
 
@@ -45,14 +47,14 @@ function update_parse_and_send(
   connection,
   received_data,
   managers,
-  { packet_ext_name, data_name, create_data, validate }
+  { var_ext_name, create_data, validate }
 ) {
   if (managers.admin_server.DefaultObjectClass == null)
     throw new Error("DefaultObjectClass is not set");
 
   const { action, object } = received_data;
   const module_data = managers.admin_server.root_module.data;
-  const map = module_data[data_name];
+  const map = module_data[`${var_ext_name}s_map`];
 
   let message = "Unknown";
 
@@ -67,7 +69,7 @@ function update_parse_and_send(
     message = `Removed id[${object.id}]`;
   } else if (action.type === "update") {
     try {
-      validate(object);
+      validate(object, managers, var_ext_name);
 
       // "id: map[id].get_id()" to be sure id wont be override
       map[object.id]._data = {
@@ -84,7 +86,7 @@ function update_parse_and_send(
     message = `Wrong action type. Id[${action.id}] Type: [${action.type}]`;
   }
 
-  managers.admin_server.send(connection.get_id(), `update_${packet_ext_name}`, {
+  managers.admin_server.send(connection.get_id(), `update_${var_ext_name}`, {
     action_id: action.id,
     message
   });
@@ -208,101 +210,49 @@ const parse_packet = {
     });
   },
   data_am_form: (connection, received_data, managers) => {
-    data_parse_and_send(connection, received_data, managers, {
-      packet_ext_name: "am_form",
-      data_name: "am_forms_map",
-      rule_name: "form"
-    });
+    data_parse_and_send(connection, received_data, managers, "am_form");
   },
   data_am_program: (connection, received_data, managers) => {
-    data_parse_and_send(connection, received_data, managers, {
-      packet_ext_name: "am_program",
-      data_name: "am_programs_map",
-      rule_name: "program"
-    });
+    data_parse_and_send(connection, received_data, managers, "am_program");
   },
   data_am_system: (connection, received_data, managers) => {
-    data_parse_and_send(connection, received_data, managers, {
-      packet_ext_name: "am_system",
-      data_name: "am_systems_map",
-      rule_name: "system"
-    });
+    data_parse_and_send(connection, received_data, managers, "am_system");
   },
   data_am_script: (connection, received_data, managers) => {
-    data_parse_and_send(connection, received_data, managers, {
-      packet_ext_name: "am_script",
-      data_name: "am_scripts_map",
-      rule_name: "script"
-    });
+    data_parse_and_send(connection, received_data, managers, "am_script");
   },
   update_am_form: (connection, received_data, managers) => {
     update_parse_and_send(connection, received_data, managers, {
-      packet_ext_name: "am_form",
-      data_name: "am_forms_map",
-      create_data: new_id => {
-        return {
-          name: "new_" + new_id,
-          id: new_id,
-          rules: [],
-          scripts: []
-        };
+      var_ext_name: "am_form",
+      create_data: id => {
+        return { id, name: `new_${id}`, rules: [], scripts: [] };
       },
-      validate: object => {
-        validate_json(
-          managers.admin_server.root_module.config.am_data_rules.form,
-          object
-        );
-      }
+      validate: validate_json
     });
   },
   update_am_program: (connection, received_data, managers) => {
     update_parse_and_send(connection, received_data, managers, {
-      packet_ext_name: "am_program",
-      data_name: "am_programs_map",
+      var_ext_name: "am_program",
       create_data: id => {
-        return {
-          name: "new_" + id,
-          id,
-          rules: [],
-          forms: []
-        };
+        return { id, name: `new_${id}`, rules: [], forms: [] };
       },
-      validate: object => {
-        validate_json(
-          managers.admin_server.root_module.config.am_data_rules.program,
-          object
-        );
-      }
+      validate: validate_json
     });
   },
   update_am_system: (connection, received_data, managers) => {
     update_parse_and_send(connection, received_data, managers, {
-      packet_ext_name: "am_system",
-      data_name: "am_systems_map",
+      var_ext_name: "am_system",
       create_data: id => {
-        return {
-          name: "new_" + id,
-          id,
-          programs: []
-        };
+        return { id, name: `new_${id}`, programs: [] };
       },
-      validate: object => {
-        validate_json(
-          managers.admin_server.root_module.config.am_data_rules.system,
-          object
-        );
-      }
+      validate: validate_json
     });
   },
   update_am_script: (connection, received_data, managers) => {
     update_parse_and_send(connection, received_data, managers, {
-      packet_ext_name: "am_script",
-      data_name: "am_scripts_map",
+      var_ext_name: "am_script",
       create_data: id => {
-        return {
-          id: id,
-          source: `id ${id}\r\nname new_${id}\r\n data\r\n`
-        };
+        return { id, source: `id ${id}\r\nname new_${id}\r\n data\r\n` };
       },
       validate: object => AML.parse(object.source)
     });
