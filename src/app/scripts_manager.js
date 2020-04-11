@@ -16,14 +16,36 @@ class ScriptsManager {
     this._initialize();
   }
 
-  run_script({
-    command = "",
-    script_name = "",
-    arguments_as_string = "",
-    arguments_as_list = []
+  get_scripts_data() {
+    const scripts_list = [];
+    for (const script of Object.values(this.scripts_map)) {
+      const { name, desc, args } = script;
+      scripts_list.push({ name, desc, args });
+    }
+    return scripts_list;
+  }
+
+  run_script(args) {
+    let ret_val = null;
+    let error_data = null;
+
+    try {
+      ret_val = this._run_script(args);
+    } catch (e) {
+      error_data = { error: e.message, stack: e.stack };
+    }
+
+    if (args.callback != null) args.callback({ ret_val, error_data });
+  }
+
+  _run_script({
+    command,
+    script_name,
+    arguments_as_string,
+    arguments_as_list
   }) {
     const parse = function(command) {
-      if (command === "") command = "help";
+      if (command == null || command === "") command = "help";
       const command_end_index = command.indexOf(" ");
       let script_name = "";
       let arguments_as_string = "";
@@ -36,6 +58,11 @@ class ScriptsManager {
       }
       return { script_name, arguments_as_string };
     };
+
+    if (command == null) command = "";
+    if (script_name == null) script_name = "";
+    if (arguments_as_string == null) arguments_as_string = "";
+    if (!Array.isArray(arguments_as_list)) arguments_as_list = [];
 
     if (command != "") {
       command = command.trim();
