@@ -17,6 +17,79 @@ function validate_json(rule, object) {
   if (!valid) throw new Error("AJV: " + ajv.errorsText(validate.errors));
 }
 
+function data_parse_and_send(
+  connection,
+  received_data,
+  managers,
+  { packet_ext_name, data_name, rule_name }
+) {
+  if (managers.admin_server.DefaultObjectClass == null)
+    throw new Error("DefaultObjectClass is not set");
+
+  const { action_id } = received_data;
+  const module_data = managers.admin_server.root_module.data;
+
+  const db_objects_list = [];
+
+  for (const value of Object.values(module_data[data_name]))
+    db_objects_list.push(value._data);
+
+  managers.admin_server.send(connection.get_id(), `data_${packet_ext_name}`, {
+    action_id,
+    db_objects_list,
+    rules: managers.admin_server.root_module.config.am_data_rules[rule_name]
+  });
+}
+
+function update_parse_and_send(
+  connection,
+  received_data,
+  managers,
+  { packet_ext_name, data_name, create_data, validate }
+) {
+  if (managers.admin_server.DefaultObjectClass == null)
+    throw new Error("DefaultObjectClass is not set");
+
+  const { action, object } = received_data;
+  const module_data = managers.admin_server.root_module.data;
+  const map = module_data[data_name];
+
+  let message = "Unknown";
+
+  if (action.type === "new") {
+    const new_id = ObjectID().toHexString();
+    map[new_id] = new managers.admin_server.DefaultObjectClass(
+      create_data(new_id)
+    );
+    message = `Added id[${new_id}]`;
+  } else if (action.type === "remove") {
+    delete map[object.id];
+    message = `Removed id[${object.id}]`;
+  } else if (action.type === "update") {
+    try {
+      validate(object);
+
+      // "id: map[id].get_id()" to be sure id wont be override
+      map[object.id]._data = {
+        ...map[object.id]._data,
+        ...object,
+        id: map[object.id].get_id()
+      };
+      message = `Updated id[${object.id}]`;
+    } catch (e) {
+      logger.error(e);
+      message = e.message;
+    }
+  } else {
+    message = `Wrong action type. Id[${action.id}] Type: [${action.type}]`;
+  }
+
+  managers.admin_server.send(connection.get_id(), `update_${packet_ext_name}`, {
+    action_id: action.id,
+    message
+  });
+}
+
 const parse_packet = {
   accept_connection: (connection, received_data, managers) => {
     const login = received_data.login;
@@ -58,7 +131,7 @@ const parse_packet = {
     const json = JSON.parse(stringify(managers.admin_server.root_module.data));
     managers.admin_server.send(connection.get_id(), "module_data", { json });
   },
-  process_script: (connection, received_data, managers) => {
+  scripts_process: (connection, received_data, managers) => {
     const {
       action_id,
       command,
@@ -67,260 +140,36 @@ const parse_packet = {
     } = received_data;
     const { scripts_manager } = managers.admin_server.root_module.application;
 
-    let ret_val = null;
-    let error_data = null;
-
-    try {
-      if (command != null) ret_val = scripts_manager.run_script({ command });
-      else if (script_name != null)
-        ret_val = scripts_manager.run_script({
-          script_name,
-          arguments_as_string
+    scripts_manager.run_script({
+      command,
+      script_name,
+      arguments_as_string,
+      callback: ({ ret_val, error_data }) => {
+        let json = {};
+        if (ret_val != null) json = { action_id, ret_val };
+        else if (error_data != null) json = { action_id, ...error_data };
+        else json = { action_id };
+        managers.admin_server.send(connection.get_id(), "scripts_process", {
+          json
         });
-      else
-        throw new Error(
-          `Wrong scripts data[${{ command, script_name, arguments_as_string }}]`
-        );
-    } catch (e) {
-      error_data = { error: e.message, stack: e.stack };
-    }
-
-    if (ret_val != null) {
-      managers.admin_server.send(connection.get_id(), "process_script", {
-        json: { action_id, ret_val }
-      });
-    } else if (error_data != null) {
-      managers.admin_server.send(connection.get_id(), "process_script", {
-        json: { action_id, ...error_data }
-      });
-    }
-  },
-  scripts_list: (connection, received_data, managers) => {
-    const app = managers.admin_server.root_module.application;
-
-    const scripts_list = [];
-    for (const script of Object.values(app.scripts_manager.scripts_map)) {
-      const { name, desc, args } = script;
-      scripts_list.push({ name, desc, args });
-    }
-
-    managers.admin_server.send(connection.get_id(), "scripts_list", {
-      scripts_list
-    });
-  },
-  data_am_form: (connection, received_data, managers) => {
-    if (managers.admin_server.DefaultObjectClass == null)
-      throw new Error("DefaultObjectClass is not set");
-
-    const { action_id } = received_data;
-    const module_data = managers.admin_server.root_module.data;
-
-    const list = [];
-
-    for (const value of Object.values(module_data.am_forms_map))
-      list.push(value._data);
-
-    managers.admin_server.send(connection.get_id(), "data_am_form", {
-      action_id,
-      list,
-      rules: managers.admin_server.root_module.config.am_data_rules.form
-    });
-  },
-  data_am_program: (connection, received_data, managers) => {
-    if (managers.admin_server.DefaultObjectClass == null)
-      throw new Error("DefaultObjectClass is not set");
-
-    const { action_id } = received_data;
-    const module_data = managers.admin_server.root_module.data;
-
-    const list = [];
-
-    for (const value of Object.values(module_data.am_programs_map))
-      list.push(value._data);
-
-    managers.admin_server.send(connection.get_id(), "data_am_program", {
-      action_id,
-      list,
-      rules: managers.admin_server.root_module.config.am_data_rules.program
-    });
-  },
-  data_am_system: (connection, received_data, managers) => {
-    if (managers.admin_server.DefaultObjectClass == null)
-      throw new Error("DefaultObjectClass is not set");
-
-    const { action_id } = received_data;
-    const module_data = managers.admin_server.root_module.data;
-
-    const list = [];
-
-    for (const value of Object.values(module_data.am_systems_map))
-      list.push(value._data);
-
-    managers.admin_server.send(connection.get_id(), "data_am_system", {
-      action_id,
-      list,
-      rules: managers.admin_server.root_module.config.am_data_rules.system
-    });
-  },
-  data_am_script: (connection, received_data, managers) => {
-    if (managers.admin_server.DefaultObjectClass == null)
-      throw new Error("DefaultObjectClass is not set");
-
-    const { action_id } = received_data;
-    const module_data = managers.admin_server.root_module.data;
-
-    const list = [];
-
-    for (const value of Object.values(module_data.am_scripts_map))
-      list.push(value._data);
-
-    managers.admin_server.send(connection.get_id(), "data_am_script", {
-      action_id,
-      list,
-      rules: managers.admin_server.root_module.config.am_data_rules.system
-    });
-  },
-  update_am_form: (connection, received_data, managers) => {
-    if (managers.admin_server.DefaultObjectClass == null)
-      throw new Error("DefaultObjectClass is not set");
-
-    const { action_id, id, object } = received_data;
-    const module_data = managers.admin_server.root_module.data;
-    const map = module_data.am_forms_map;
-
-    let message = "Unknown";
-
-    if (id === "") {
-      const id = ObjectID().toHexString();
-      map[id] = new managers.admin_server.DefaultObjectClass({
-        name: "new_" + id,
-        id,
-        rules: [],
-        scripts: []
-      });
-      message = `Added id[${id}]`;
-    } else if (!(id in map)) {
-      message = `Wrong id[${id}]`;
-    } else if (object == null) {
-      delete map[id];
-      message = `Removed id[${id}]`;
-    } else {
-      try {
-        validate_json(
-          managers.admin_server.root_module.config.am_data_rules.form,
-          object
-        );
-
-        // "id: map[id].get_id()" to be sure id wont be override
-        map[id]._data = { ...map[id]._data, ...object, id: map[id].get_id() };
-        message = `Updated id[${id}]`;
-      } catch (e) {
-        logger.error(e);
-        message = e.message;
       }
-    }
-
-    managers.admin_server.send(connection.get_id(), "update_am_form", {
-      action_id,
-      message
     });
   },
-  update_am_program: (connection, received_data, managers) => {
+  scripts_data: (connection, received_data, managers) => {
+    const { scripts_manager } = managers.admin_server.root_module.application;
+    const scripts_data = scripts_manager.get_scripts_data();
+
+    managers.admin_server.send(connection.get_id(), "scripts_data", {
+      scripts_data
+    });
+  },
+  scripts_update: (connection, received_data, managers) => {
     if (managers.admin_server.DefaultObjectClass == null)
       throw new Error("DefaultObjectClass is not set");
 
     const { action_id, id, object } = received_data;
     const module_data = managers.admin_server.root_module.data;
-    const map = module_data.am_programs_map;
-
-    let message = "Unknown";
-
-    if (id === "") {
-      const id = ObjectID().toHexString();
-      map[id] = new managers.admin_server.DefaultObjectClass({
-        name: "new_" + id,
-        id,
-        rules: [],
-        forms: []
-      });
-      message = `Added id[${id}]`;
-    } else if (!(id in map)) {
-      message = `Wrong id[${id}]`;
-    } else if (object == null) {
-      delete map[id];
-      message = `Removed id[${id}]`;
-    } else {
-      try {
-        validate_json(
-          managers.admin_server.root_module.config.am_data_rules.program,
-          object
-        );
-
-        // "id: map[id].get_id()" to be sure id wont be override
-        map[id]._data = { ...map[id]._data, ...object, id: map[id].get_id() };
-        message = `Updated id[${id}]`;
-      } catch (e) {
-        logger.error(e);
-        message = e.message;
-      }
-    }
-
-    managers.admin_server.send(connection.get_id(), "update_am_program", {
-      action_id,
-      message
-    });
-  },
-  update_am_system: (connection, received_data, managers) => {
-    if (managers.admin_server.DefaultObjectClass == null)
-      throw new Error("DefaultObjectClass is not set");
-
-    const { action_id, id, object } = received_data;
-    const module_data = managers.admin_server.root_module.data;
-    const map = module_data.am_systems_map;
-
-    let message = "Unknown";
-
-    if (id === "") {
-      const id = ObjectID().toHexString();
-      map[id] = new managers.admin_server.DefaultObjectClass({
-        name: "new_" + id,
-        id,
-        programs: []
-      });
-      message = `Added id[${id}]`;
-    } else if (!(id in map)) {
-      message = `Wrong id[${id}]`;
-    } else if (object == null) {
-      delete map[id];
-      message = `Removed id[${id}]`;
-    } else {
-      try {
-        validate_json(
-          managers.admin_server.root_module.config.am_data_rules.system,
-          object
-        );
-
-        // "id: map[id].get_id()" to be sure id wont be override
-        map[id]._data = { ...map[id]._data, ...object, id: map[id].get_id() };
-        message = `Updated id[${id}]`;
-      } catch (e) {
-        logger.error(e);
-        message = e.message;
-      }
-    }
-
-    managers.admin_server.send(connection.get_id(), "update_am_system", {
-      action_id,
-      message
-    });
-  },
-  update_am_script: (connection, received_data, managers) => {
-    if (managers.admin_server.DefaultObjectClass == null)
-      throw new Error("DefaultObjectClass is not set");
-
-    const { action_id, id, object } = received_data;
-    const module_data = managers.admin_server.root_module.data;
-    const map = module_data.am_scripts_map;
+    const map = module_data.admin_scripts_map;
 
     let message = "Unknown";
 
@@ -353,18 +202,113 @@ const parse_packet = {
       }
     }
 
-    managers.admin_server.send(connection.get_id(), "update_am_script", {
+    managers.admin_server.send(connection.get_id(), "scripts_update", {
       action_id,
       message
+    });
+  },
+  data_am_form: (connection, received_data, managers) => {
+    data_parse_and_send(connection, received_data, managers, {
+      packet_ext_name: "am_form",
+      data_name: "am_forms_map",
+      rule_name: "form"
+    });
+  },
+  data_am_program: (connection, received_data, managers) => {
+    data_parse_and_send(connection, received_data, managers, {
+      packet_ext_name: "am_program",
+      data_name: "am_programs_map",
+      rule_name: "program"
+    });
+  },
+  data_am_system: (connection, received_data, managers) => {
+    data_parse_and_send(connection, received_data, managers, {
+      packet_ext_name: "am_system",
+      data_name: "am_systems_map",
+      rule_name: "system"
+    });
+  },
+  data_am_script: (connection, received_data, managers) => {
+    data_parse_and_send(connection, received_data, managers, {
+      packet_ext_name: "am_script",
+      data_name: "am_scripts_map",
+      rule_name: "script"
+    });
+  },
+  update_am_form: (connection, received_data, managers) => {
+    update_parse_and_send(connection, received_data, managers, {
+      packet_ext_name: "am_form",
+      data_name: "am_forms_map",
+      create_data: new_id => {
+        return {
+          name: "new_" + new_id,
+          id: new_id,
+          rules: [],
+          scripts: []
+        };
+      },
+      validate: object => {
+        validate_json(
+          managers.admin_server.root_module.config.am_data_rules.form,
+          object
+        );
+      }
+    });
+  },
+  update_am_program: (connection, received_data, managers) => {
+    update_parse_and_send(connection, received_data, managers, {
+      packet_ext_name: "am_program",
+      data_name: "am_programs_map",
+      create_data: id => {
+        return {
+          name: "new_" + id,
+          id,
+          rules: [],
+          forms: []
+        };
+      },
+      validate: object => {
+        validate_json(
+          managers.admin_server.root_module.config.am_data_rules.program,
+          object
+        );
+      }
+    });
+  },
+  update_am_system: (connection, received_data, managers) => {
+    update_parse_and_send(connection, received_data, managers, {
+      packet_ext_name: "am_system",
+      data_name: "am_systems_map",
+      create_data: id => {
+        return {
+          name: "new_" + id,
+          id,
+          programs: []
+        };
+      },
+      validate: object => {
+        validate_json(
+          managers.admin_server.root_module.config.am_data_rules.system,
+          object
+        );
+      }
+    });
+  },
+  update_am_script: (connection, received_data, managers) => {
+    update_parse_and_send(connection, received_data, managers, {
+      packet_ext_name: "am_script",
+      data_name: "am_scripts_map",
+      create_data: id => {
+        return {
+          id: id,
+          source: `id ${id}\r\nname new_${id}\r\n data\r\n`
+        };
+      },
+      validate: object => AML.parse(object.source)
     });
   }
 };
 
-/**
- * Need managers:
- *  - admin_server
- *  - virtual_world_server
- */
 class AdminServerManager extends ServerManager {
   constructor({ root_module, config, DefaultObjectClass }) {
     super({ root_module, config, parse_packet, DefaultObjectClass });
