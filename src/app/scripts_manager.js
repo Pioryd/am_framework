@@ -16,15 +16,6 @@ class ScriptsManager {
     this._initialize();
   }
 
-  get_scripts_data() {
-    const scripts_list = [];
-    for (const script of Object.values(this.scripts_map)) {
-      const { name, desc, args } = script;
-      scripts_list.push({ name, desc, args });
-    }
-    return scripts_list;
-  }
-
   run_script(args) {
     let ret_val = null;
     let error_data = null;

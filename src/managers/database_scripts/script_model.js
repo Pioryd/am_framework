@@ -18,7 +18,7 @@ const schema = {
     name: { type: String, required: true },
     desc: { type: String, required: true },
     args: { type: [String], required: true },
-    source: { type: String, required: true }
+    fn: { type: String, required: true }
   }
 };
 
@@ -41,37 +41,19 @@ class Script {
     );
   }
 
-  save(objects, callback, index = 0) {
-    if (!Array.isArray(objects)) objects = [objects];
-
-    if (index < objects.length && objects.length > 0) {
-      const object = objects[index];
-      index++;
-
-      if (object == null) {
-        callback({
-          step: this.model.collection.name + ".save"
-        });
-        return;
-      }
-
-      this.model.updateOne(
-        { id: object.id },
-        { ...object },
-        { upsert: true },
-        (error, raw) => {
-          try {
-            if (error) callback({ error: error, results: raw });
-            else this.save(classes_instances, callback, index);
-          } catch (e) {
-            logger.error(e, e.stack);
-          }
+  save(object, callback) {
+    this.model.updateOne(
+      { id: object.id },
+      { ...object },
+      { upsert: true },
+      (error, raw) => {
+        try {
+          callback({ error: error, results: raw });
+        } catch (e) {
+          logger.error(e, e.stack);
         }
-      );
-      return;
-    }
-
-    callback({});
+      }
+    );
   }
 
   remove(id, callback) {

@@ -133,7 +133,7 @@ const parse_packet = {
     const json = JSON.parse(stringify(managers.admin_server.root_module.data));
     managers.admin_server.send(connection.get_id(), "module_data", { json });
   },
-  scripts_process: (connection, received_data, managers) => {
+  process_admin_script: (connection, received_data, managers) => {
     const {
       action_id,
       command,
@@ -151,63 +151,47 @@ const parse_packet = {
         if (ret_val != null) json = { action_id, ret_val };
         else if (error_data != null) json = { action_id, ...error_data };
         else json = { action_id };
-        managers.admin_server.send(connection.get_id(), "scripts_process", {
-          json
+        managers.admin_server.send(
+          connection.get_id(),
+          "process_admin_script",
+          { json }
+        );
+      }
+    });
+  },
+  data_admin_script: (connection, received_data, managers) => {
+    const { action_id } = received_data;
+
+    managers.database_scripts.database.models["script"].load_all(
+      ({ error, results }) => {
+        const {
+          scripts_manager
+        } = managers.admin_server.root_module.application;
+        const scripts_list = Object.values(scripts_manager.scripts_map);
+        const db_objects_list = [];
+        for (let i = 0; i < scripts_list.length; i++) {
+          const object = scripts_list[i];
+          db_objects_list.push({
+            ...object,
+            id: "local",
+            fn: object.fn.toString()
+          });
+        }
+
+        for (const result of results) {
+          const data = result._doc;
+          delete data._id;
+          delete data.__v;
+          db_objects_list.push(data);
+        }
+
+        managers.admin_server.send(connection.get_id(), "data_admin_script", {
+          action_id,
+          db_objects_list,
+          message: error
         });
       }
-    });
-  },
-  scripts_data: (connection, received_data, managers) => {
-    const { scripts_manager } = managers.admin_server.root_module.application;
-    const scripts_data = scripts_manager.get_scripts_data();
-
-    managers.admin_server.send(connection.get_id(), "scripts_data", {
-      scripts_data
-    });
-  },
-  scripts_update: (connection, received_data, managers) => {
-    if (managers.admin_server.DefaultObjectClass == null)
-      throw new Error("DefaultObjectClass is not set");
-
-    const { action_id, id, object } = received_data;
-    const module_data = managers.admin_server.root_module.data;
-    const map = module_data.admin_scripts_map;
-
-    let message = "Unknown";
-
-    if (id === "") {
-      const id = ObjectID().toHexString();
-      map[id] = new managers.admin_server.DefaultObjectClass({
-        id,
-        source: `id ${id}\r\nname new_${id}\r\n data\r\n`
-      });
-      message = `Added id[${id}]`;
-    } else if (!(id in map)) {
-      message = `Wrong id[${id}]`;
-    } else if (object == null) {
-      delete map[id];
-      message = `Removed id[${id}]`;
-    } else {
-      try {
-        AML.parse(object);
-
-        // "id: map[id].get_id()" to be sure id wont be override
-        map[id]._data = {
-          ...map[id]._data,
-          source: object,
-          id: map[id].get_id()
-        };
-        message = `Updated id[${id}]`;
-      } catch (e) {
-        logger.error(e);
-        message = e.message;
-      }
-    }
-
-    managers.admin_server.send(connection.get_id(), "scripts_update", {
-      action_id,
-      message
-    });
+    );
   },
   data_am_form: (connection, received_data, managers) => {
     data_parse_and_send(connection, received_data, managers, "am_form");
@@ -220,6 +204,61 @@ const parse_packet = {
   },
   data_am_script: (connection, received_data, managers) => {
     data_parse_and_send(connection, received_data, managers, "am_script");
+  },
+  update_admin_script: (connection, received_data, managers) => {
+    const { action, object } = received_data;
+    const script_model = managers.database_scripts.database.models["script"];
+
+    const send = message => {
+      managers.admin_server.send(connection.get_id(), "update_admin_script", {
+        action_id: action.id,
+        message
+      });
+    };
+
+    if (action.type === "new") {
+      const new_id = ObjectID().toHexString();
+      const new_object = {
+        id: new_id,
+        type: "type_" + new_id,
+        name: "new_" + new_id,
+        desc: "",
+        args: [],
+        fn: `(app, args) => {}`
+      };
+      script_model.save(new_object, ({ error, results }) =>
+        send(`Added id[${object.id}]. Errors[${error}]`)
+      );
+    } else if (action.type === "remove") {
+      script_model.remove(object.id, ({ error, results }) =>
+        send(`Removed id[${object.id}]. Errors[${error}]`)
+      );
+    } else if (action.type === "update") {
+      try {
+        if (
+          ["id", "type", "name", "desc", "args", "fn"].map(value => {
+            if (!(value in object))
+              throw new Error(`Object doesn't contains key[${value}]`);
+          })
+        )
+          const updated_data = {
+            id: object.id,
+            type: object.type,
+            name: object.name,
+            desc: object.desc,
+            args: object.args,
+            fn: object.fn
+          };
+
+        script_model.save(updated_data, ({ error, results }) =>
+          send(`Updated id[${object.id}]. Errors[${error}]`)
+        );
+      } catch (e) {
+        send(e.message);
+      }
+    } else {
+      send(`Wrong action type. Id[${action.id}] Type: [${action.type}]`);
+    }
   },
   update_am_form: (connection, received_data, managers) => {
     update_parse_and_send(connection, received_data, managers, {
