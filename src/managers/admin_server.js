@@ -1,7 +1,6 @@
 const stringify = require("json-stringify-safe");
 const ObjectID = require("bson-objectid");
 const Ajv = require("ajv");
-const { Database } = require("../database");
 
 const logger = require("../logger").create_logger({
   module_name: "am_framework",
@@ -134,27 +133,16 @@ const parse_packet = {
     managers.admin_server.send(connection.get_id(), "module_data", { json });
   },
   process_admin_script: (connection, received_data, managers) => {
-    const {
-      action_id,
-      command,
-      script_name,
-      arguments_as_string
-    } = received_data;
+    const { action_id, object } = received_data;
     const { scripts_manager } = managers.admin_server.root_module.application;
 
     scripts_manager.run_script({
-      command,
-      script_name,
-      arguments_as_string,
+      script_fn_as_string: object.fn,
       callback: ({ ret_val, error_data }) => {
-        let json = {};
-        if (ret_val != null) json = { action_id, ret_val };
-        else if (error_data != null) json = { action_id, ...error_data };
-        else json = { action_id };
         managers.admin_server.send(
           connection.get_id(),
           "process_admin_script",
-          { json }
+          { action_id, message: { ret_val, error_data } }
         );
       }
     });
@@ -173,7 +161,7 @@ const parse_packet = {
           const object = scripts_list[i];
           db_objects_list.push({
             ...object,
-            id: "local",
+            type: "local",
             fn: object.fn.toString()
           });
         }
@@ -235,20 +223,19 @@ const parse_packet = {
       );
     } else if (action.type === "update") {
       try {
-        if (
-          ["id", "type", "name", "desc", "args", "fn"].map(value => {
-            if (!(value in object))
-              throw new Error(`Object doesn't contains key[${value}]`);
-          })
-        )
-          const updated_data = {
-            id: object.id,
-            type: object.type,
-            name: object.name,
-            desc: object.desc,
-            args: object.args,
-            fn: object.fn
-          };
+        ["id", "type", "name", "desc", "args", "fn"].map(value => {
+          if (!(value in object))
+            throw new Error(`Object doesn't contains key[${value}]`);
+        });
+
+        const updated_data = {
+          id: object.id,
+          type: object.type,
+          name: object.name,
+          desc: object.desc,
+          args: object.args,
+          fn: object.fn
+        };
 
         script_model.save(updated_data, ({ error, results }) =>
           send(`Updated id[${object.id}]. Errors[${error}]`)
