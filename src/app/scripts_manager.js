@@ -30,6 +30,7 @@ class ScriptsManager {
   }
 
   _run_script({
+    script_fn_as_string,
     command,
     script_name,
     arguments_as_string,
@@ -66,8 +67,9 @@ class ScriptsManager {
       arguments_as_list = Util.command_args_to_array(arguments_as_string);
 
     let script_fn = null;
-
-    if ([";", "}"].includes(command.slice(-1)))
+    if (script_fn_as_string != null)
+      script_fn = Util.string_to_function(script_fn_as_string);
+    else if ([";", "}"].includes(command.slice(-1)))
       script_fn = Util.string_to_function(`(app, args)=>{${command}}`);
     else if (script_name in this.scripts_map)
       script_fn = this.scripts_map[script_name].fn;
