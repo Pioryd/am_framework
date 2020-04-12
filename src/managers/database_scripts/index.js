@@ -10,6 +10,10 @@ class DatabaseWorldManager extends DatabaseDynamic {
       models: { script: new ScriptModel() }
     });
   }
+
+  get_model() {
+    return this.database.models["script"];
+  }
 }
 
 module.exports = DatabaseWorldManager;

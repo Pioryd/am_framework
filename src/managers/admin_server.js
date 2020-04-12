@@ -149,33 +149,15 @@ const parse_packet = {
   },
   data_admin_script: (connection, received_data, managers) => {
     const { action_id } = received_data;
+    const { scripts_manager } = managers.admin_server.root_module.application;
+    const db_model = managers.database_scripts.get_model();
 
-    managers.database_scripts.database.models["script"].load_all(
-      ({ error, results }) => {
-        const {
-          scripts_manager
-        } = managers.admin_server.root_module.application;
-        const scripts_list = Object.values(scripts_manager.scripts_map);
-        const db_objects_list = [];
-        for (let i = 0; i < scripts_list.length; i++) {
-          const object = scripts_list[i];
-          db_objects_list.push({
-            ...object,
-            type: "local",
-            fn: object.fn.toString()
-          });
-        }
-
-        for (const result of results) {
-          const data = result._doc;
-          delete data._id;
-          delete data.__v;
-          db_objects_list.push(data);
-        }
-
+    scripts_manager.get_scripts_map_async(
+      db_model,
+      ({ scripts_map, error }) => {
         managers.admin_server.send(connection.get_id(), "data_admin_script", {
           action_id,
-          db_objects_list,
+          db_objects_list: Object.values(scripts_map),
           message: error
         });
       }
@@ -195,7 +177,7 @@ const parse_packet = {
   },
   update_admin_script: (connection, received_data, managers) => {
     const { action, object } = received_data;
-    const script_model = managers.database_scripts.database.models["script"];
+    const { scripts_manager } = managers.admin_server.root_module.application;
 
     const send = message => {
       managers.admin_server.send(connection.get_id(), "update_admin_script", {
@@ -214,13 +196,17 @@ const parse_packet = {
         args: [],
         fn: `(app, args) => {}`
       };
-      script_model.save(new_object, ({ error, results }) =>
-        send(`Added id[${object.id}]. Errors[${error}]`)
-      );
+      managers.database_scripts
+        .get_model()
+        .save(new_object, ({ error, results }) =>
+          send(`Added id[${object.id}]. Errors[${error}]`)
+        );
     } else if (action.type === "remove") {
-      script_model.remove(object.id, ({ error, results }) =>
-        send(`Removed id[${object.id}]. Errors[${error}]`)
-      );
+      managers.database_scripts
+        .get_model()
+        .remove(object.id, ({ error, results }) =>
+          send(`Removed id[${object.id}]. Errors[${error}]`)
+        );
     } else if (action.type === "update") {
       try {
         ["id", "type", "name", "desc", "args", "fn"].map(value => {
@@ -237,9 +223,11 @@ const parse_packet = {
           fn: object.fn
         };
 
-        script_model.save(updated_data, ({ error, results }) =>
-          send(`Updated id[${object.id}]. Errors[${error}]`)
-        );
+        managers.database_scripts
+          .get_model()
+          .save(updated_data, ({ error, results }) =>
+            send(`Updated id[${object.id}]. Errors[${error}]`)
+          );
       } catch (e) {
         send(e.message);
       }

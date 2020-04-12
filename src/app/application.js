@@ -96,22 +96,62 @@ class Application extends EventEmitter {
   }
 
   _auto_run_scripts() {
-    // TODO razem z args
-    for (const script_data of this.config.data.app.auto_run_scripts) {
-      const { name, args } = script_data;
-      const arguments_as_list = args;
-      const script_name = name;
-      logger.log(
-        `Autorun script [${script_name}]` +
-          (arguments_as_list != null && arguments_as_list.length > 0
-            ? ` with arguments ${JSON.stringify(arguments_as_list)}`
-            : "")
-      );
-      try {
-        this.scripts_manager.run_script({ script_name, arguments_as_list });
-      } catch (e) {
-        logger.error(e, e.stack);
-      }
+    for (const [module_name, config] of Object.entries(
+      this.config.data.app.auto_run_scripts
+    )) {
+      const module = this.modules_manager.modules_map[module_name];
+
+      const run_module_scripts = () => {
+        const model = module.managers.database_scripts.get_model();
+
+        for (const script_data of config) {
+          const { name, args } = script_data;
+          const arguments_as_list = args;
+          const script_name = name;
+
+          const display_result = ({ ret_val, error_data }) => {
+            logger.log(
+              `Autorun script [${script_name}]` +
+                (arguments_as_list != null && arguments_as_list.length > 0
+                  ? ` with arguments ${JSON.stringify(arguments_as_list)}`
+                  : "") +
+                "\nResult:\n" +
+                JSON.stringify({ ret_val, error_data }, null, 2)
+            );
+          };
+
+          try {
+            this.scripts_manager.get_scripts_map_async(
+              model,
+              ({ scripts_map, error }) => {
+                this.scripts_manager.run_script({
+                  script_name,
+                  arguments_as_list,
+                  scripts_map,
+                  callback: display_result
+                });
+              }
+            );
+          } catch (e) {
+            logger.error(e, e.stack);
+          }
+        }
+      };
+
+      setTimeout(() => {
+        const try_to_execute = () => {
+          const { database_scripts } = module.managers;
+          if (
+            database_scripts.database.is_connected() === true &&
+            database_scripts.get_model().model != null &&
+            typeof database_scripts.get_model().model.find === "function"
+          )
+            run_module_scripts();
+          else setTimeout(try_to_execute, 10);
+        };
+
+        try_to_execute();
+      }, 10);
     }
   }
 }
