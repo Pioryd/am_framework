@@ -16,6 +16,29 @@ class ScriptsManager {
     this._initialize();
   }
 
+  get_scripts_map_async(db_model, callback) {
+    db_model.load_all(({ error, results }) => {
+      const new_scripts_map = [];
+      for (const result of results) {
+        const data = result._doc;
+        delete data._id;
+        delete data.__v;
+        new_scripts_map[data.name] = data;
+      }
+
+      for (const [key, script] of Object.entries(this.scripts_map)) {
+        new_scripts_map[key] = {
+          ...script,
+          id: "local",
+          type: "local",
+          fn: script.fn.toString()
+        };
+      }
+
+      callback({ scripts_map: new_scripts_map, error });
+    });
+  }
+
   run_script(args) {
     let ret_val = null;
     let error_data = null;
@@ -34,7 +57,8 @@ class ScriptsManager {
     command,
     script_name,
     arguments_as_string,
-    arguments_as_list
+    arguments_as_list,
+    scripts_map = {}
   }) {
     const parse = function(command) {
       if (command == null || command === "") command = "help";
@@ -66,13 +90,16 @@ class ScriptsManager {
     if (arguments_as_list.length === 0)
       arguments_as_list = Util.command_args_to_array(arguments_as_string);
 
+    for (const [key, value] of Object.entries(this.scripts_map))
+      scripts_map[key] = value;
+
     let script_fn = null;
     if (script_fn_as_string != null)
       script_fn = Util.string_to_function(script_fn_as_string);
     else if ([";", "}"].includes(command.slice(-1)))
       script_fn = Util.string_to_function(`(app, args)=>{${command}}`);
-    else if (script_name in this.scripts_map)
-      script_fn = this.scripts_map[script_name].fn;
+    else if (script_name in scripts_map)
+      script_fn = scripts_map[script_name].fn;
     else
       throw new Error(
         `Unable to parse command$[${command}] or script[${script_name}]`

@@ -73,7 +73,7 @@ class Database {
   }
 
   is_connected() {
-    if (this.connection == null) return;
+    if (this.connection == null) return false;
     return this.connection.readyState === 1;
   }
 
