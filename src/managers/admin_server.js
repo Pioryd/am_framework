@@ -277,6 +277,10 @@ class AdminServerManager extends ServerManager {
   constructor({ root_module, config, DefaultObjectClass }) {
     super({ root_module, config, parse_packet, DefaultObjectClass });
   }
+
+  send(connection_id, packet_id, packet_data) {
+    super.send(connection_id, "root", { packet_id, packet_data });
+  }
 }
 
 module.exports = AdminServerManager;
