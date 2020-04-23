@@ -23,7 +23,6 @@ describe("Scripting system test", () => {
     const scripts_source = Util.read_from_json(scripts_full_name);
 
     root.forms = { Test_form: { _source: { scripts: [] }, _root: root } };
-    root.api_map = { std: {} };
     root.generate_unique_id = () => {
       return "1";
     };

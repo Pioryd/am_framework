@@ -47,7 +47,7 @@ class Helper {
     this.root.source.forms = {
       Test_form: { _source: { scripts: [] }, _root: this.root }
     };
-    this.root.api_map = this.api;
+    this.root.execute_api = (args) => this._execute_api(args);
     this.root.generate_unique_id = () => {
       return "1";
     };
@@ -56,40 +56,52 @@ class Helper {
       this.root.source.forms["Test_form"]._source.scripts.push(script);
   }
 
+  _execute_api({ fn_full_name, script_id, query_id, timeout, args }) {
+    let debug_fn = "Not found api fn";
+    try {
+      let api = null;
+      eval(`api = this.api.${fn_full_name}`);
+      if (api == null) throw new Error(`API[${fn_full_name}] not found`);
+
+      api({ fn_full_name, script_id, query_id, timeout, args });
+    } catch (e) {
+      console.error(
+        `API - unable to call function(${e.message}): ${debug_fn.toString()}.` +
+          ` Args[${JSON.stringify({
+            fn_full_name,
+            script_id,
+            query_id,
+            timeout,
+            args
+          })}]` +
+          `ApiMap[${JSON.stringify(this.api)}]`
+      );
+    }
+  }
+
   _setup_api() {
     this.api = {
-      local: {
-        add_min_max: {
-          local_fn: ({ root, timeout, args }) => {
-            return args.min + args.max;
-          }
-        }
-      },
-      remote: {
-        add_min_max: {
-          remote_fn: ({ fn_full_name, script_id, query_id, timeout, args }) => {
-            if (this.options.receive_lock) return;
+      add_min_max: ({ fn_full_name, script_id, query_id, timeout, args }) => {
+        if (this.options.receive_lock) return;
 
-            // Send -> "process_api" (From MAM to ServerApi)
-            // ...
-            // Server api -> remote (From ServerApi to MAM)
-            const value = args.min + args.max;
-            // Parse -> "process_api" (MAM)
-            //const { script_id, query_id, value } = data;
+        // Send -> "process_api" (From MAM to ServerApi)
+        // ...
+        // Server api -> remote (From ServerApi to MAM)
+        const value = args.min + args.max;
+        // Parse -> "process_api" (MAM)
+        //const { script_id, query_id, value } = data;
 
-            const received_data = {
-              script_id,
-              query_id,
-              value
-            };
+        const received_data = {
+          script_id,
+          query_id,
+          value
+        };
 
-            if (this.options.manual_poll === true)
-              this.received_data_list.push(
-                JSON.parse(JSON.stringify(received_data))
-              );
-            else this.root.return_data.insert(received_data);
-          }
-        }
+        if (this.options.manual_poll === true)
+          this.received_data_list.push(
+            JSON.parse(JSON.stringify(received_data))
+          );
+        else this.root.return_data.insert(received_data);
       }
     };
   }

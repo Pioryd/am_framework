@@ -17,7 +17,7 @@
           "type": "api",
           "timeout": "20",
           "id": "Test_api_2",
-          "name": "remote.add_min_max",
+          "name": "add_min_max",
           "args": ["min:script.data.min", "max:5"],
           "return": "add_min_max"
         },

@@ -2,7 +2,10 @@ const ObjectID = require("bson-objectid");
 const ReturnData = require("./return_data");
 const System = require("./system");
 const EventEmitter = require("events");
-
+const logger = require("../logger").create_logger({
+  module_name: "am_framework",
+  file_name: __filename
+});
 /**
  * NOTE!
  *  Very important is [terminate()]. Not terminated have still
@@ -13,7 +16,7 @@ class Root {
   constructor() {
     this.system = null;
     this.source = { systems: {}, programs: {}, forms: {}, scripts: {} };
-    this.api_map = {};
+    this.execute_api = () => logger.error("Not set execute_api");
     this.data = {};
     this.ext = {};
 
@@ -25,39 +28,7 @@ class Root {
   }
 
   api(fn_full_name, script_id, query_id, timeout, args) {
-    let debug_fn = "Not found api fn";
-    try {
-      let api = null;
-      eval(`api = this.api_map.${fn_full_name}`);
-      if (api == null) return;
-
-      if ("remote_fn" in api) {
-        debug_fn = api.remote_fn;
-        api.remote_fn({ fn_full_name, script_id, query_id, timeout, args });
-      } else if ("local_fn" in api) {
-        debug_fn = api.local_fn;
-        const value = api.local_fn({
-          root: this,
-          timeout,
-          args
-        });
-        this.return_data.insert({ script_id, query_id, value });
-      } else {
-        throw new Error();
-      }
-    } catch (e) {
-      throw new Error(
-        `API - unable to call function(${e.message}): ${debug_fn.toString()}.` +
-          ` Args[${JSON.stringify({
-            fn_full_name,
-            script_id,
-            query_id,
-            timeout,
-            args
-          })}]` +
-          `ApiMap[${JSON.stringify(this.api_map)}]`
-      );
-    }
+    this.execute_api({ fn_full_name, script_id, query_id, timeout, args });
   }
 
   generate_unique_id() {
