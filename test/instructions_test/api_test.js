@@ -13,7 +13,7 @@ describe("Test instruction - Api", () => {
   before(() => {
     helper.initialize();
   });
-  describe("Remote return_value", () => {
+  describe("Return_value", () => {
     it("01 - Not received", () => {
       const script = helper.get_script({
         name: "Test_api",
