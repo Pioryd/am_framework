@@ -16,7 +16,7 @@ class Root {
   constructor() {
     this.system = null;
     this.source = { systems: {}, programs: {}, forms: {}, scripts: {} };
-    this.execute_api = () => logger.error("Not set execute_api");
+    this.process_api = () => logger.error("Not set process_api");
     this.data = {};
     this.ext = {};
 
@@ -25,10 +25,6 @@ class Root {
     this.return_data = new ReturnData();
     this.signals_event_emitter = new EventEmitter();
     this.events_event_emitter = new EventEmitter();
-  }
-
-  api(fn_full_name, script_id, query_id, timeout, args) {
-    this.execute_api({ fn_full_name, script_id, query_id, timeout, args });
   }
 
   generate_unique_id() {
@@ -59,8 +55,17 @@ class Root {
     this.source.scripts = scripts_source;
   }
 
-  install_api(api_source) {
-    this.api = { ...api_source, ...this.api };
+  install_api(process_api_fn) {
+    this.process_api = (fn_full_name, script_id, query_id, timeout, args) => {
+      process_api_fn({
+        root: this,
+        fn_full_name,
+        script_id,
+        query_id,
+        timeout,
+        args
+      });
+    };
   }
 
   install_data(source) {
