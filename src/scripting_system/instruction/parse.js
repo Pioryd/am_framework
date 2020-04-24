@@ -199,7 +199,7 @@ function parse_instruction_api(form, instruction) {
     `const query_id = root.generate_unique_id();` +
     `script.add_return_data(` +
     `  {query_id, timeout: ${timeout}, key: "${return_data_key}"});` +
-    `root.api(` +
+    `root.process_api(` +
     `  "${instruction.name}", script._id, query_id, ${timeout}, ${args});`;
   const api = new Api();
   api._id = instruction.id;
