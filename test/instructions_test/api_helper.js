@@ -47,7 +47,14 @@ class Helper {
     this.root.source.forms = {
       Test_form: { _source: { scripts: [] }, _root: this.root }
     };
-    this.root.execute_api = (args) => this._execute_api(args);
+    this.root.process_api = (
+      fn_full_name,
+      script_id,
+      query_id,
+      timeout,
+      args
+    ) =>
+      this._process_api({ fn_full_name, script_id, query_id, timeout, args });
     this.root.generate_unique_id = () => {
       return "1";
     };
@@ -56,7 +63,7 @@ class Helper {
       this.root.source.forms["Test_form"]._source.scripts.push(script);
   }
 
-  _execute_api({ fn_full_name, script_id, query_id, timeout, args }) {
+  _process_api({ fn_full_name, script_id, query_id, timeout, args }) {
     let debug_fn = "Not found api fn";
     try {
       let api = null;
