@@ -8,6 +8,7 @@ class Logger {
       print_log: true,
       print_info: true,
       print_error: true,
+      print_trace: true,
       print_warn: true,
       print_debug: false,
       ...options
@@ -25,6 +26,11 @@ class Logger {
   error(...args) {
     if (this.options.print_error)
       this.print("error", "\x1b[1m\x1b[31m", ...args);
+  }
+
+  trace(...args) {
+    if (this.options.print_trace)
+      this.print("trace", "\x1b[1m\x1b[31m", ...args);
   }
 
   warn(...args) {
