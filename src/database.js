@@ -19,12 +19,14 @@ class Database {
         try {
           if (error) logger.error(error);
 
-          for (const model_schema of this.models_schema_list)
-            this.models[model_schema.collection_name] = this.connection.model(
+          for (const model_schema of this.models_schema_list) {
+            const model = this.connection.model(
               model_schema.model_name,
               new mongoose.Schema(model_schema.schema_source),
               model_schema.collection_name
             );
+            this.models[model_schema.collection_name] = model;
+          }
 
           this.__check_collections(collections);
           callback();
