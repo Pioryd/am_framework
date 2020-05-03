@@ -33,13 +33,12 @@ class Backup {
     });
 
     this.parent_data_object = parent_data_object;
-    this.stop_watch = new Stopwatch(this.config.interval);
+    this.stop_watch = new Stopwatch(this.config.interval * 1000);
     this.restored = false;
     this.auto_backup = true;
   }
 
   initialize() {
-    this.database.connect();
     this.database.connect(() => {
       this.restore();
     });
