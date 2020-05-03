@@ -22,7 +22,7 @@ const MODELS_SCHEMA_LIST = [
 ];
 
 class Backup {
-  constructor({ root_module, config, parent_data_object }) {
+  constructor({ root_module, config }) {
     this.root_module = root_module;
     this.config = config;
 
@@ -32,7 +32,6 @@ class Backup {
       models_schema_list: MODELS_SCHEMA_LIST
     });
 
-    this.parent_data_object = parent_data_object;
     this.stop_watch = new Stopwatch(this.config.interval * 1000);
     this.restored = false;
     this.auto_backup = true;
@@ -171,11 +170,11 @@ class Backup {
   }
 
   _get_data() {
-    return this.parent_data_object[this.config.object_name];
+    return this.root_module.data[this.config.object_name];
   }
 
   _set_data(data) {
-    this.parent_data_object[this.config.object_name] = data;
+    this.this.root_module.data[this.config.object_name] = data;
   }
 }
 

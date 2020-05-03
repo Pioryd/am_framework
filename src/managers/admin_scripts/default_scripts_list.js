@@ -15,11 +15,20 @@ module.exports = [
     args: [],
     fn: (app, args) => {
       const command_list = {};
-      for (const script of Object.values(app.scripts_manager.scripts_map)) {
+
+      const module_name = Object.keys(app.modules_manager.modules_map)[0];
+      const module = app.modules_manager.modules_map[module_name];
+
+      for (const script of Object.values(
+        module.managers.admin_scripts.get_scripts_map()
+      )) {
         const { name, desc, args } = script;
         command_list[name] = { desc, args };
       }
-      app.logger.log("Commands:", JSON.stringify(command_list, null, 2));
+      app.logger.log(
+        `Module[${module_name}] Commands:\n ` +
+          `${JSON.stringify(command_list, null, 2)}`
+      );
     }
   },
   {

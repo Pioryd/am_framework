@@ -9,88 +9,6 @@ const logger = require("../logger").create_logger({
 const { AML } = require("../scripting_system").ScriptingSystem;
 const ServerManager = require("./server");
 
-function validate_json(object, managers, var_ext_name) {
-  const rule =
-    managers.admin_server.root_module.config.am_data_rules[var_ext_name];
-  const ajv = new Ajv({ allErrors: true });
-  const validate = ajv.compile(rule);
-  const valid = validate(object);
-  if (!valid) throw new Error("AJV: " + ajv.errorsText(validate.errors));
-}
-
-function data_parse_and_send(
-  connection,
-  received_data,
-  managers,
-  var_ext_name
-) {
-  if (managers.admin_server.DefaultObjectClass == null)
-    throw new Error("DefaultObjectClass is not set");
-
-  const { action_id } = received_data;
-  const module_data = managers.admin_server.root_module.data;
-
-  const db_objects_list = [];
-
-  for (const value of Object.values(module_data[`${var_ext_name}s_map`]))
-    db_objects_list.push(value._data);
-
-  managers.admin_server.send(connection.get_id(), `data_${var_ext_name}`, {
-    action_id,
-    db_objects_list,
-    rules: managers.admin_server.root_module.config.am_data_rules[var_ext_name]
-  });
-}
-
-function update_parse_and_send(
-  connection,
-  received_data,
-  managers,
-  { var_ext_name, create_data, validate }
-) {
-  if (managers.admin_server.DefaultObjectClass == null)
-    throw new Error("DefaultObjectClass is not set");
-
-  const { action, object } = received_data;
-  const module_data = managers.admin_server.root_module.data;
-  const map = module_data[`${var_ext_name}s_map`];
-
-  let message = "Unknown";
-
-  if (action.type === "new") {
-    const new_id = ObjectID().toHexString();
-    map[new_id] = new managers.admin_server.DefaultObjectClass(
-      create_data(new_id)
-    );
-    message = `Added id[${new_id}]`;
-  } else if (action.type === "remove") {
-    delete map[object.id];
-    message = `Removed id[${object.id}]`;
-  } else if (action.type === "update") {
-    try {
-      validate(object, managers, var_ext_name);
-
-      // "id: map[id].get_id()" to be sure id wont be override
-      map[object.id]._data = {
-        ...map[object.id]._data,
-        ...object,
-        id: map[object.id].get_id()
-      };
-      message = `Updated id[${object.id}]`;
-    } catch (e) {
-      logger.error(e);
-      message = e.message;
-    }
-  } else {
-    message = `Wrong action type. Id[${action.id}] Type: [${action.type}]`;
-  }
-
-  managers.admin_server.send(connection.get_id(), `update_${var_ext_name}`, {
-    action_id: action.id,
-    message
-  });
-}
-
 const parse_packet = {
   accept_connection: (connection, received_data, managers) => {
     const login = received_data.login;
@@ -112,7 +30,7 @@ const parse_packet = {
       return false;
     }
 
-    connection.on_close = connection => {};
+    connection.on_close = (connection) => {};
     managers.admin_server.send(connection.get_id(), "accept_connection", {
       user_name: login
     });
@@ -132,7 +50,95 @@ const parse_packet = {
     const json = JSON.parse(stringify(managers.admin_server.root_module.data));
     managers.admin_server.send(connection.get_id(), "module_data", { json });
   },
-  process_admin_script: (connection, received_data, managers) => {
+  editor_data: (connection, received_data, managers) => {
+    const { action_id, type } = received_data;
+    const module_data = managers.admin_server.root_module.data;
+
+    managers.admin_server.send(connection.get_id(), `editor_data_${type}`, {
+      action_id,
+      db_objects_list: module_data[type],
+      rules: managers.admin_server.root_module.config.am_data_rules[type]
+    });
+  },
+  editor_update(
+    connection,
+    received_data,
+    managers,
+    { create_data, validate }
+  ) {
+    const validate_json = (object, managers, var_ext_name) => {
+      const rule =
+        managers.admin_server.root_module.config.am_data_rules[var_ext_name];
+      const ajv = new Ajv({ allErrors: true });
+      const validate = ajv.compile(rule);
+      const valid = validate(object);
+      if (!valid) throw new Error("AJV: " + ajv.errorsText(validate.errors));
+    };
+
+    const editor_fn = {
+      am_form: {
+        create_data: (id) => {
+          return { id, name: `new_${id}`, rules: [], scripts: [] };
+        },
+        validate: validate_json
+      },
+      am_program: {
+        create_data: (id) => {
+          return { id, name: `new_${id}`, rules: [], forms: [] };
+        },
+        validate: validate_json
+      },
+      am_system: {
+        create_data: (id) => {
+          return { id, name: `new_${id}`, programs: [] };
+        },
+        validate: validate_json
+      },
+      am_script: {
+        create_data: (id) => {
+          return { id, source: `id ${id}\r\nname new_${id}\r\n data\r\n` };
+        },
+        validate: (object) => AML.parse(object.source)
+      }
+    };
+
+    const { action, object, type } = received_data;
+    const module_data = managers.admin_server.root_module.data;
+
+    let message = "Unknown";
+
+    if (action.type === "new") {
+      const new_id = ObjectID().toHexString();
+      module_data[type][new_id] = editor_fn[type].create_data(new_id);
+      message = `Added id[${new_id}]`;
+    } else if (action.type === "remove") {
+      delete module_data[type][object.id];
+      message = `Removed id[${object.id}]`;
+    } else if (action.type === "update") {
+      try {
+        editor_fn[type].validate(object, managers, type);
+
+        // "id: map[id].id" to be sure id wont be override
+        module_data[type][object.id] = {
+          ...module_data[type][object.id],
+          ...object,
+          id: module_data[type][object.id].id
+        };
+        message = `Updated id[${object.id}]`;
+      } catch (e) {
+        logger.error(e);
+        message = e.message;
+      }
+    } else {
+      message = `Wrong action type. Id[${action.id}] Type: [${action.type}]`;
+    }
+
+    managers.admin_server.send(connection.get_id(), `editor_update_${type}`, {
+      action_id: action.id,
+      message
+    });
+  },
+  admin_script_process: (connection, received_data, managers) => {
     const { action_id, object } = received_data;
     const { scripts_manager } = managers.admin_server.root_module.application;
 
@@ -141,46 +147,26 @@ const parse_packet = {
       callback: ({ ret_val, error_data }) => {
         managers.admin_server.send(
           connection.get_id(),
-          "process_admin_script",
+          "admin_script_process",
           { action_id, message: { ret_val, error_data } }
         );
       }
     });
   },
-  data_admin_script: (connection, received_data, managers) => {
+  admin_script_data: (connection, received_data, managers) => {
     const { action_id } = received_data;
-    const { scripts_manager } = managers.admin_server.root_module.application;
-    const db_model = managers.database_scripts.get_model();
 
-    scripts_manager.get_scripts_map_async(
-      db_model,
-      ({ scripts_map, error }) => {
-        managers.admin_server.send(connection.get_id(), "data_admin_script", {
-          action_id,
-          db_objects_list: Object.values(scripts_map),
-          message: error
-        });
-      }
-    );
+    managers.admin_server.send(connection.get_id(), "admin_script_data", {
+      action_id,
+      db_objects_list: Object.values(managers.admin_scripts.get_scripts_map()),
+      message: error
+    });
   },
-  data_am_form: (connection, received_data, managers) => {
-    data_parse_and_send(connection, received_data, managers, "am_form");
-  },
-  data_am_program: (connection, received_data, managers) => {
-    data_parse_and_send(connection, received_data, managers, "am_program");
-  },
-  data_am_system: (connection, received_data, managers) => {
-    data_parse_and_send(connection, received_data, managers, "am_system");
-  },
-  data_am_script: (connection, received_data, managers) => {
-    data_parse_and_send(connection, received_data, managers, "am_script");
-  },
-  update_admin_script: (connection, received_data, managers) => {
+  admin_script_update: (connection, received_data, managers) => {
     const { action, object } = received_data;
-    const { scripts_manager } = managers.admin_server.root_module.application;
 
-    const send = message => {
-      managers.admin_server.send(connection.get_id(), "update_admin_script", {
+    const send = (message) => {
+      managers.admin_server.send(connection.get_id(), "admin_script_update", {
         action_id: action.id,
         message
       });
@@ -196,20 +182,18 @@ const parse_packet = {
         args: [],
         fn: `(app, args) => {}`
       };
-      managers.database_scripts
-        .get_model()
-        .save(new_object, ({ error, results }) =>
+      managers.admin_scripts.db.update_async(
+        new_object,
+        ({ error, result, data }) =>
           send(`Added id[${object.id}]. Errors[${error}]`)
-        );
+      );
     } else if (action.type === "remove") {
-      managers.database_scripts
-        .get_model()
-        .remove(object.id, ({ error, results }) =>
-          send(`Removed id[${object.id}]. Errors[${error}]`)
-        );
+      managers.admin_scripts.db.remove_async(object.id, ({ error, result }) =>
+        send(`Removed id[${object.id}]. Errors[${error}]`)
+      );
     } else if (action.type === "update") {
       try {
-        ["id", "type", "name", "desc", "args", "fn"].map(value => {
+        ["id", "type", "name", "desc", "args", "fn"].map((value) => {
           if (!(value in object))
             throw new Error(`Object doesn't contains key[${value}]`);
         });
@@ -234,42 +218,6 @@ const parse_packet = {
     } else {
       send(`Wrong action type. Id[${action.id}] Type: [${action.type}]`);
     }
-  },
-  update_am_form: (connection, received_data, managers) => {
-    update_parse_and_send(connection, received_data, managers, {
-      var_ext_name: "am_form",
-      create_data: id => {
-        return { id, name: `new_${id}`, rules: [], scripts: [] };
-      },
-      validate: validate_json
-    });
-  },
-  update_am_program: (connection, received_data, managers) => {
-    update_parse_and_send(connection, received_data, managers, {
-      var_ext_name: "am_program",
-      create_data: id => {
-        return { id, name: `new_${id}`, rules: [], forms: [] };
-      },
-      validate: validate_json
-    });
-  },
-  update_am_system: (connection, received_data, managers) => {
-    update_parse_and_send(connection, received_data, managers, {
-      var_ext_name: "am_system",
-      create_data: id => {
-        return { id, name: `new_${id}`, programs: [] };
-      },
-      validate: validate_json
-    });
-  },
-  update_am_script: (connection, received_data, managers) => {
-    update_parse_and_send(connection, received_data, managers, {
-      var_ext_name: "am_script",
-      create_data: id => {
-        return { id, source: `id ${id}\r\nname new_${id}\r\n data\r\n` };
-      },
-      validate: object => AML.parse(object.source)
-    });
   }
 };
 
