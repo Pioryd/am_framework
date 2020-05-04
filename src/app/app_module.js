@@ -23,8 +23,16 @@ class AppModule extends EventEmitter {
   // The order is important for logic
   setup_managers({ managers, order }) {
     // this.managers is used before setup_managers, object cannot be overwritten
-    for (const [key, value] of Object.entries(managers))
+    for (const [key, value] of Object.entries(managers)) {
+      if (!order.initialize.includes(key))
+        throw new Error(`Order[initialize] not include manager[${key}]`);
+      if (!order.terminate.includes(key))
+        throw new Error(`Order[terminate] not include manager[${key}]`);
+      if (!order.poll.includes(key))
+        throw new Error(`Order[poll] not include manager[${key}]`);
+
       this.managers[key] = value;
+    }
 
     this.__order = order;
   }
