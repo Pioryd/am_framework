@@ -1,13 +1,13 @@
-const AdminScripts = require("./admin_scripts");
-const AdminServer = require("./admin_server");
-const Backup = require("./backup");
-const Client = require("./client");
-const Server = require("./server");
+const admin_scripts = require("./admin_scripts");
+const admin_server = require("./admin_server");
+const backup = require("./backup");
+const client = require("./client");
+const server = require("./server");
 
 module.exports = {
-  AdminScripts,
-  AdminServer,
-  Backup,
-  Client,
-  Server
+  admin_scripts,
+  admin_server,
+  backup,
+  client,
+  server
 };

@@ -1,6 +1,7 @@
 const { Util } = require("./src/util");
 const { Application } = require("./src/app/application");
-const { ModuleBase } = require("./src/app/module_base");
+const { run_app } = require("./src/app/run_app");
+const { AppModule } = require("./src/app/app_module");
 const { Server } = require("./src/net/server");
 const { Client } = require("./src/net/client");
 const { Config } = require("./src/config");
@@ -13,7 +14,8 @@ const Managers = require("./src/managers");
 module.exports = {
   Util,
   Application,
-  ModuleBase,
+  run_app,
+  AppModule,
   Server,
   Client,
   Config,
