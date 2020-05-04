@@ -7,7 +7,7 @@ const logger = require("../logger").create_logger({
   file_name: __filename
 });
 const { AML } = require("../scripting_system").ScriptingSystem;
-const ServerManager = require("./server");
+const { Server } = require("./server");
 
 const parse_packet = {
   accept_connection: (connection, received_data, managers) => {
@@ -220,7 +220,7 @@ const parse_packet = {
   }
 };
 
-class AdminServerManager extends ServerManager {
+class AdminServer extends Server {
   constructor({ root_module, config, DefaultObjectClass }) {
     super({ root_module, config, parse_packet, DefaultObjectClass });
   }
@@ -230,4 +230,4 @@ class AdminServerManager extends ServerManager {
   }
 }
 
-module.exports = AdminServerManager;
+module.exports = { AdminServer };

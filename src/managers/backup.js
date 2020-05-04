@@ -178,4 +178,4 @@ class Backup {
   }
 }
 
-module.exports = Backup;
+module.exports = { Backup };

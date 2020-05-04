@@ -6,9 +6,9 @@ const logger = require("../../logger").create_logger({
 });
 const { Util } = require("../../util");
 const default_scripts_list = require("./default_scripts_list");
-const DB = require("./db");
+const { DB } = require("./db");
 
-class Runner {
+class AdminScripts {
   constructor({ root_module, config }) {
     this.root_module = root_module;
     this.config = config;
@@ -220,4 +220,4 @@ class Runner {
   }
 }
 
-module.exports = Runner;
+module.exports = { AdminScripts };

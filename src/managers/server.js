@@ -2,9 +2,9 @@ const logger = require("../logger").create_logger({
   module_name: "am_framework",
   file_name: __filename
 });
-const { Server } = require("../net/server");
+const NetServer = require("../net/server").Server;
 
-class ServerManager {
+class Server {
   constructor({
     root_module,
     config,
@@ -17,7 +17,7 @@ class ServerManager {
     this.config = config;
     this.parse_packet = parse_packet;
 
-    this.server = new Server(this.config);
+    this.server = new NetServer(this.config);
 
     this.DefaultObjectClass = DefaultObjectClass;
   }
@@ -74,4 +74,4 @@ class ServerManager {
   }
 }
 
-module.exports = ServerManager;
+module.exports = { Server };

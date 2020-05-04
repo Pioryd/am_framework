@@ -1,13 +1,13 @@
-const { Client } = require("../net/client");
+const NetClient = require("../net/client").Client;
 
-class ClientManager {
+class Client {
   constructor({ root_module, config, parse_packet, on_connected }) {
     this.root_module = root_module;
     this.config = config;
     this.parse_packet = parse_packet;
     this.on_connected = on_connected;
 
-    this.client = new Client({
+    this.client = new NetClient({
       options: this.config.options,
       socket_io_options: this.config.socket_io_options
     });
@@ -39,7 +39,7 @@ class ClientManager {
   _create_parse_packet_dict() {
     let parse_packet_dict = {};
     for (const [packet_id] of Object.entries(this.parse_packet)) {
-      parse_packet_dict[packet_id] = data => {
+      parse_packet_dict[packet_id] = (data) => {
         return this.parse_packet[packet_id](data, this.root_module.managers);
       };
     }
@@ -51,4 +51,4 @@ class ClientManager {
   }
 }
 
-module.exports = ClientManager;
+module.exports = { Client };
