@@ -174,7 +174,7 @@ class Backup {
   }
 
   _set_data(data) {
-    this.this.root_module.data[this.config.object_name] = data;
+    this.root_module.data[this.config.object_name] = data;
   }
 }
 

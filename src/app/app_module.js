@@ -4,7 +4,7 @@ const logger = require("../logger").create_logger({
   file_name: __filename
 });
 
-class ModuleBase extends EventEmitter {
+class AppModule extends EventEmitter {
   constructor({ event_emitter, config, data }) {
     super();
 
@@ -104,4 +104,4 @@ class ModuleBase extends EventEmitter {
   }
 }
 
-module.exports = { ModuleBase };
+module.exports = { AppModule };

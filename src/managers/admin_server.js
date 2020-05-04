@@ -57,7 +57,7 @@ const parse_packet = {
     managers.admin_server.send(connection.get_id(), `editor_data_${type}`, {
       action_id,
       db_objects_list: module_data[type],
-      rules: managers.admin_server.root_module.config.am_data_rules[type]
+      rules: managers.admin_server.config.validate_rules[type]
     });
   },
   editor_update(
@@ -67,8 +67,7 @@ const parse_packet = {
     { create_data, validate }
   ) {
     const validate_json = (object, managers, var_ext_name) => {
-      const rule =
-        managers.admin_server.root_module.config.am_data_rules[var_ext_name];
+      const rule = managers.admin_server.config.validate_rules[var_ext_name];
       const ajv = new Ajv({ allErrors: true });
       const validate = ajv.compile(rule);
       const valid = validate(object);

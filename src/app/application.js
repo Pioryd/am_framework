@@ -8,31 +8,36 @@ const { Config } = require("../config");
 const { ModulesManager } = require("./modules_manager");
 const { setup_exit_handlers } = require("./signal_handler");
 
+const DEFAULT_CONFIG = {
+  managers_rel_name: "managers",
+  node_modules_rel_path: "node_modules",
+  close_app_delay: 5000
+};
+
 class Application extends EventEmitter {
   constructor({ root_full_name, config_file_rel_name = "config.json" }) {
     super();
     this.root_full_name = root_full_name;
     this.logger = logger;
     this.config = new Config({
+      default_data: DEFAULT_CONFIG,
       file_full_name: path.join(root_full_name, config_file_rel_name),
       on_update: () => {
         logger.info("config updated");
       }
     });
+
     this.config.load();
 
     global.node_modules_path = path.join(
       root_full_name,
-      this.config.data.app.node_modules_rel_path
+      this.config.data.node_modules_rel_path
     );
 
     this.modules_manager = new ModulesManager({
       config: this.config.data,
       event_emitter: this,
-      root_path: root_full_name,
-      modules_full_name_map: this.config.data.app.modules.map,
-      paths_auto_find: this.config.data.app.modules.paths_auto_find,
-      disabled_modules: this.config.data.app.modules.disabled
+      root_path: root_full_name
     });
 
     this.on_command = () => logger.error("on_command is not set.");
@@ -72,7 +77,7 @@ class Application extends EventEmitter {
   // Should be called only once
   close() {
     logger.info(
-      `Closing in ${this.config.data.app.close_app_delay / 1000} seconds`
+      `Closing in ${this.config.data.close_app_delay / 1000} seconds`
     );
 
     this.config.terminate();
@@ -81,7 +86,7 @@ class Application extends EventEmitter {
 
     setTimeout(() => {
       process.exit(0);
-    }, this.config.data.app.close_app_delay);
+    }, this.config.data.close_app_delay);
   }
 }
 

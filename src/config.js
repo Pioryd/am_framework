@@ -3,7 +3,8 @@ const { Util } = require("./util");
 
 // Config i async
 class Config {
-  constructor({ file_full_name, on_update = () => {} }) {
+  constructor({ default_data = {}, file_full_name, on_update = () => {} }) {
+    this.default_data = default_data;
     this.file_full_name = file_full_name;
     this.on_update = on_update;
     this.data = null;
@@ -11,7 +12,10 @@ class Config {
   }
 
   _read_data_from_file() {
-    this.data = Util.read_from_json(this.file_full_name);
+    this.data = {
+      ...this.default_data,
+      ...Util.read_from_json(this.file_full_name)
+    };
   }
 
   load() {
