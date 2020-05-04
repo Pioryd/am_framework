@@ -15,13 +15,18 @@ const DEFAULT_CONFIG = {
 };
 
 class Application extends EventEmitter {
-  constructor({ root_full_name, config_file_rel_name = "config.json" }) {
+  constructor({
+    root_full_name,
+    config_file_rel_name = "config.json",
+    config_folder_rel_name = "configs"
+  }) {
     super();
     this.root_full_name = root_full_name;
     this.logger = logger;
     this.config = new Config({
       default_data: DEFAULT_CONFIG,
       file_full_name: path.join(root_full_name, config_file_rel_name),
+      folder_full_name: path.join(root_full_name, config_folder_rel_name),
       on_update: () => {
         logger.info("config updated");
       }

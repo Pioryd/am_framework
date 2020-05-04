@@ -13,11 +13,11 @@ const config_path_temp_full_name = path.join(
 let config = null;
 
 describe("Config test", () => {
-  before(function() {
+  before(function () {
     fs.copyFileSync(
       config_path_dist_full_name,
       config_path_temp_full_name,
-      err => {
+      (err) => {
         if (err) throw err;
       }
     );
@@ -27,7 +27,7 @@ describe("Config test", () => {
   });
 
   it("Is config.data null at start?", () => {
-    expect(config.data).to.equal(null);
+    expect(Object.keys(config.data).length).to.equal(0);
   });
 
   it("Load", () => {
