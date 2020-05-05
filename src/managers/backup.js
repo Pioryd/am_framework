@@ -86,45 +86,53 @@ class Backup {
       {},
       { id: 1, create: 1, _id: 0 },
       (error, results) => {
-        if (error) logger.trace(error);
-        else {
-          let latest_backup = null;
+        try {
+          if (error) logger.trace(error);
+          else {
+            let latest_backup = null;
 
-          if (results == null || results.length === 0) {
-            logger.info("No data to restore.");
-            this.restored = true;
-            return;
-          }
+            if (results == null || results.length === 0) {
+              logger.info("No data to restore.");
+              this.restored = true;
+              return;
+            }
 
-          for (const result of results) {
-            const { id, create } = result._doc;
+            for (const result of results) {
+              const { id, create } = result._doc;
 
-            if (
-              latest_backup == null ||
-              Date.parse(create) > Date.parse(latest_backup.create)
-            )
-              latest_backup = { id, create };
-          }
+              if (
+                latest_backup == null ||
+                Date.parse(create) > Date.parse(latest_backup.create)
+              )
+                latest_backup = { id, create };
+            }
 
-          this.database.models.backup.findOne(
-            { id: latest_backup.id },
-            { data: 1, _id: 0 },
-            (error, result) => {
-              if (error) logger.trace(error);
-              else {
+            this.database.models.backup.findOne(
+              { id: latest_backup.id },
+              { data: 1, _id: 0 },
+              (error, result) => {
                 try {
-                  if (error) throw new Error(error);
-                  this._set_data(result._doc.data);
-                  this.backup();
-                  this.restored = true;
-                  if (callback) callback();
-                  logger.info("Data restored.");
+                  if (error) logger.trace(error);
+                  else {
+                    try {
+                      if (error) throw new Error(error);
+                      this._set_data(result._doc.data);
+                      this.backup();
+                      this.restored = true;
+                      if (callback) callback();
+                      logger.info("Data restored.");
+                    } catch (e) {
+                      logger.error(e, e.stack);
+                    }
+                  }
                 } catch (e) {
                   logger.error(e, e.stack);
                 }
               }
-            }
-          );
+            );
+          }
+        } catch (e) {
+          logger.error(e, e.stack);
         }
       }
     );
@@ -137,33 +145,41 @@ class Backup {
       {},
       { id: 1, create: 1, _id: 0 },
       (error, results) => {
-        if (error) logger.trace(error);
-        else {
-          if (results == null || results.length <= limit) return;
+        try {
+          if (error) logger.trace(error);
+          else {
+            if (results == null || results.length <= limit) return;
 
-          results.sort(function (a, b) {
-            const parsed = {
-              a: Date.parse(a._doc.create),
-              b: Date.parse(b._doc.create)
-            };
+            results.sort(function (a, b) {
+              const parsed = {
+                a: Date.parse(a._doc.create),
+                b: Date.parse(b._doc.create)
+              };
 
-            if (parsed.a < parsed.b) return -1;
-            if (parsed.a > parsed.b) return 1;
-            return 0;
-          });
+              if (parsed.a < parsed.b) return -1;
+              if (parsed.a > parsed.b) return 1;
+              return 0;
+            });
 
-          const ids_to_remove = [];
-          for (let i = 0; i < results.length - limit; i++)
-            ids_to_remove.push(results[i]._doc.id);
+            const ids_to_remove = [];
+            for (let i = 0; i < results.length - limit; i++)
+              ids_to_remove.push(results[i]._doc.id);
 
-          this.database.models.backup.deleteMany(
-            {
-              id: { $in: [...ids_to_remove] }
-            },
-            (error, results) => {
-              if (error) logger.trace(error);
-            }
-          );
+            this.database.models.backup.deleteMany(
+              {
+                id: { $in: [...ids_to_remove] }
+              },
+              (error, results) => {
+                try {
+                  if (error) logger.trace(error);
+                } catch (e) {
+                  logger.error(e, e.stack);
+                }
+              }
+            );
+          }
+        } catch (e) {
+          logger.error(e, e.stack);
         }
       }
     );

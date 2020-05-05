@@ -38,18 +38,22 @@ class DB {
       {},
       { id: 1, type: 1, name: 1, desc: 1, args: 1, fn: 1, _id: 0 },
       (error, results) => {
-        const scripts_list = [];
-        if (error) {
-          logger.trace(error);
-        } else {
-          for (const result of results) {
-            const data = result._doc;
-            delete data.__v;
-            scripts_list.push(data);
+        try {
+          const scripts_list = [];
+          if (error) {
+            logger.trace(error);
+          } else {
+            for (const result of results) {
+              const data = result._doc;
+              delete data.__v;
+              scripts_list.push(data);
+            }
           }
-        }
 
-        callback({ error, results, scripts_list });
+          callback({ error, results, scripts_list });
+        } catch (e) {
+          logger.error(e, e.stack);
+        }
       }
     );
   }
@@ -59,23 +63,31 @@ class DB {
       { id },
       { id: 1, type: 1, name: 1, desc: 1, args: 1, fn: 1, _id: 0 },
       (error, result) => {
-        let data = {};
-        if (error) {
-          logger.trace(error);
-        } else {
-          data = result._doc;
-          delete data.__v;
-        }
+        try {
+          let data = {};
+          if (error) {
+            logger.trace(error);
+          } else {
+            data = result._doc;
+            delete data.__v;
+          }
 
-        if (callback) callback({ error, result, data });
+          if (callback) callback({ error, result, data });
+        } catch (e) {
+          logger.error(e, e.stack);
+        }
       }
     );
   }
 
   remove_async(id, callback) {
     this.database.models.script.deleteMany({ id }, (error, result) => {
-      if (error) logger.trace(error);
-      if (callback) callback({ error, result });
+      try {
+        if (error) logger.trace(error);
+        if (callback) callback({ error, result });
+      } catch (e) {
+        logger.error(e, e.stack);
+      }
     });
   }
 
@@ -85,8 +97,12 @@ class DB {
       { ...data },
       { upsert: true },
       (error, result) => {
-        if (error) logger.trace(error);
-        if (callback) callback({ error, result });
+        try {
+          if (error) logger.trace(error);
+          if (callback) callback({ error, result });
+        } catch (e) {
+          logger.error(e, e.stack);
+        }
       }
     );
   }
