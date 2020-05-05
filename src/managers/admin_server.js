@@ -10,7 +10,7 @@ const { AML } = require("../scripting_system").ScriptingSystem;
 const { Server } = require("./server");
 
 const parse_packet = {
-  accept_connection: (connection, received_data, managers) => {
+  accept_connection(connection, received_data, managers) {
     const login = received_data.login;
     const password = received_data.password;
 
@@ -36,7 +36,7 @@ const parse_packet = {
     });
     return true;
   },
-  module_info: (connection, received_data, managers) => {
+  module_info(connection, received_data, managers) {
     const { root_module } = managers.admin_server;
     const modules_map = Object.keys(
       root_module.application.modules_manager.modules_map
@@ -46,26 +46,33 @@ const parse_packet = {
     const json = { root_module_name, modules_map };
     managers.admin_server.send(connection.get_id(), "module_info", { json });
   },
-  module_data: (connection, received_data, managers) => {
+  module_data(connection, received_data, managers) {
     const json = JSON.parse(stringify(managers.admin_server.root_module.data));
     managers.admin_server.send(connection.get_id(), "module_data", { json });
   },
-  editor_data: (connection, received_data, managers) => {
+  editor_data(connection, received_data, managers) {
+    if (received_data.type === "admin_script") {
+      this.editor_data_admin_script(connection, received_data, managers);
+      return;
+    }
+
     const { action_id, type } = received_data;
     const module_data = managers.admin_server.root_module.data;
 
+    if (!(type in module_data)) module_data[type] = {};
+
     managers.admin_server.send(connection.get_id(), `editor_data_${type}`, {
       action_id,
-      db_objects_list: module_data[type],
+      db_objects_list: Object.values(module_data[type]),
       rules: managers.admin_server.config.validate_rules[type]
     });
   },
-  editor_update(
-    connection,
-    received_data,
-    managers,
-    { create_data, validate }
-  ) {
+  editor_update(connection, received_data, managers) {
+    if (received_data.type === "admin_script") {
+      this.editor_update_admin_script(connection, received_data, managers);
+      return;
+    }
+
     const validate_json = (object, managers, var_ext_name) => {
       const rule = managers.admin_server.config.validate_rules[var_ext_name];
       const ajv = new Ajv({ allErrors: true });
@@ -104,6 +111,8 @@ const parse_packet = {
     const { action, object, type } = received_data;
     const module_data = managers.admin_server.root_module.data;
 
+    if (!(type in module_data)) module_data[type] = {};
+
     let message = "Unknown";
 
     if (action.type === "new") {
@@ -125,7 +134,7 @@ const parse_packet = {
         };
         message = `Updated id[${object.id}]`;
       } catch (e) {
-        logger.error(e);
+        logger.error(e, e.stack);
         message = e.message;
       }
     } else {
@@ -137,38 +146,64 @@ const parse_packet = {
       message
     });
   },
-  admin_script_process: (connection, received_data, managers) => {
+  editor_process(connection, received_data, managers) {
+    if (received_data.type === "admin_script") {
+      this.editor_process_admin_script(connection, received_data, managers);
+      return;
+    }
+  },
+  editor_process_admin_script(connection, received_data, managers) {
     const { action_id, object } = received_data;
     const { scripts_manager } = managers.admin_server.root_module.application;
 
     scripts_manager.run_script({
       script_fn_as_string: object.fn,
       callback: ({ ret_val, error_data }) => {
-        managers.admin_server.send(
-          connection.get_id(),
-          "admin_script_process",
-          { action_id, message: { ret_val, error_data } }
-        );
+        try {
+          managers.admin_server.send(
+            connection.get_id(),
+            "editor_process_admin_script",
+            { action_id, message: { ret_val, error_data } }
+          );
+        } catch (e) {
+          logger.error(e, e.stack);
+        }
       }
     });
   },
-  admin_script_data: (connection, received_data, managers) => {
+  editor_data_admin_script(connection, received_data, managers) {
     const { action_id } = received_data;
 
-    managers.admin_server.send(connection.get_id(), "admin_script_data", {
-      action_id,
-      db_objects_list: Object.values(managers.admin_scripts.get_scripts_map()),
-      message: error
+    managers.admin_scripts.reload_scripts(() => {
+      managers.admin_server.send(
+        connection.get_id(),
+        "editor_data_admin_script",
+        {
+          action_id,
+          db_objects_list: Object.values(
+            managers.admin_scripts.get_scripts_map()
+          ),
+          message: null
+        }
+      );
     });
   },
-  admin_script_update: (connection, received_data, managers) => {
+  editor_update_admin_script(connection, received_data, managers) {
     const { action, object } = received_data;
 
     const send = (message) => {
-      managers.admin_server.send(connection.get_id(), "admin_script_update", {
-        action_id: action.id,
-        message
-      });
+      try {
+        managers.admin_server.send(
+          connection.get_id(),
+          "editor_update_admin_script",
+          {
+            action_id: action.id,
+            message
+          }
+        );
+      } catch (e) {
+        logger.error(e, e.stack);
+      }
     };
 
     if (action.type === "new") {
@@ -183,13 +218,14 @@ const parse_packet = {
       };
       managers.admin_scripts.db.update_async(
         new_object,
-        ({ error, result, data }) =>
-          send(`Added id[${object.id}]. Errors[${error}]`)
+        ({ error, result, data }) => {
+          send(`Added id[${new_object.id}]. Errors[${error}]`);
+        }
       );
     } else if (action.type === "remove") {
-      managers.admin_scripts.db.remove_async(object.id, ({ error, result }) =>
-        send(`Removed id[${object.id}]. Errors[${error}]`)
-      );
+      managers.admin_scripts.db.remove_async(object.id, ({ error, result }) => {
+        send(`Removed id[${object.id}]. Errors[${error}]`);
+      });
     } else if (action.type === "update") {
       try {
         ["id", "type", "name", "desc", "args", "fn"].map((value) => {
@@ -206,11 +242,12 @@ const parse_packet = {
           fn: object.fn
         };
 
-        managers.database_scripts
-          .get_model()
-          .save(updated_data, ({ error, results }) =>
-            send(`Updated id[${object.id}]. Errors[${error}]`)
-          );
+        managers.admin_scripts.db.update_async(
+          updated_data,
+          ({ error, result, data }) => {
+            send(`Updated id[${object.id}]. Errors[${error}]`);
+          }
+        );
       } catch (e) {
         send(e.message);
       }

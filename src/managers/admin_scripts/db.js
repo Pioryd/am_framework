@@ -45,7 +45,7 @@ class DB {
           for (const result of results) {
             const data = result._doc;
             delete data.__v;
-            scripts_list[data.name] = data;
+            scripts_list.push(data);
           }
         }
 

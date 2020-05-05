@@ -100,7 +100,7 @@ class AdminScripts {
   reload_db_scripts_async(callback) {
     this.db.get_all_async(({ error, results, scripts_list }) => {
       this.db_scripts_map = {};
-      for (const data of scripts_list) db_scripts_map[data.name] = data;
+      for (const data of scripts_list) this.db_scripts_map[data.name] = data;
 
       if (callback != null) callback();
     });
