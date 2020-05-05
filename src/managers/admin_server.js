@@ -108,7 +108,7 @@ const parse_packet = {
       }
     };
 
-    const { action, object, type } = received_data;
+    const { action, object, type, old_id, new_id } = received_data;
     const module_data = managers.admin_server.root_module.data;
 
     if (!(type in module_data)) module_data[type] = {};
@@ -118,10 +118,10 @@ const parse_packet = {
     if (action.type === "new") {
       const new_id = ObjectID().toHexString();
       module_data[type][new_id] = editor_fn[type].create_data(new_id);
-      message = `Added id[${new_id}]`;
+      message = `Added object with id[${new_id}]`;
     } else if (action.type === "remove") {
       delete module_data[type][object.id];
-      message = `Removed id[${object.id}]`;
+      message = `Removed object with id[${object.id}]`;
     } else if (action.type === "update") {
       try {
         editor_fn[type].validate(object, managers, type);
@@ -129,10 +129,32 @@ const parse_packet = {
         // "id: map[id].id" to be sure id wont be override
         module_data[type][object.id] = {
           ...module_data[type][object.id],
-          ...object,
-          id: module_data[type][object.id].id
+          ...object
         };
-        message = `Updated id[${object.id}]`;
+
+        message = `Updated object with id[${object.id}]`;
+      } catch (e) {
+        logger.error(e, e.stack);
+        message = e.message;
+      }
+    } else if (action.type === "replace_id") {
+      try {
+        if (new_id == null || new_id.length < 1)
+          throw new Error(`Unable to replace id. Wrong new_id[${new_id}]`);
+        if (
+          old_id == null ||
+          old_id.length < 1 ||
+          module_data[type][old_id] == null
+        )
+          throw new Error(
+            `Unable to replace id. Not found object with id[${old_id}]`
+          );
+
+        module_data[type][new_id] = module_data[type][old_id];
+        module_data[type][new_id].id = new_id;
+        delete module_data[type][old_id];
+
+        message = `Replaced old_id[${old_id}] with new_id[${new_id}]`;
       } catch (e) {
         logger.error(e, e.stack);
         message = e.message;
@@ -189,7 +211,7 @@ const parse_packet = {
     });
   },
   editor_update_admin_script(connection, received_data, managers) {
-    const { action, object } = received_data;
+    const { action, object, old_id, new_id } = received_data;
 
     const send = (message) => {
       try {
@@ -219,12 +241,12 @@ const parse_packet = {
       managers.admin_scripts.db.update_async(
         new_object,
         ({ error, result, data }) => {
-          send(`Added id[${new_object.id}]. Errors[${error}]`);
+          send(`Added object with id[${new_object.id}]. Errors[${error}]`);
         }
       );
     } else if (action.type === "remove") {
       managers.admin_scripts.db.remove_async(object.id, ({ error, result }) => {
-        send(`Removed id[${object.id}]. Errors[${error}]`);
+        send(`Removed object with id[${object.id}]. Errors[${error}]`);
       });
     } else if (action.type === "update") {
       try {
@@ -245,7 +267,35 @@ const parse_packet = {
         managers.admin_scripts.db.update_async(
           updated_data,
           ({ error, result, data }) => {
-            send(`Updated id[${object.id}]. Errors[${error}]`);
+            send(`Updated object with id[${object.id}]. Errors[${error}]`);
+          }
+        );
+      } catch (e) {
+        send(e.message);
+      }
+    } else if (action.type === "replace_id") {
+      try {
+        if (new_id == null || new_id.length < 1)
+          throw new Error(
+            `Unable to replace object id. Wrong new_id[${new_id}]`
+          );
+        if (old_id == null || old_id.length < 1)
+          throw new Error(
+            `Unable to replace object id. Not found object with id[${old_id}]`
+          );
+
+        managers.admin_scripts.db.get_async(
+          old_id,
+          ({ error, result, data }) => {
+            managers.admin_scripts.db.update_async(
+              { ...data, id: new_id },
+              ({ error, result, data }) => {
+                send(
+                  `Replaced object old_id[${old_id}] new_id[${new_id}].` +
+                    ` Errors[${error}]`
+                );
+              }
+            );
           }
         );
       } catch (e) {
