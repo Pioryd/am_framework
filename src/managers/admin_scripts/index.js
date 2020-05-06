@@ -107,7 +107,7 @@ class AdminScripts {
   run_script({
     script_fn_as_string,
     command,
-    script_name,
+    script_id,
     arguments_as_string,
     arguments_as_list,
     scripts_map = {},
@@ -116,30 +116,30 @@ class AdminScripts {
     const parse = function (command) {
       if (command == null || command === "") command = "help";
       const command_end_index = command.indexOf(" ");
-      let script_name = "";
+      let script_id = "";
       let arguments_as_string = "";
 
       if (command_end_index != -1) {
-        script_name = command.substr(0, command_end_index);
+        script_id = command.substr(0, command_end_index);
         arguments_as_string = command.substr(command_end_index).trim();
       } else {
-        script_name = command;
+        script_id = command;
       }
-      return { script_name, arguments_as_string };
+      return { script_id, arguments_as_string };
     };
 
     let ret_val = null;
     let error_data = null;
     try {
       if (command == null) command = "";
-      if (script_name == null) script_name = "";
+      if (script_id == null) script_id = "";
       if (arguments_as_string == null) arguments_as_string = "";
       if (!Array.isArray(arguments_as_list)) arguments_as_list = [];
 
       if (command != "") {
         command = command.trim();
         const parsed = parse(command);
-        script_name = parsed.script_name;
+        script_id = parsed.script_id;
         arguments_as_string = parsed.arguments_as_string;
       }
 
@@ -156,11 +156,10 @@ class AdminScripts {
         script_fn = Util.string_to_function(script_fn_as_string);
       else if ([";", "}"].includes(command.slice(-1)))
         script_fn = Util.string_to_function(`(app, args)=>{${command}}`);
-      else if (script_name in scripts_map)
-        script_fn = scripts_map[script_name].fn;
+      else if (script_id in scripts_map) script_fn = scripts_map[script_id].fn;
       else
         throw new Error(
-          `Unable to parse command$[${command}] or script[${script_name}]`
+          `Unable to parse command$[${command}] or script[${script_id}]`
         );
 
       ret_val = script_fn(this.root_module.application, arguments_as_list);

@@ -91,9 +91,9 @@ class DB {
     });
   }
 
-  update_async(data, callback) {
+  update_async(id, data, callback) {
     this.database.models.script.updateOne(
-      { id: data.id },
+      { id: id || data.id },
       { ...data },
       { upsert: true },
       (error, result) => {

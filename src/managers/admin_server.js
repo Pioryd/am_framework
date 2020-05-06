@@ -102,7 +102,7 @@ const parse_packet = {
       },
       am_script: {
         create_data: (id) => {
-          return { id, source: `id ${id}\r\nname new_${id}\r\n data\r\n` };
+          return { id, source: `data\r\n` };
         },
         validate: (object) => AML.parse(object.id, object.source)
       }
@@ -239,6 +239,7 @@ const parse_packet = {
         fn: `(app, args) => {}`
       };
       managers.admin_scripts.db.update_async(
+        new_object.id,
         new_object,
         ({ error, result, data }) => {
           send(`Added object with id[${new_object.id}]. Errors[${error}]`);
@@ -250,7 +251,7 @@ const parse_packet = {
       });
     } else if (action.type === "update") {
       try {
-        ["id", "type", "name", "desc", "args", "fn"].map((value) => {
+        ["id", "type", "desc", "args", "fn"].map((value) => {
           if (!(value in object))
             throw new Error(`Object doesn't contains key[${value}]`);
         });
@@ -264,6 +265,7 @@ const parse_packet = {
         };
 
         managers.admin_scripts.db.update_async(
+          updated_data.id,
           updated_data,
           ({ error, result, data }) => {
             send(`Updated object with id[${object.id}]. Errors[${error}]`);
@@ -287,6 +289,7 @@ const parse_packet = {
           old_id,
           ({ error, result, data }) => {
             managers.admin_scripts.db.update_async(
+              old_id,
               { ...data, id: new_id },
               ({ error, result, data }) => {
                 send(
