@@ -40,7 +40,7 @@ function parse(form, instruction) {
 
 function parse_instruction_internal(form, instruction) {
   if (instruction.command == null || instruction.id == null)
-    throw "Unable to parse_instruction_internal: " + instruction;
+    throw new Error("Unable to parse_instruction_internal: " + instruction);
 
   const [command, arg] = instruction.command.split(" ");
 
@@ -54,7 +54,7 @@ function parse_instruction_internal(form, instruction) {
 
 function parse_instruction_js(form, instruction) {
   if (instruction.body == null || instruction.id == null)
-    throw "Unable to parse_instruction_js: " + instruction;
+    throw new Error("Unable to parse_instruction_js: " + instruction);
 
   const js = new JS();
   js._id = instruction.id;
@@ -64,7 +64,7 @@ function parse_instruction_js(form, instruction) {
 
 function parse_instruction_scope(form, instruction) {
   if (instruction.instructions == null || instruction.id == null)
-    throw "Unable to parse_instruction: " + instruction;
+    throw new Error("Unable to parse_instruction: " + instruction);
 
   const scope = new Scope();
   scope._id = instruction.id;
@@ -77,7 +77,7 @@ function parse_instruction_scope(form, instruction) {
 
 function parse_instruction_if(form, instruction) {
   if (instruction.conditions == null || instruction.id == null)
-    throw "Unable to parse_instruction_if: " + instruction;
+    throw new Error("Unable to parse_instruction_if: " + instruction);
 
   const scope_if = new Scope_IF();
   scope_if._id = instruction.id;
@@ -106,7 +106,7 @@ function parse_instruction_while(form, instruction) {
     instruction.instructions == null ||
     instruction.id == null
   )
-    throw "Unable to parse_instruction_while: " + instruction;
+    throw new Error("Unable to parse_instruction_while: " + instruction);
 
   const scope_while = new Scope_WHILE();
   scope_while._id = instruction.id;
@@ -129,7 +129,7 @@ function parse_instruction_for(form, instruction) {
     instruction.instructions == null ||
     instruction.id == null
   )
-    throw "Unable to parse_instruction_for: " + instruction;
+    throw new Error("Unable to parse_instruction_for: " + instruction);
 
   const [
     init_source,
@@ -201,7 +201,7 @@ function parse_instruction_script(form, instruction) {
 
 function parse_instruction_api(form, instruction) {
   if (instruction.api == null || instruction.id == null)
-    throw "Unable to parse_instruction_api: " + instruction;
+    throw new Error("Unable to parse_instruction_api: " + instruction);
 
   const timeout = instruction.timeout != null ? instruction.timeout : "null";
   const return_data_key = instruction.return != null ? instruction.return : "";

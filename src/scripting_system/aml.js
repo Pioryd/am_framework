@@ -160,7 +160,7 @@ function parse_source(source) {
       type: instruction_type
     };
   } else {
-    throw `Unknown type. Unable to parse source[${source}].`;
+    throw new Error(`Unknown type. Unable to parse source[${source}].`);
   }
 
   return parsed_source;

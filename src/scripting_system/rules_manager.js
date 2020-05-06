@@ -43,7 +43,7 @@ class RulesManager {
 
   add_rule(name, event_emitter, process_actions) {
     if (name == null || event_emitter == null)
-      throw `Unable to add rule[${name}]`;
+      throw new Error(`Unable to add rule[${name}]`);
     this._rules[name] = new Rule(name, event_emitter, process_actions);
   }
 
@@ -70,7 +70,9 @@ class RulesManager {
   parse(source_rules_list) {
     for (const rule_source of source_rules_list) {
       if (!(rule_source.type in this._rules))
-        throw `Unable to parse rule. Unknown type[${rule_source.type}]`;
+        throw new Error(
+          `Unable to parse rule. Unknown type[${rule_source.type}]`
+        );
 
       const selected_rule = this._rules[rule_source.type];
 
@@ -105,9 +107,9 @@ class RulesManager {
               selected_rule.process_actions(rule_source.actions, value);
           });
         } else {
-          throw (
+          throw new Error(
             `Wrong trigger[${trigger_name}] value: ${trigger_value}` +
-            ` of rule[${rule_source}]`
+              ` of rule[${rule_source}]`
           );
         }
       }

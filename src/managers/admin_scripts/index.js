@@ -70,7 +70,7 @@ class AdminScripts {
         path.join(this.scripts_folder_full_name, id),
         "utf8",
         (err) => {
-          if (err) throw err;
+          if (err) throw new Error(err);
         }
       );
 

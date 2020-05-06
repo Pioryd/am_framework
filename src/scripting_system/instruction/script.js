@@ -48,7 +48,7 @@ class Script {
       if (!this._goto_find.enabled) {
         return { return_code };
       } else if (return_code === RETURN_CODE.PROCESSED) {
-        throw "Unable to find [goto label]";
+        throw new Error("Unable to find [goto label]");
       }
     }
 
@@ -60,9 +60,9 @@ class Script {
     if (internal === "goto") {
       return { return_code: RETURN_CODE.PROCESSING };
     } else if (internal === "break") {
-      throw "Unable to find [break]";
+      throw new Error("Unable to find [break]");
     } else if (internal === "continue") {
-      throw "Unable to find [continue]";
+      throw new Error("Unable to find [continue]");
     } else if (return_code === RETURN_CODE.PROCESSED) {
       this.clear_return_data();
       return { return_code };

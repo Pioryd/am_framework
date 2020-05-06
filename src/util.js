@@ -5,8 +5,8 @@ const logger = require("./logger").create_logger({
 });
 class Util {
   static read_from_json(file_name) {
-    const json = fs.readFileSync(file_name, "utf8", err => {
-      if (err) throw err;
+    const json = fs.readFileSync(file_name, "utf8", (err) => {
+      if (err) throw new Error(err);
     });
 
     return JSON.parse(json);
@@ -15,8 +15,8 @@ class Util {
   static write_to_json(file_name, data) {
     const json = JSON.stringify(data, null, 2);
 
-    fs.writeFileSync(file_name, json, "utf8", err => {
-      if (err) throw err;
+    fs.writeFileSync(file_name, json, "utf8", (err) => {
+      if (err) throw new Error(err);
     });
   }
 
@@ -42,8 +42,8 @@ class Util {
     }
     return fs
       .readdirSync(path, { withFileTypes: true })
-      .filter(dir => dir.isDirectory())
-      .map(dir => dir.name);
+      .filter((dir) => dir.isDirectory())
+      .map((dir) => dir.name);
   }
 
   static get_files(path) {
@@ -55,8 +55,8 @@ class Util {
     }
     return fs
       .readdirSync(path, { withFileTypes: true })
-      .filter(dir => dir.isFile())
-      .map(dir => dir.name);
+      .filter((dir) => dir.isFile())
+      .map((dir) => dir.name);
   }
 
   /**
@@ -118,7 +118,7 @@ class Util {
     let argPart = null;
 
     text &&
-      text.split(" ").forEach(function(arg) {
+      text.split(" ").forEach(function (arg) {
         if ((re.test(arg) || re2.test(arg)) && !argPart) {
           arr.push(arg);
         } else {

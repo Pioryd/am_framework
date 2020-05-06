@@ -18,7 +18,7 @@ describe("Config test", () => {
       config_path_dist_full_name,
       config_path_temp_full_name,
       (err) => {
-        if (err) throw err;
+        if (err) throw new Error(err);
       }
     );
 

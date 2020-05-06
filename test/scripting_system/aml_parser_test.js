@@ -22,7 +22,7 @@ describe("AML Parser", () => {
         path.join(aml_parser_directory_aml_full_name, key + ".aml"),
         "utf8",
         (err) => {
-          if (err) throw err;
+          if (err) throw new Error(err);
         }
       );
     }

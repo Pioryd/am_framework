@@ -24,7 +24,7 @@ describe("Forms test", () => {
             path.join(scripts_path_full_name, scripts_id + ".aml"),
             "utf8",
             (err) => {
-              if (err) throw err;
+              if (err) throw new Error(err);
             }
           )
         );
