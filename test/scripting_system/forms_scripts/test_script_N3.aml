@@ -1,0 +1,3 @@
+data val:0 
+
+js script.data.val++

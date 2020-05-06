@@ -1,5 +1,3 @@
-id test_script_N1_ID
-name test_script_N1
 data val:0 
 
 js script.data.val++

@@ -5,7 +5,7 @@ class System {
     this._root = root;
     this._source = source;
 
-    if (this._source.name == null || this._source.id == null)
+    if (this._source.id == null)
       throw new Error("Unable to parse system: " + this._source);
 
     this._programs_list = [];
@@ -32,10 +32,6 @@ class System {
 
   get_id() {
     return this._source.id;
-  }
-
-  get_name() {
-    return this._source.name;
   }
 }
 

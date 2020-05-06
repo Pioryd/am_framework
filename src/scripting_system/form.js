@@ -16,8 +16,7 @@ class Form {
     this._root = root;
     this._source = source;
 
-    if (source.name == null || source.id == null)
-      throw new Error("Unable to parse form: " + source);
+    if (source.id == null) throw new Error("Unable to parse form: " + source);
 
     this._running_scripts = {};
     this._listeners_list = [];
@@ -67,10 +66,6 @@ class Form {
 
   get_id() {
     return this._source.id;
-  }
-
-  get_name() {
-    return this._source.name;
   }
 
   _run_script(id) {

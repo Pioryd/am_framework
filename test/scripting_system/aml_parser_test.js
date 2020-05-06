@@ -21,7 +21,7 @@ describe("AML Parser", () => {
       aml_parser_aml_scripts_map[key] = fs.readFileSync(
         path.join(aml_parser_directory_aml_full_name, key + ".aml"),
         "utf8",
-        err => {
+        (err) => {
           if (err) throw err;
         }
       );
@@ -30,22 +30,22 @@ describe("AML Parser", () => {
   describe("parse", () => {
     it("01", () => {
       expect(
-        JSON.stringify(AML.parse(aml_parser_aml_scripts_map["01"]))
+        JSON.stringify(AML.parse("01", aml_parser_aml_scripts_map["01"]))
       ).to.equal(JSON.stringify(aml_parser_json_source["01"]));
     });
     it("02", () => {
       expect(
-        JSON.stringify(AML.parse(aml_parser_aml_scripts_map["02"]))
+        JSON.stringify(AML.parse("02", aml_parser_aml_scripts_map["02"]))
       ).to.equal(JSON.stringify(aml_parser_json_source["02"]));
     });
     it("03", () => {
       expect(
-        JSON.stringify(AML.parse(aml_parser_aml_scripts_map["03"]))
+        JSON.stringify(AML.parse("03", aml_parser_aml_scripts_map["03"]))
       ).to.equal(JSON.stringify(aml_parser_json_source["03"]));
     });
     it("04", () => {
       expect(
-        JSON.stringify(AML.parse(aml_parser_aml_scripts_map["04"]))
+        JSON.stringify(AML.parse("04", aml_parser_aml_scripts_map["04"]))
       ).to.equal(JSON.stringify(aml_parser_json_source["04"]));
     });
   });

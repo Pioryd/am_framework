@@ -1,8 +1,7 @@
 {
   "Test_api": {
     "type": "script",
-    "name": "Test_api",
-    "id": "Test_api_ID",
+    "id": "Test_api",
     "data": { "val": 0, "min": 1 },
     "root_scope": {
       "type": "scope",
@@ -17,7 +16,7 @@
           "type": "api",
           "timeout": "20",
           "id": "Test_api_2",
-          "name": "add_min_max",
+          "api": "add_min_max",
           "args": ["min:script.data.min", "max:5"],
           "return": "add_min_max"
         },

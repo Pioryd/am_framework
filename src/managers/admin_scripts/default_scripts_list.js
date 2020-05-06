@@ -1,6 +1,6 @@
 module.exports = [
   {
-    name: "close",
+    id: "close",
     desc: "Close application",
     args: [],
     fn: (app, args) => {
@@ -10,7 +10,7 @@ module.exports = [
     }
   },
   {
-    name: "help",
+    id: "help",
     desc: "Print scripts list",
     args: [],
     fn: (app, args) => {
@@ -22,8 +22,8 @@ module.exports = [
       for (const script of Object.values(
         module.managers.admin_scripts.get_scripts_map()
       )) {
-        const { name, desc, args } = script;
-        command_list[name] = { desc, args };
+        const { id, desc, args } = script;
+        command_list[id] = { desc, args };
       }
       app.logger.log(
         `Module[${module_name}] Commands:\n ` +
@@ -32,7 +32,7 @@ module.exports = [
     }
   },
   {
-    name: "net_msg",
+    id: "net_msg",
     desc: "Enable/Disable network logs",
     args: ["module name", "manager(server) name", "enabled[true/false]"],
     fn: (app, args) => {

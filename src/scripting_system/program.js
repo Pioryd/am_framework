@@ -11,7 +11,7 @@ class Program {
     this._root = root;
     this._source = source;
 
-    if (source.name == null || source.id == null)
+    if (source.id == null)
       throw new Error("Unable to parse program: " + source);
 
     this._current_form = null;
@@ -59,10 +59,6 @@ class Program {
     return this._source.id;
   }
 
-  get_name() {
-    return this._source.name;
-  }
-
   _run_form(id) {
     if (this._current_form != null)
       if (id === this._current_form.get_id()) return;
@@ -79,7 +75,7 @@ class Program {
   }
 
   _terminate_form(id) {
-    if (name === this._current_form.get_id()) {
+    if (id === this._current_form.get_id()) {
       form.terminate();
       this._current_form = null;
       this._event_emitter.emit("forms_count", 0);

@@ -1,8 +1,7 @@
 {
   "Test_js": {
     "type": "script",
-    "name": "Test_js",
-    "id": "Test_js_ID",
+    "id": "Test_js",
     "data": { "val": 0 },
     "root_scope": {
       "type": "scope",
@@ -14,8 +13,7 @@
   },
   "Test_scope": {
     "type": "script",
-    "name": "Test_scope",
-    "id": "Test_scope_ID",
+    "id": "Test_scope",
     "data": { "val": 0 },
     "root_scope": {
       "type": "scope",
@@ -29,8 +27,7 @@
   },
   "Test_scope_if": {
     "type": "script",
-    "name": "Test_scope_if",
-    "id": "Test_scope_if_ID",
+    "id": "Test_scope_if",
     "data": { "val": 0 },
     "root_scope": {
       "type": "if",
@@ -77,8 +74,7 @@
   },
   "Test_scope_while": {
     "type": "script",
-    "name": "Test_scope_while",
-    "id": "Test_scope_while_ID",
+    "id": "Test_scope_while",
     "data": { "val": 0 },
     "root_scope": {
       "type": "while",
@@ -100,8 +96,7 @@
   },
   "Test_scope_for": {
     "type": "script",
-    "name": "Test_scope_for",
-    "id": "Test_scope_for_ID",
+    "id": "Test_scope_for",
     "data": { "val": 0 },
     "root_scope": {
       "type": "for",
@@ -115,8 +110,7 @@
   },
   "Test_internal_break": {
     "type": "script",
-    "name": "Test_internal_break",
-    "id": "Test_internal_break_ID",
+    "id": "Test_internal_break",
     "data": { "val": 0, "val_2": 0 },
     "root_scope": {
       "type": "scope",
@@ -220,8 +214,7 @@
   },
   "Test_internal_continue": {
     "type": "script",
-    "name": "Test_internal_continue",
-    "id": "Test_internal_continue_ID",
+    "id": "Test_internal_continue",
     "data": { "val": 0, "val_2": 0 },
     "root_scope": {
       "type": "scope",
@@ -308,8 +301,7 @@
   },
   "Test_internal_sleep": {
     "type": "script",
-    "name": "Test_internal_sleep",
-    "id": "Test_internal_sleep_ID",
+    "id": "Test_internal_sleep",
     "data": { "val": 0 },
     "root_scope": {
       "type": "scope",
@@ -335,8 +327,7 @@
   },
   "Test_label_and_goto": {
     "type": "script",
-    "name": "Test_label_and_goto",
-    "id": "Test_label_and_goto_ID",
+    "id": "Test_label_and_goto",
     "data": { "val": 0, "val_2": 0 },
     "root_scope": {
       "type": "scope",
@@ -485,8 +476,7 @@
   },
   "Test_unhandled_internal": {
     "type": "script",
-    "name": "Test_unhandled_internal",
-    "id": "Test_unhandled_internal_ID",
+    "id": "Test_unhandled_internal",
     "data": { "val": 0 },
     "root_scope": {
       "type": "if",
@@ -518,8 +508,7 @@
   },
   "Test_timeout_scope": {
     "type": "script",
-    "name": "Test_timeout_scope",
-    "id": "Test_timeout_scope_ID",
+    "id": "Test_timeout_scope",
     "data": { "val": 0 },
     "root_scope": {
       "type": "scope",
@@ -533,7 +522,7 @@
         {
           "type": "script",
           "timeout": 40,
-          "name": "Test_internal_sleep",
+          "script": "Test_internal_sleep",
           "id": "Test_timeout_scope_2"
         },
         {
@@ -546,8 +535,7 @@
   },
   "Test_timeout_if": {
     "type": "script",
-    "name": "Test_timeout_if",
-    "id": "Test_timeout_if_ID",
+    "id": "Test_timeout_if",
     "data": { "val": 0 },
     "root_scope": {
       "type": "if",
@@ -562,7 +550,7 @@
           {
             "type": "script",
             "timeout": 40,
-            "name": "Test_internal_sleep",
+            "script": "Test_internal_sleep",
             "id": "Test_timeout_if_2"
           },
           {
@@ -576,8 +564,7 @@
   },
   "Test_timeout_while": {
     "type": "script",
-    "name": "Test_timeout_while",
-    "id": "Test_timeout_while_ID",
+    "id": "Test_timeout_while",
     "data": { "val": 0 },
     "root_scope": {
       "type": "while",
@@ -592,7 +579,7 @@
         {
           "type": "script",
           "timeout": 40,
-          "name": "Test_internal_sleep",
+          "script": "Test_internal_sleep",
           "id": "Test_timeout_while_2"
         },
         {
@@ -605,8 +592,7 @@
   },
   "Test_timeout_for": {
     "type": "script",
-    "name": "Test_timeout_for",
-    "id": "Test_timeout_for_ID",
+    "id": "Test_timeout_for",
     "data": { "val": 0 },
     "root_scope": {
       "type": "for",
@@ -621,7 +607,7 @@
         {
           "type": "script",
           "timeout": 40,
-          "name": "Test_internal_sleep",
+          "script": "Test_internal_sleep",
           "id": "Test_timeout_for_2"
         },
         {
@@ -634,8 +620,7 @@
   },
   "Test_timeout_script": {
     "type": "script",
-    "name": "Test_timeout_script",
-    "id": "Test_timeout_script_ID",
+    "id": "Test_timeout_script",
     "data": { "val": 0 },
     "root_scope": {
       "type": "scope",
@@ -649,7 +634,7 @@
         {
           "type": "script",
           "timeout": 20,
-          "name": "Test_timeout_scope",
+          "script": "Test_timeout_scope",
           "id": "Test_timeout_script_2"
         },
         {

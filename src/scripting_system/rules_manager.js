@@ -13,10 +13,6 @@ class Rule {
     this._listeners_list = [];
   }
 
-  get_name() {
-    this._name;
-  }
-
   terminate() {
     this._remove_all_listeners();
   }
@@ -86,7 +82,7 @@ class RulesManager {
           "priority" in trigger_value ? trigger_value.priority : 0;
 
         if ("min" in trigger_value && "max" in trigger_value) {
-          selected_rule.add_listener(trigger_name, value => {
+          selected_rule.add_listener(trigger_name, (value) => {
             if (value >= trigger_value.min && value <= trigger_value.max) {
               if (this._check_trigger_priority(trigger_name, priority))
                 selected_rule.process_actions(rule_source.actions, value);
@@ -95,7 +91,7 @@ class RulesManager {
             }
           });
         } else if ("value" in trigger_value) {
-          selected_rule.add_listener(trigger_name, value => {
+          selected_rule.add_listener(trigger_name, (value) => {
             if (value === trigger_value.value) {
               if (this._check_trigger_priority(trigger_name, priority))
                 selected_rule.process_actions(rule_source.actions, value);
@@ -104,13 +100,15 @@ class RulesManager {
             }
           });
         } else if ("any" in trigger_value) {
-          selected_rule.add_listener(trigger_name, value => {
+          selected_rule.add_listener(trigger_name, (value) => {
             if (this._check_trigger_priority(trigger_name, priority))
               selected_rule.process_actions(rule_source.actions, value);
           });
         } else {
-          throw `Wrong trigger[${trigger_name}] value: ${trigger_value}` +
-            ` of rule[${rule_source}]`;
+          throw (
+            `Wrong trigger[${trigger_name}] value: ${trigger_value}` +
+            ` of rule[${rule_source}]`
+          );
         }
       }
     }

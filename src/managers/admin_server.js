@@ -84,19 +84,19 @@ const parse_packet = {
     const editor_fn = {
       am_form: {
         create_data: (id) => {
-          return { id, name: `new_${id}`, rules: [], scripts: [] };
+          return { id, rules: [], scripts: [] };
         },
         validate: validate_json
       },
       am_program: {
         create_data: (id) => {
-          return { id, name: `new_${id}`, rules: [], forms: [] };
+          return { id, rules: [], forms: [] };
         },
         validate: validate_json
       },
       am_system: {
         create_data: (id) => {
-          return { id, name: `new_${id}`, programs: [] };
+          return { id, programs: [] };
         },
         validate: validate_json
       },
@@ -104,7 +104,7 @@ const parse_packet = {
         create_data: (id) => {
           return { id, source: `id ${id}\r\nname new_${id}\r\n data\r\n` };
         },
-        validate: (object) => AML.parse(object.source)
+        validate: (object) => AML.parse(object.id, object.source)
       }
     };
 
@@ -258,7 +258,6 @@ const parse_packet = {
         const updated_data = {
           id: object.id,
           type: object.type,
-          name: object.name,
           desc: object.desc,
           args: object.args,
           fn: object.fn

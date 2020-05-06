@@ -24,7 +24,7 @@ class Helper {
     this.options = options;
     return parse(
       this.root.source.forms["Test_form"],
-      this._get_script_by_name(this.options.name)
+      this._get_script_by_id(this.options.id)
     );
   }
 
@@ -34,10 +34,10 @@ class Helper {
       this.root.return_data.insert(this.received_data_list.pop());
   }
 
-  _get_script_by_name(name) {
+  _get_script_by_id(id) {
     for (const script of this.root.source.forms["Test_form"]._source.scripts)
-      if (script.name === name) return script;
-    throw new Error(`Script[${name}] not found.`);
+      if (script.id === id) return script;
+    throw new Error(`Script[${id}] not found.`);
   }
 
   _setup_root() {

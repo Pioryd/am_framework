@@ -1,19 +1,18 @@
 {
   "forms": {
-    "Test_1_ID": {
-      "name": "Test_1",
-      "id": "Test_1_ID",
+    "Test_1": {
+      "id": "Test_1",
       "rules": [
         {
           "type": "system",
           "triggers": [
             {
-              "form_init": { "value": "Test_1_ID" }
+              "form_init": { "value": "Test_1" }
             }
           ],
           "actions": [
             {
-              "script_run": { "value": "test_script_N2_ID" }
+              "script_run": { "value": "test_script_N2" }
             }
           ]
         },
@@ -21,12 +20,12 @@
           "type": "system",
           "triggers": [
             {
-              "script_run": { "value": "test_script_N1_ID" }
+              "script_run": { "value": "test_script_N1" }
             }
           ],
           "actions": [
             {
-              "script_run": { "value": "test_script_N2_ID" }
+              "script_run": { "value": "test_script_N2" }
             }
           ]
         },
@@ -34,12 +33,12 @@
           "type": "system",
           "triggers": [
             {
-              "script_processed": { "value": "test_script_N3_ID" }
+              "script_processed": { "value": "test_script_N3" }
             }
           ],
           "actions": [
             {
-              "script_run": { "value": "test_script_N2_ID" }
+              "script_run": { "value": "test_script_N2" }
             }
           ]
         },
@@ -52,7 +51,7 @@
           ],
           "actions": [
             {
-              "script_run": { "value": "test_script_N1_ID" }
+              "script_run": { "value": "test_script_N1" }
             }
           ]
         },
@@ -65,7 +64,7 @@
           ],
           "actions": [
             {
-              "script_terminate": { "value": "test_script_N2_ID" }
+              "script_terminate": { "value": "test_script_N2" }
             }
           ]
         },
@@ -78,11 +77,11 @@
           ],
           "actions": [
             {
-              "script_run": { "value": "test_script_N2_ID" }
+              "script_run": { "value": "test_script_N2" }
             },
             {
               "script_set_data": {
-                "script": "test_script_N2_ID",
+                "script": "test_script_N2",
                 "data": "val"
               }
             }
@@ -97,12 +96,12 @@
           ],
           "actions": [
             {
-              "script_run": { "value": "test_script_N1_ID" }
+              "script_run": { "value": "test_script_N1" }
             }
           ]
         }
       ],
-      "scripts": ["test_script_N1_ID", "test_script_N2_ID", "test_script_N3_ID"]
+      "scripts": ["test_script_N1", "test_script_N2", "test_script_N3"]
     }
   }
 }

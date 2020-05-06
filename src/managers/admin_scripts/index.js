@@ -55,20 +55,19 @@ class AdminScripts {
   reload_default_scripts() {
     this.default_scripts_map = {};
     for (const script of default_scripts_list) {
-      this.default_scripts_map[script.name] = {
+      this.default_scripts_map[script.id] = {
         ...script,
-        id: "local",
         type: "local"
       };
     }
   }
 
   reload_file_scripts() {
-    const scripts_names_list = Util.get_files(this.scripts_folder_full_name);
+    const scripts_ids_list = Util.get_files(this.scripts_folder_full_name);
 
-    for (const name of scripts_names_list) {
+    for (const id of scripts_ids_list) {
       const script_body = fs.readFileSync(
-        path.join(this.scripts_folder_full_name, name),
+        path.join(this.scripts_folder_full_name, id),
         "utf8",
         (err) => {
           if (err) throw err;
@@ -81,15 +80,14 @@ class AdminScripts {
       eval(script_body);
 
       this.file_scripts_map = {};
-      if (script != null) this.file_scripts_map[script.name] = script;
+      if (script != null) this.file_scripts_map[script.id] = script;
       if (scripts_list != null)
         for (const _script of scripts_list)
-          this.file_scripts_map[_script.name] = _script;
+          this.file_scripts_map[_script.id] = _script;
 
       for (const [key, script] of Object.entries(this.file_scripts_map)) {
         this.file_scripts_map[key] = {
           ...script,
-          id: "local",
           type: "local",
           fn: script.fn.toString()
         };
@@ -100,7 +98,7 @@ class AdminScripts {
   reload_db_scripts_async(callback) {
     this.db.get_all_async(({ error, results, scripts_list }) => {
       this.db_scripts_map = {};
-      for (const data of scripts_list) this.db_scripts_map[data.name] = data;
+      for (const data of scripts_list) this.db_scripts_map[data.id] = data;
 
       if (callback != null) callback();
     });
@@ -176,13 +174,13 @@ class AdminScripts {
   _auto_run_scripts() {
     const run_module_scripts = () => {
       for (const script_data of this.config.auto_run_scripts) {
-        const { name, args } = script_data;
+        const { id, args } = script_data;
         const arguments_as_list = args;
-        const script_name = name;
+        const script_id = id;
 
         const display_result = ({ ret_val, error_data }) => {
           logger.log(
-            `Autorun script [${script_name}]` +
+            `Autorun script [${script_id}]` +
               (arguments_as_list != null && arguments_as_list.length > 0
                 ? ` with arguments ${JSON.stringify(arguments_as_list)}`
                 : "") +
@@ -193,7 +191,7 @@ class AdminScripts {
 
         try {
           this.run_script({
-            script_name,
+            script_id,
             arguments_as_list,
             scripts_map: this.scripts_map,
             callback: display_result

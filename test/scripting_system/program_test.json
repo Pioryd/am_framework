@@ -1,8 +1,7 @@
 {
   "programs": {
-    "Test_1_ID": {
-      "id": "Test_1_ID",
-      "name": "Test_1",
+    "Test_1": {
+      "id": "Test_1",
       "rules": [
         {
           "type": "system",
@@ -13,7 +12,7 @@
           ],
           "actions": [
             {
-              "form_run": { "value": "Test_form_1_ID" }
+              "form_run": { "value": "Test_form_1" }
             }
           ]
         },
@@ -26,7 +25,7 @@
           ],
           "actions": [
             {
-              "form_run": { "value": "Test_form_2_ID" }
+              "form_run": { "value": "Test_form_2" }
             }
           ]
         },
@@ -39,7 +38,7 @@
           ],
           "actions": [
             {
-              "form_terminate": { "value": "Test_form_1_ID" }
+              "form_terminate": { "value": "Test_form_1" }
             }
           ]
         },
@@ -57,21 +56,19 @@
           ]
         }
       ],
-      "forms": ["Test_form_1_ID", "Test_form_2_ID"]
+      "forms": ["Test_form_1", "Test_form_2"]
     }
   },
   "forms": {
-    "Test_form_1_ID": {
-      "name": "Test_form_1",
-      "id": "Test_form_1_ID",
+    "Test_form_1": {
+      "id": "Test_form_1",
       "rules": [],
       "signals": [],
       "events": [],
       "scripts": []
     },
-    "Test_form_2_ID": {
-      "name": "Test_form_2",
-      "id": "Test_form_2_ID",
+    "Test_form_2": {
+      "id": "Test_form_2",
       "rules": [],
       "signals": [],
       "events": [],

@@ -1,5 +1,3 @@
-id 02
-name test_script
 data val:0 val_2:"test_1" \
     val_3:{}
 

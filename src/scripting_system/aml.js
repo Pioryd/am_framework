@@ -57,11 +57,9 @@ function get_instruction_source(start_index, lines) {
 }
 
 function parse_header(start_index, lines) {
-  const parsed_header = { id: ObjectID().toHexString(), name: "", data: {} };
+  const parsed_header = { data: {} };
 
   const header_data_found = {
-    id: false,
-    name: false,
     data: false
   };
 
@@ -86,12 +84,7 @@ function parse_header(start_index, lines) {
     // Iterate loop
     index = index_list[index_list.length - 1] + 1;
 
-    if (
-      header_data_found.id !== false &&
-      header_data_found.name !== false &&
-      header_data_found.data !== false
-    )
-      break;
+    if (header_data_found.data !== false) break;
   }
 
   eval(
@@ -100,11 +93,7 @@ function parse_header(start_index, lines) {
     ).join()}}`
   );
 
-  if (
-    header_data_found.id === false ||
-    header_data_found.name === false ||
-    header_data_found.data === false
-  )
+  if (header_data_found.data === false)
     throw new Error(`Not found header data. [${header_data_found}]`);
 
   if (index >= lines.length)
@@ -137,7 +126,7 @@ function _parse_api_source(source) {
     }
   }
 
-  parsed_api.name = splitted[index];
+  parsed_api.api = splitted[index];
   index++;
   parsed_api.args = source;
 
@@ -178,11 +167,11 @@ function parse_source(source) {
 }
 
 function merge_if_statements(parsed_instructions_list) {
-  const merge = list => {
+  const merge = (list) => {
     const statement_if_merger = {
       _current_if_object: null,
       _current_elif_object_list: [],
-      handle: function(object, parent_list) {
+      handle: function (object, parent_list) {
         try {
           if (object.type === "if") {
             this._close_if_statement(parent_list);
@@ -209,7 +198,7 @@ function merge_if_statements(parsed_instructions_list) {
           );
         }
       },
-      _close_if_statement: function(parent_list) {
+      _close_if_statement: function (parent_list) {
         for (let i = parent_list.length - 1; i >= 0; i--)
           if (this._current_elif_object_list.includes(parent_list[i]))
             parent_list.splice(i, 1);
@@ -233,11 +222,11 @@ function merge_if_statements(parsed_instructions_list) {
 function parse_instructions(start_index, lines) {
   const instructions_info = {
     _info_list: [],
-    get: function(object) {
+    get: function (object) {
       for (const info of this._info_list)
         if (info.object === object) return info.data;
     },
-    set: function(object, data) {
+    set: function (object, data) {
       if (this.get(object) == null) this._info_list.push({ object, data });
     }
   };
@@ -307,7 +296,7 @@ function parse_instructions(start_index, lines) {
 }
 
 module.exports = {
-  parse: source => {
+  parse: (id, source) => {
     const lines = source.split("\r\n");
     const header_start_index = 0;
 
@@ -318,7 +307,7 @@ module.exports = {
 
     const { root_scope } = parse_instructions(instructions_start_index, lines);
 
-    return { ...parsed_header, root_scope };
+    return { id, ...parsed_header, root_scope };
   },
   validate: () => {}
 };

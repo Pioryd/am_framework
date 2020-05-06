@@ -159,14 +159,20 @@ function parse_instruction_for(form, instruction) {
 }
 
 function parse_instruction_script(form, instruction) {
-  if (instruction.name == null || instruction.id == null)
-    throw "Unable to parse_instruction_script: " + instruction;
+  if (instruction.id == null)
+    throw new Error(
+      `Not found {id}. Unable to parse_instruction_script: [${JSON.stringify(
+        instruction,
+        null,
+        2
+      )}]`
+    );
 
   let data = instruction.data;
   let root_scope = instruction.root_scope;
   if (data == null || root_scope == null) {
     for (const script_source of form._source.scripts) {
-      if (script_source.name === instruction.name) {
+      if (script_source.id === instruction.script) {
         data = script_source.data;
         root_scope = script_source.root_scope;
         break;
@@ -175,12 +181,18 @@ function parse_instruction_script(form, instruction) {
   }
 
   if (data == null || root_scope == null)
-    throw "Unable to parse_instruction_script: " + instruction;
+    throw new Error(
+      `Not found {data} or {root_scope}.` +
+        ` Unable to parse_instruction_script: [${JSON.stringify(
+          instruction,
+          null,
+          2
+        )}]`
+    );
 
   const script = new Script();
   script._id = instruction.id;
   script._root = form._root;
-  script._name = instruction.name;
   script._timeout = instruction.timeout;
   script.data = JSON.parse(JSON.stringify(data)); // Can be shared
   script._root_scope = parse(form, root_scope);
@@ -188,7 +200,7 @@ function parse_instruction_script(form, instruction) {
 }
 
 function parse_instruction_api(form, instruction) {
-  if (instruction.name == null || instruction.id == null)
+  if (instruction.api == null || instruction.id == null)
     throw "Unable to parse_instruction_api: " + instruction;
 
   const timeout = instruction.timeout != null ? instruction.timeout : "null";
@@ -200,7 +212,7 @@ function parse_instruction_api(form, instruction) {
     `script.add_return_data(` +
     `  {query_id, timeout: ${timeout}, key: "${return_data_key}"});` +
     `root.process_api(` +
-    `  "${instruction.name}", script._id, query_id, ${timeout}, ${args});`;
+    `  "${instruction.api}", script._id, query_id, ${timeout}, ${args});`;
   const api = new Api();
   api._id = instruction.id;
   api._fn = Util.string_to_function(`(script, root){${body};}`);

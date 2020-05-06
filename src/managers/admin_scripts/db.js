@@ -36,7 +36,7 @@ class DB {
   get_all_async(callback) {
     this.database.models.script.find(
       {},
-      { id: 1, type: 1, name: 1, desc: 1, args: 1, fn: 1, _id: 0 },
+      { id: 1, type: 1, desc: 1, args: 1, fn: 1, _id: 0 },
       (error, results) => {
         try {
           const scripts_list = [];
@@ -61,7 +61,7 @@ class DB {
   get_async(id, callback) {
     this.database.models.script.findOne(
       { id },
-      { id: 1, type: 1, name: 1, desc: 1, args: 1, fn: 1, _id: 0 },
+      { id: 1, type: 1, desc: 1, args: 1, fn: 1, _id: 0 },
       (error, result) => {
         try {
           let data = {};

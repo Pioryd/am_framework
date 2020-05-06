@@ -15,12 +15,10 @@ describe("Program test", () => {
     root.source.programs = program_test_json.programs;
   });
   it("Parse", () => {
-    const program = new Program(root, root.source.programs["Test_1_ID"]);
+    const program = new Program(root, root.source.programs["Test_1"]);
 
-    expect(program.get_id()).to.equal("Test_1_ID");
-    expect(program.get_name()).to.equal("Test_1");
+    expect(program.get_id()).to.equal("Test_1");
     expect(program._source.rules.length).to.equal(4);
     expect(program._source.forms.length).to.equal(2);
-    expect(program._current_form.get_name()).equal("Test_form_1");
   });
 });

@@ -25,10 +25,6 @@ class Script {
     return this._id;
   }
 
-  get_name() {
-    return this._name;
-  }
-
   process(script, root) {
     const current_script = script != null ? script : this;
 
