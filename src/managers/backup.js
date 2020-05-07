@@ -1,4 +1,5 @@
 const ObjectID = require("bson-objectid");
+const { unflatten } = require("flat");
 
 const { create_logger } = require("../logger");
 const { Database } = require("../database");
@@ -186,11 +187,20 @@ class Backup {
   }
 
   _get_data() {
-    return this.root_module.data[this.config.object_name];
+    if (this.config.list.length === 0) return this.root_module.data;
+
+    const flatten_data = {};
+    for (const data_name of this.config.list) flatten_data[data_name] = {};
+
+    const unflatten_data = unflatten(flatten_data, { object: true });
+    for (const data_name of this.config.list)
+      eval(`unflatten_data.${data_name} = this.root_module.data.${data_name}`);
+
+    return unflatten_data;
   }
 
   _set_data(data) {
-    this.root_module.data[this.config.object_name] = data;
+    this.root_module.data = data;
   }
 }
 
