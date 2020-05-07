@@ -1,12 +1,10 @@
 const stringify = require("json-stringify-safe");
-const ObjectID = require("bson-objectid");
-const Ajv = require("ajv");
 
 const logger = require("../logger").create_logger({
   module_name: "am_framework",
   file_name: __filename
 });
-const { AML } = require("../scripting_system").ScriptingSystem;
+
 const { Server } = require("./server");
 
 const parse_packet = {
@@ -51,125 +49,56 @@ const parse_packet = {
     managers.admin_server.send(connection.get_id(), "module_data", { json });
   },
   editor_data(connection, received_data, managers) {
-    if (received_data.type === "admin_script") {
+    if (received_data.name === "admin_script") {
       this.editor_data_admin_script(connection, received_data, managers);
       return;
     }
 
-    const { action_id, type } = received_data;
-    const module_data = managers.admin_server.root_module.data;
+    const { action_id, name } = received_data;
 
-    if (!(type in module_data)) module_data[type] = {};
-
-    managers.admin_server.send(connection.get_id(), `editor_data_${type}`, {
+    managers.admin_server.send(connection.get_id(), `editor_data_${name}`, {
       action_id,
-      db_objects_list: Object.values(module_data[type]),
-      rules: managers.admin_server.config.validate_rules[type]
+      db_objects_list: Object.values(managers.editor.get_data(name)),
+      rules: managers.editor.data_config[name].validate
     });
   },
   editor_update(connection, received_data, managers) {
-    if (received_data.type === "admin_script") {
+    if (received_data.name === "admin_script") {
       this.editor_update_admin_script(connection, received_data, managers);
       return;
     }
+    let { action, object, name, old_id, new_id } = received_data;
 
-    const validate_json = (object, managers, var_ext_name) => {
-      const rule = managers.admin_server.config.validate_rules[var_ext_name];
-      const ajv = new Ajv({ allErrors: true });
-      const validate = ajv.compile(rule);
-      const valid = validate(object);
-      if (!valid) throw new Error("AJV: " + ajv.errorsText(validate.errors));
-    };
+    let message = null;
+    try {
+      object = managers.editor.update_data({
+        action,
+        object,
+        name,
+        old_id,
+        new_id
+      });
 
-    const editor_fn = {
-      am_form: {
-        create_data: (id) => {
-          return { id, rules: [], scripts: [] };
-        },
-        validate: validate_json
-      },
-      am_program: {
-        create_data: (id) => {
-          return { id, rules: [], forms: [] };
-        },
-        validate: validate_json
-      },
-      am_system: {
-        create_data: (id) => {
-          return { id, programs: [] };
-        },
-        validate: validate_json
-      },
-      am_script: {
-        create_data: (id) => {
-          return { id, source: `data\r\n` };
-        },
-        validate: (object) => AML.parse(object.id, object.source)
-      }
-    };
-
-    const { action, object, type, old_id, new_id } = received_data;
-    const module_data = managers.admin_server.root_module.data;
-
-    if (!(type in module_data)) module_data[type] = {};
-
-    let message = "Unknown";
-
-    if (action.type === "new") {
-      const new_id = ObjectID().toHexString();
-      module_data[type][new_id] = editor_fn[type].create_data(new_id);
-      message = `Added object with id[${new_id}]`;
-    } else if (action.type === "remove") {
-      delete module_data[type][object.id];
-      message = `Removed object with id[${object.id}]`;
-    } else if (action.type === "update") {
-      try {
-        editor_fn[type].validate(object, managers, type);
-
-        // "id: map[id].id" to be sure id wont be override
-        module_data[type][object.id] = {
-          ...module_data[type][object.id],
-          ...object
-        };
-
-        message = `Updated object with id[${object.id}]`;
-      } catch (e) {
-        logger.error(e, e.stack);
-        message = e.message;
-      }
-    } else if (action.type === "replace_id") {
-      try {
-        if (new_id == null || new_id.length < 1)
-          throw new Error(`Unable to replace id. Wrong new_id[${new_id}]`);
-        if (
-          old_id == null ||
-          old_id.length < 1 ||
-          module_data[type][old_id] == null
-        )
-          throw new Error(
-            `Unable to replace id. Not found object with id[${old_id}]`
-          );
-
-        module_data[type][new_id] = module_data[type][old_id];
-        module_data[type][new_id].id = new_id;
-        delete module_data[type][old_id];
-
-        message = `Replaced old_id[${old_id}] with new_id[${new_id}]`;
-      } catch (e) {
-        logger.error(e, e.stack);
-        message = e.message;
-      }
-    } else {
-      message = `Wrong action type. Id[${action.id}] Type: [${action.type}]`;
+      message =
+        {
+          new: `Added object with id[${object.id}]`,
+          remove: `Removed object with id[${object.id}]`,
+          update: `Updated object with id[${object.id}]`,
+          replace_id: `Replaced old_id[${old_id}] with new_id[${new_id}]`
+        }[action.type] ||
+        `Wrong action type. Id[${action.id}] Type: [${action.type}]`;
+    } catch (e) {
+      logger.error(e, e.stack, { action, object, name, old_id, new_id });
+      message = e.message;
     }
 
-    managers.admin_server.send(connection.get_id(), `editor_update_${type}`, {
+    managers.admin_server.send(connection.get_id(), `editor_update_${name}`, {
       action_id: action.id,
       message
     });
   },
   editor_process(connection, received_data, managers) {
-    if (received_data.type === "admin_script") {
+    if (received_data.name === "admin_script") {
       this.editor_process_admin_script(connection, received_data, managers);
       return;
     }
@@ -233,7 +162,6 @@ const parse_packet = {
       const new_object = {
         id: new_id,
         type: "type_" + new_id,
-        name: "new_" + new_id,
         desc: "",
         args: [],
         fn: `(app, args) => {}`
