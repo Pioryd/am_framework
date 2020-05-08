@@ -1,5 +1,6 @@
 module.exports = {
   am_form: {
+    actions: ["data", "update"],
     init: { id: "", rules: [], scripts: [] },
     validate: {
       properties: {
@@ -36,6 +37,7 @@ module.exports = {
     }
   },
   am_program: {
+    actions: ["data", "update"],
     init: { id: "", rules: [], forms: [] },
     validate: {
       properties: {
@@ -72,6 +74,7 @@ module.exports = {
     additionalProperties: false
   },
   am_system: {
+    actions: ["data", "update"],
     init: { id: "", programs: [] },
     validate: {
       properties: {
@@ -89,5 +92,22 @@ module.exports = {
       additionalProperties: false
     }
   },
-  am_script: { init: { id: "", source: `data\r\n` }, validate: "aml" }
+  am_script: {
+    actions: ["data", "update"],
+    init: { id: "", source: `data\r\n` },
+    validate: "aml"
+  },
+  admin_script: {
+    db_manager: "admin_scripts",
+    actions: ["data", "update", "process"],
+
+    init: {
+      id: "",
+      type: "",
+      desc: "",
+      args: [],
+      fn: `(app, args) => {}`
+    },
+    validate: "js"
+  }
 };

@@ -38,6 +38,40 @@ class AdminScripts {
 
   poll() {}
 
+  editor_data(callback) {
+    this.reload_scripts(() => {
+      callback(Object.values(this.get_scripts_map()));
+    });
+  }
+
+  editor_update_or_new(id, object, callback) {
+    this.db.update_async(id, object, ({ error, result }) => {
+      callback(object, error);
+    });
+  }
+
+  editor_remove(id, callback) {
+    this.db.remove_async(id, ({ error, result }) => {
+      callback({ id }, error);
+    });
+  }
+
+  editor_replace_id({ old_id, new_id }, callback) {
+    this.db.get_async(old_id, ({ error, result, data }) => {
+      const object = { ...data, id: new_id };
+      this.db.update_async(old_id, object, ({ error, result }) => {
+        callback(object, error);
+      });
+    });
+  }
+
+  editor_process(object, callback) {
+    this.run_script({
+      script_fn_as_string: object.fn,
+      callback
+    });
+  }
+
   get_scripts_map() {
     return {
       ...this.default_scripts_map,
