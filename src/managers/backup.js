@@ -1,5 +1,6 @@
 const ObjectID = require("bson-objectid");
 const { unflatten } = require("flat");
+const _ = require("lodash");
 
 const { create_logger } = require("../logger");
 const { Database } = require("../database");
@@ -200,7 +201,7 @@ class Backup {
   }
 
   _set_data(data) {
-    this.root_module.data = data;
+    this.root_module.data = _.merge(this.root_module.data, data);
   }
 }
 
