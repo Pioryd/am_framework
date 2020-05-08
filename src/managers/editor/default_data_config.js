@@ -1,5 +1,5 @@
 module.exports = {
-  "editor.am_form": {
+  am_form: {
     init: { id: "", rules: [], scripts: [] },
     validate: {
       properties: {

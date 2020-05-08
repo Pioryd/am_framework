@@ -30,7 +30,8 @@ const parse_packet = {
 
     connection.on_close = (connection) => {};
     managers.admin_server.send(connection.get_id(), "accept_connection", {
-      user_name: login
+      user_name: login,
+      editor_data_config: managers.editor.data_config
     });
     return true;
   },
@@ -47,6 +48,11 @@ const parse_packet = {
   module_data(connection, received_data, managers) {
     const json = JSON.parse(stringify(managers.admin_server.root_module.data));
     managers.admin_server.send(connection.get_id(), "module_data", { json });
+  },
+  editor_config(connection, received_data, managers) {
+    managers.admin_server.send(connection.get_id(), "editor_config", {
+      data_config: managers.editor.data_config
+    });
   },
   editor_data(connection, received_data, managers) {
     if (received_data.name === "admin_script") {
