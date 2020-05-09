@@ -107,8 +107,13 @@ class AppModule extends EventEmitter {
   }
 
   _poll(_this) {
-    for (const manager_name of this.__order.poll)
-      this.managers[manager_name].poll();
+    for (const manager_name of this.__order.poll) {
+      try {
+        this.managers[manager_name].poll();
+      } catch (e) {
+        logger.error({ manager_name }, e, e.stack);
+      }
+    }
   }
 }
 
