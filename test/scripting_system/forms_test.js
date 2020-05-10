@@ -77,9 +77,9 @@ describe("Forms test", () => {
 
     // energy
     expect(Object.keys(form._running_scripts).length).to.equal(1);
-    root.signals_event_emitter.emit("energy", 100);
+    root.event_emitter.emit("energy", 100);
     expect(Object.keys(form._running_scripts).length).to.equal(1);
-    root.signals_event_emitter.emit("energy", 70);
+    root.event_emitter.emit("energy", 70);
     expect(Object.keys(form._running_scripts).length).to.equal(2);
   });
   it("Events", () => {
@@ -87,9 +87,9 @@ describe("Forms test", () => {
 
     // time
     expect(Object.keys(form._running_scripts).length).to.equal(1);
-    root.events_event_emitter.emit("time", 1680926960000);
+    root.event_emitter.emit("time", 1680926960000);
     expect(Object.keys(form._running_scripts).length).to.equal(1);
-    root.events_event_emitter.emit("time", 1580928360000);
+    root.event_emitter.emit("time", 1580928360000);
     expect(Object.keys(form._running_scripts).length).to.equal(2);
   });
   it("Actions", () => {
@@ -97,11 +97,11 @@ describe("Forms test", () => {
 
     // script_terminate
     expect(Object.keys(form._running_scripts).length).to.equal(1);
-    root.signals_event_emitter.emit("stres", 85);
+    root.event_emitter.emit("stres", 85);
     expect(Object.keys(form._running_scripts).length).to.equal(0);
 
     // script_set_data
-    root.signals_event_emitter.emit("choice", 10);
+    root.event_emitter.emit("choice", 10);
     expect(Object.keys(form._running_scripts).length).to.equal(1);
     expect(form._running_scripts["test_script_N2"].data.val).to.equal(10);
   });

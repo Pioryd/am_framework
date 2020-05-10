@@ -15,36 +15,20 @@ class Form {
   constructor(root, source) {
     this._root = root;
     this._source = source;
+    this.event_emitter = this._root.event_emitter;
 
     if (source.id == null) throw new Error("Unable to parse form: " + source);
 
     this._running_scripts = {};
     this._listeners_list = [];
 
-    this._event_emitter = new EventEmitter();
-
-    this._rules_manager = new RulesManager();
-
-    this._rules_manager.add_rule("system", this._event_emitter, (...args) => {
+    this._rules_manager = new RulesManager(this.event_emitter, (...args) => {
       this._process_actions(...args);
     });
-    this._rules_manager.add_rule(
-      "signal",
-      this._root.signals_event_emitter,
-      (...args) => {
-        this._process_actions(...args);
-      }
-    );
-    this._rules_manager.add_rule(
-      "event",
-      this._root.events_event_emitter,
-      (...args) => {
-        this._process_actions(...args);
-      }
-    );
+
     this._rules_manager.parse(this._source.rules);
 
-    this._event_emitter.emit("form_init", this.get_id());
+    this.event_emitter.emit("form_init", this.get_id());
   }
 
   terminate() {
@@ -76,12 +60,12 @@ class Form {
 
     this._running_scripts[id] = parse(this, this._root.source.scripts[id]);
 
-    this._event_emitter.emit("script_run", id);
+    this.event_emitter.emit("script_run", id);
   }
 
   _terminate_script(id) {
     delete this._running_scripts[id];
-    this._event_emitter.emit("script_processed", id);
+    this.event_emitter.emit("script_processed", id);
   }
 
   _process_actions(actions, value) {

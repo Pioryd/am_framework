@@ -10,36 +10,20 @@ class Program {
   constructor(root, source) {
     this._root = root;
     this._source = source;
+    this.event_emitter = this._root.event_emitter;
 
     if (source.id == null)
       throw new Error("Unable to parse program: " + source);
 
     this._current_form = null;
 
-    this._event_emitter = new EventEmitter();
-
-    this._rules_manager = new RulesManager();
-
-    this._rules_manager.add_rule("system", this._event_emitter, (...args) => {
+    this._rules_manager = new RulesManager(this.event_emitter, (...args) => {
       this._process_actions(...args);
     });
-    this._rules_manager.add_rule(
-      "signal",
-      this._root.signals_event_emitter,
-      (...args) => {
-        this._process_actions(...args);
-      }
-    );
-    this._rules_manager.add_rule(
-      "event",
-      this._root.events_event_emitter,
-      (...args) => {
-        this._process_actions(...args);
-      }
-    );
+
     this._rules_manager.parse(this._source.rules);
 
-    this._event_emitter.emit("forms_count", 0);
+    this.event_emitter.emit("forms_count", 0);
   }
 
   terminate() {
@@ -51,7 +35,7 @@ class Program {
     if (this._current_form != null) {
       this._current_form.process();
     } else {
-      this._event_emitter.emit("forms_count", 0);
+      this.event_emitter.emit("forms_count", 0);
     }
   }
 
@@ -71,14 +55,14 @@ class Program {
       );
 
     this._current_form = new Form(this._root, this._root.source.forms[id]);
-    this._event_emitter.emit("forms_count", 1);
+    this.event_emitter.emit("forms_count", 1);
   }
 
   _terminate_form(id) {
     if (id === this._current_form.get_id()) {
       form.terminate();
       this._current_form = null;
-      this._event_emitter.emit("forms_count", 0);
+      this.event_emitter.emit("forms_count", 0);
     }
   }
 

@@ -4,7 +4,6 @@
       "id": "Test_1",
       "rules": [
         {
-          "type": "system",
           "triggers": [
             {
               "forms_count": { "value": 0 }
@@ -17,7 +16,6 @@
           ]
         },
         {
-          "type": "signal",
           "triggers": [
             {
               "energy": { "min": 0, "max": 10 }
@@ -30,7 +28,6 @@
           ]
         },
         {
-          "type": "signal",
           "triggers": [
             {
               "energy": { "min": 0, "max": 10 }
@@ -43,7 +40,6 @@
           ]
         },
         {
-          "type": "event",
           "triggers": [
             {
               "unknown_event": { "value": 0 }

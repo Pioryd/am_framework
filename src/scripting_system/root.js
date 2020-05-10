@@ -23,8 +23,7 @@ class Root {
     this._debug_enabled = false;
 
     this.return_data = new ReturnData();
-    this.signals_event_emitter = new EventEmitter();
-    this.events_event_emitter = new EventEmitter();
+    this.event_emitter = new EventEmitter();
   }
 
   generate_unique_id() {
