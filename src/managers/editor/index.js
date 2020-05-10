@@ -18,7 +18,7 @@ class Editor {
   constructor({ root_module, config }) {
     this.root_module = root_module;
     this.config = config;
-    this.data_config = { ...this.config.data_config, ...default_data_config };
+    this.data_config = _.merge(default_data_config, this.config.data_config);
 
     this.db_map = {};
   }
