@@ -1,5 +1,6 @@
 module.exports = {
   am_form: {
+    db_data: { url: "mongodb://127.0.0.1:27017", name: "am_data" },
     actions: ["data", "update"],
     init: { id: "", rules: [], scripts: [] },
     validate: {
@@ -37,6 +38,7 @@ module.exports = {
     }
   },
   am_program: {
+    db_data: { url: "mongodb://127.0.0.1:27017", name: "am_data" },
     actions: ["data", "update"],
     init: { id: "", rules: [], forms: [] },
     validate: {
@@ -74,6 +76,7 @@ module.exports = {
     additionalProperties: false
   },
   am_system: {
+    db_data: { url: "mongodb://127.0.0.1:27017", name: "am_data" },
     actions: ["data", "update"],
     init: { id: "", programs: [] },
     validate: {
@@ -93,14 +96,14 @@ module.exports = {
     }
   },
   am_script: {
+    db_data: { url: "mongodb://127.0.0.1:27017", name: "am_data" },
     actions: ["data", "update"],
     init: { id: "", source: `data\r\n` },
     validate: "aml"
   },
   admin_script: {
-    db_manager: "admin_scripts",
+    db_data: { manager: "admin_scripts" },
     actions: ["data", "update", "process"],
-
     init: {
       id: "",
       type: "",
