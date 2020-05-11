@@ -130,8 +130,8 @@ const parse_packet = {
 };
 
 class AdminServer extends Server {
-  constructor({ root_module, config, DefaultObjectClass }) {
-    super({ root_module, config, parse_packet, DefaultObjectClass });
+  constructor({ root_module, config }) {
+    super({ root_module, config, parse_packet });
   }
 
   send(connection_id, packet_id, packet_data) {
