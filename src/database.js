@@ -11,9 +11,13 @@ class Database {
     this.name = name;
     this.models_schema_list = models_schema_list;
     this.models = {};
+
+    this.connected = false;
   }
 
   connect(callback = () => {}) {
+    this.connected = false;
+
     const process_callback = (db) => {
       db.listCollections().toArray((error, collections) => {
         try {
@@ -29,6 +33,7 @@ class Database {
           }
 
           this.__check_collections(collections);
+          this.connected = true;
           callback();
         } catch (e) {
           console.log(e, e.stack);
@@ -82,7 +87,7 @@ class Database {
 
   is_connected() {
     if (this.connection == null) return false;
-    return this.connection.readyState === 1;
+    return this.connection.readyState === 1 && this.connected == true;
   }
 
   is_disconnecting() {
