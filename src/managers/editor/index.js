@@ -80,6 +80,13 @@ class Editor {
     }
   }
 
+  is_connected() {
+    for (const db of Object.values(this.db_map)) {
+      if (!db.database.is_connected()) return false;
+    }
+    return true;
+  }
+
   _db_get_data(name, callback) {
     const { db_data } = this.data_config[name];
     const key = db_data.url + db_data.name;
