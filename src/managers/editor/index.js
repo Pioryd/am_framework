@@ -10,7 +10,7 @@ const logger = require("../../logger").create_logger({
   module_name: "am_framework",
   file_name: __filename
 });
-const { AML } = require("../../scripting_system").ScriptingSystem;
+const { AML } = require("../../am").ScriptingSystem;
 
 const default_data_config = require("./default_data_config");
 

@@ -2,7 +2,7 @@ const { expect, config } = require("chai");
 const path = require("path");
 const fs = require("fs");
 const { Util } = require("../../src/util");
-const AML = require("../../src/scripting_system/aml");
+const AML = require("../../src/am/aml");
 
 const aml_parser_json_full_name = path.join(__dirname, "aml_parser.json");
 const aml_parser_directory_aml_full_name = path.join(

@@ -3,9 +3,7 @@ const { Util } = require("../../src/util");
 const { Stopper } = require("../../src/stopper");
 const { Stopwatch } = require("../../src/stopwatch");
 const Helper = require("./api_helper");
-const {
-  RETURN_CODE
-} = require("../../src/scripting_system/instruction/return_code");
+const { RETURN_CODE } = require("../../src/am/instruction/return_code");
 
 const helper = new Helper();
 

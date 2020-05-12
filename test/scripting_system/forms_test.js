@@ -2,9 +2,9 @@ const { expect, config } = require("chai");
 const path = require("path");
 const fs = require("fs");
 const { Util } = require("../../src/util");
-const Root = require("../../src/scripting_system/root");
-const Form = require("../../src/scripting_system/form");
-const AML = require("../../src/scripting_system/aml");
+const Root = require("../../src/am/root");
+const Form = require("../../src/am/form");
+const AML = require("../../src/am/aml");
 
 const forms_full_name = path.join(__dirname, "forms_test.json");
 const scripts_path_full_name = path.join(__dirname, "forms_scripts");

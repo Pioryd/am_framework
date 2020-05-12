@@ -1,8 +1,8 @@
 const { expect, config } = require("chai");
 const path = require("path");
 const { Util } = require("../../src/util");
-const Root = require("../../src/scripting_system/root");
-const System = require("../../src/scripting_system/system");
+const Root = require("../../src/am/root");
+const System = require("../../src/am/system");
 
 const system_full_name = path.join(__dirname, "system_test.json");
 

@@ -3,11 +3,9 @@ const path = require("path");
 const { Util } = require("../../src/util");
 const { Stopper } = require("../../src/stopper");
 const { Stopwatch } = require("../../src/stopwatch");
-const Root = require("../../src/scripting_system/root");
-const parse = require("../../src/scripting_system/instruction/parse");
-const {
-  RETURN_CODE
-} = require("../../src/scripting_system/instruction/return_code");
+const Root = require("../../src/am/root");
+const parse = require("../../src/am/instruction/parse");
+const { RETURN_CODE } = require("../../src/am/instruction/return_code");
 
 const scripts_full_name = path.join(__dirname, "instructions_test.json");
 
