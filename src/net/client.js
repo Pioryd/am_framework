@@ -11,8 +11,6 @@ const { Stopwatch } = require("../stopwatch");
  */
 class Client {
   constructor({ options = {}, socket_io_options = {} }) {
-    this.logger = logger;
-
     this.options = {
       send_delay: 0,
       packet_timeout: 25 * 1000, // Not including internal ping
@@ -24,6 +22,9 @@ class Client {
       forceNew: false,
       ...socket_io_options
     };
+
+    this.logger = logger;
+    logger.options.print_debug = this.options.debug;
 
     this.last_packet_time = new Date();
     this.parse_packet_dict = {};

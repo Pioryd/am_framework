@@ -15,8 +15,6 @@ const logger = require("../logger").create_logger({
  */
 class Server {
   constructor({ options, socket_io_options }) {
-    this.logger = logger;
-
     this.options = {
       send_delay: 0,
       packet_timeout: 25 * 1000, // Not including internal ping
@@ -27,6 +25,9 @@ class Server {
       pingTimeout: 5 * 1000,
       ...socket_io_options
     };
+
+    this.logger = logger;
+    logger.options.print_debug = this.options.debug;
 
     this.socket = {};
     this.connections_map = {};
@@ -72,7 +73,7 @@ class Server {
     });
 
     for (const [packet_id] of Object.entries(this.parse_packet_dict)) {
-      connection.socket.on(packet_id, data => {
+      connection.socket.on(packet_id, (data) => {
         // This is async code, so we must handle it in poll
         this.pending_parse_packets_queue_async.push({
           connection_id: connection.socket.id,
@@ -214,7 +215,7 @@ class Server {
   start() {
     this.socket = io(this.options.port, this.socket_io_options);
 
-    this.socket.on("connection", socket => {
+    this.socket.on("connection", (socket) => {
       this.pending_add_connections_queue_async.push(new Connection(socket));
     });
   }
