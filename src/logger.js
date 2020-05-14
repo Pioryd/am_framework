@@ -10,36 +10,38 @@ class Logger {
       print_error: true,
       print_trace: true,
       print_warn: true,
-      print_debug: false,
+      print_debug: true,
       ...options
     };
   }
 
   log(...args) {
-    if (this.options.print_log) this.print("log", "\x1b[1m\x1b[37m", ...args);
+    if (this.options.print_log) this.print("log", "\x1b[30m\x1b[107m", ...args);
   }
 
   info(...args) {
-    if (this.options.print_info) this.print("info", "\x1b[1m\x1b[44m", ...args);
+    if (this.options.print_info)
+      this.print("info", "\x1b[97m\x1b[44m", ...args);
   }
 
   error(...args) {
     if (this.options.print_error)
-      this.print("error", "\x1b[1m\x1b[31m", ...args);
+      this.print("error", "\x1b[31m\x1b[107m", ...args);
   }
 
   trace(...args) {
     if (this.options.print_trace)
-      this.print("trace", "\x1b[1m\x1b[31m", ...args);
+      this.print("trace", "\x1b[34m\x1b[107m", ...args);
   }
 
   warn(...args) {
-    if (this.options.print_warn) this.print("warn", "\x1b[1m\x1b[33m", ...args);
+    if (this.options.print_warn)
+      this.print("warn", "\x1b[30m\x1b[43m", ...args);
   }
 
   debug(...args) {
     if (this.options.print_debug)
-      this.print("debug", "\x1b[1m\x1b[32m", ...args);
+      this.print("debug", "\x1b[32m\x1b[40m", ...args);
   }
 
   print(message_type, color, ...args) {
@@ -53,21 +55,18 @@ class Logger {
         second: "numeric"
       });
     if (this.options.show_type) type = message_type.toUpperCase();
+
     console[message_type](
-      "\x1b[1m\x1b[30m",
+      color,
       `${time}`,
       "(",
-      //color,
       type,
-      //"\x1b[0m",
-      //"\x1b[1m\x1b[30m",
       ")",
       `<${this.options.module_name}>`,
       `{${this.options.file_name}}`,
+      "\x1b[0m\x1b[0m",
       "\n",
-      color,
-      ...args,
-      "\x1b[0m"
+      ...args
     );
   }
 }
