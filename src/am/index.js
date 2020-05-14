@@ -1,7 +1,7 @@
 const Root = require("./root");
 const AML = require("./aml");
 module.exports = {
-  ScriptingSystem: {
+  AM: {
     Root,
     AML
   }

@@ -17,7 +17,9 @@ class Root {
     this.system = null;
     this.source = { systems: {}, programs: {}, forms: {}, scripts: {} };
     this.process_api = () => logger.error("Not set process_api");
-    this.data = {};
+    this.get_data = () => {
+      return {};
+    };
     this.ext = {};
 
     this._debug_enabled = false;
@@ -25,6 +27,12 @@ class Root {
     this.return_data = new ReturnData();
     this.event_emitter = new EventEmitter();
   }
+
+  get data() {
+    return this.get_data();
+  }
+
+  set data(new_data) {}
 
   generate_unique_id() {
     return ObjectID().toHexString();
@@ -67,8 +75,8 @@ class Root {
     };
   }
 
-  install_data(source) {
-    this.data = source;
+  install_data_getter(get_data) {
+    this.get_data = get_data;
   }
 
   install_ext(source) {

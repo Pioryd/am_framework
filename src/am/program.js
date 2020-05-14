@@ -1,4 +1,3 @@
-const EventEmitter = require("events");
 const RulesManager = require("./rules_manager");
 const Form = require("./form");
 const logger = require("../logger").create_logger({
@@ -48,7 +47,11 @@ class Program {
       if (id === this._current_form.get_id()) return;
 
     if (!(id in this._root.source.forms))
-      throw new Error(`Program[${this._source.id}] not found form[${id}]`);
+      throw new Error(
+        `Program[${this._source.id}] not found form[${id}] + ${JSON.stringify(
+          Object.keys(this._root.source.forms)
+        )}`
+      );
     if (!this._source.forms.includes(id))
       throw new Error(
         `Program[${this._source.id}] do not contains form[${id}]`
