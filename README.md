@@ -1,11 +1,9 @@
-# Artificial Mind - am_framework
-
->> CI is disabled. Local tests are `passing 100%`. CI tests fail due to unknow reason on `eval()` in the `am_parser_test.js`.
+# Artificial Mind Framework
 
 ## Install
 
 ```powershell
-npm install
+npm install am_framework
 ```
 
 ## Test
@@ -14,4 +12,19 @@ npm install
 npm test
 ```
 
-## More informations at [Artificial Mind](https://www.artificialmind.dev/)
+## Usage
+
+```json
+require("am_framework").run_app(__dirname);
+```
+
+## Example
+
+[AM Example](https://github.com/Pioryd/am_example)
+
+## More
+
+- [Documentation](https://pioryd.github.io/)
+- [Tutorials](https://pioryd.github.io/)
+
+## More informations at [Artificial Mind](https://pioryd.github.io/)
