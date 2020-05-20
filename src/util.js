@@ -100,7 +100,7 @@ class Util {
     try {
       return new Function(...params_names, body);
     } catch (e) {
-      console.log({ ...params_names, body }, "Exception:", e);
+      throw new Error(`${{ ...params_names, body }} Exception: ${e}`);
     }
   }
 
