@@ -1,8 +1,8 @@
 const Root = require("./root");
-const AML = require("./aml");
+const Script = require("./script");
 module.exports = {
-  AM: {
+  AML: {
     Root,
-    AML
+    Script
   }
 };

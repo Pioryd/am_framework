@@ -10,7 +10,7 @@ const logger = require("../../logger").create_logger({
   module_name: "am_framework",
   file_name: __filename
 });
-const { AM } = require("../../am");
+const { AML } = require("../../aml");
 
 const default_data_config = require("./default_data_config");
 
@@ -25,7 +25,7 @@ class Editor {
 
   validate(object, name) {
     if (this.data_config[name].validate === "aml") {
-      AM.AML.parse(object.id, object.source);
+      AML.Script.parse(object.id, object.source);
     } else {
       const rule = this.data_config[name].validate;
       const ajv = new Ajv({ allErrors: true });

@@ -213,9 +213,10 @@ function parse_instruction_api(form, instruction) {
     `  {query_id, timeout: ${timeout}, key: "${return_data_key}"});` +
     `root.process_api(` +
     `  "${instruction.api}", script._id, query_id, ${timeout}, ${args});`;
+
   const api = new Api();
   api._id = instruction.id;
-  api._fn = Util.string_to_function(`(script, root){${body};}`);
+  api._fn = Util.string_to_function(`(script, root){${body}}`);
   return api;
 }
 

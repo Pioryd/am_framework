@@ -2,9 +2,9 @@ const { expect, config } = require("chai");
 const path = require("path");
 const fs = require("fs");
 const { Util } = require("../../src/util");
-const Root = require("../../src/am/root");
-const Form = require("../../src/am/form");
-const AML = require("../../src/am/aml");
+const Root = require("../../src/aml/root");
+const Form = require("../../src/aml/form");
+const Script = require("../../src/aml/script");
 
 const forms_full_name = path.join(__dirname, "forms_test.json");
 const scripts_path_full_name = path.join(__dirname, "forms_scripts");
@@ -18,7 +18,7 @@ describe("Forms test", () => {
 
     for (const form_source of Object.values(root.source.forms)) {
       for (const scripts_id of form_source.scripts) {
-        root.source.scripts[scripts_id] = AML.parse(
+        root.source.scripts[scripts_id] = Script.parse(
           scripts_id,
           fs.readFileSync(
             path.join(scripts_path_full_name, scripts_id + ".aml"),
