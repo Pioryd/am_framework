@@ -134,6 +134,13 @@ function _parse_api_source(source) {
     parsed_api.args = parsed_api.args.replace(splitted[i], "");
 
   parsed_api.args = parsed_api.args.trim();
+
+  try {
+    eval(`const check_args = ()=>{return {${parsed_api.args}};}`);
+  } catch (e) {
+    throw new Error(`Wrong arguments format of API[${parsed_api.api}].`);
+  }
+
   return parsed_api;
 }
 
