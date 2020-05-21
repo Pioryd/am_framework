@@ -8,6 +8,9 @@ module.exports = {
         id: {
           type: "string"
         },
+        name: {
+          type: "string"
+        },
         rules: {
           type: "array",
           items: {
@@ -33,7 +36,7 @@ module.exports = {
           }
         }
       },
-      required: ["id", "rules", "scripts"],
+      required: ["id", "name", "rules", "scripts"],
       additionalProperties: false
     }
   },
@@ -44,6 +47,9 @@ module.exports = {
     validate: {
       properties: {
         id: {
+          type: "string"
+        },
+        name: {
           type: "string"
         },
         rules: {
@@ -72,7 +78,7 @@ module.exports = {
         }
       }
     },
-    required: ["id", "rules", "forms"],
+    required: ["id", "name", "rules", "forms"],
     additionalProperties: false
   },
   am_system: {
@@ -84,6 +90,9 @@ module.exports = {
         id: {
           type: "string"
         },
+        name: {
+          type: "string"
+        },
         programs: {
           type: "array",
           items: {
@@ -91,7 +100,7 @@ module.exports = {
           }
         }
       },
-      required: ["id", "programs"],
+      required: ["id", "name", "programs"],
       additionalProperties: false
     }
   },
