@@ -105,9 +105,13 @@ class Editor {
     try {
       const execute = {
         new: () => {
+          const new_id =
+            object.id != null && object.id !== ""
+              ? object.id
+              : ObjectID().toHexString();
           const new_object = {
             ...JSON.parse(JSON.stringify(this.data_config[name].init)),
-            id: ObjectID().toHexString()
+            id: new_id
           };
 
           this.db_map[key].update_async(
@@ -191,7 +195,10 @@ class Editor {
 
     try {
       if (action.type === "new") {
-        const new_id = ObjectID().toHexString();
+        const new_id =
+          object.id != null && object.id !== ""
+            ? object.id
+            : ObjectID().toHexString();
         const new_object = {
           id: new_id,
           type: "type_" + new_id,
