@@ -16,9 +16,9 @@ describe("System test", () => {
     root.source.programs = system_test_json.programs;
   });
   it("Parse", () => {
-    const system = new System(root, root.source.systems["Test_system"]);
+    const system = new System(root, root.source.systems["Name_Test_system"]);
 
-    expect(system.get_id()).to.equal("Test_system");
+    expect(system.get_id()).to.equal("ID_Test_system");
     expect(system._programs_list.length).to.equal(1);
   });
 });

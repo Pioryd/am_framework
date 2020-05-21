@@ -1,64 +1,65 @@
 {
-  "01": {
-    "id": "01",
+  "Name_01": {
+    "id": "ID_01",
     "data": {
       "val": 0,
       "val_2": "test_1",
       "val_3": {}
     },
+    "name": "Name_01",
     "root_scope": {
       "id": 0,
       "type": "scope",
       "instructions": [
         {
-          "id": 4,
+          "id": 5,
           "type": "js",
           "body": "script.data.val++"
         },
         {
-          "id": 5,
+          "id": 6,
           "type": "internal",
           "command": "label test"
         },
         {
-          "id": 6,
+          "id": 7,
           "type": "if",
           "conditions": {
             "script.data.val_2 === \"test_1\"": [
               {
-                "id": 7,
+                "id": 8,
                 "type": "js",
                 "body": "script.data.val++"
               },
               {
-                "id": 8,
+                "id": 9,
                 "type": "internal",
                 "command": "sleep 50"
               },
               {
-                "id": 9,
+                "id": 10,
                 "type": "js",
                 "body": "script.data.val += 2"
               }
             ],
             "script.data.val_2 === \"test_2\"": [
               {
-                "id": 11,
+                "id": 12,
                 "type": "js",
                 "body": "script.data.val = 0"
               },
               {
-                "id": 12,
+                "id": 13,
                 "type": "for",
                 "condition": "script.data.i = 0; script.data.i < 2; script.data.i++",
                 "instructions": [
                   {
-                    "id": 13,
+                    "id": 14,
                     "type": "js",
                     "body": "script.data.val++"
                   },
                   {
-                    "id": 14,
+                    "id": 15,
                     "type": "internal",
                     "command": "continue"
                   }
@@ -67,37 +68,37 @@
             ],
             "": [
               {
-                "id": 16,
+                "id": 17,
                 "type": "js",
                 "body": "script.data.val = 0;"
               },
               {
-                "id": 17,
+                "id": 18,
                 "type": "while",
                 "condition": "script.data.val < 3",
                 "instructions": [
                   {
-                    "id": 18,
+                    "id": 19,
                     "type": "js",
                     "body": "script.data.val += 2"
                   },
                   {
-                    "id": 19,
+                    "id": 20,
                     "type": "js",
                     "body": "script.data.val--; script.data.val--"
                   },
                   {
-                    "id": 20,
+                    "id": 21,
                     "type": "internal",
                     "command": "break"
                   },
                   {
-                    "id": 21,
+                    "id": 22,
                     "type": "for",
                     "condition": "script.data.i = 0; script.data.i < 2; script.data.i++",
                     "instructions": [
                       {
-                        "id": 23,
+                        "id": 24,
                         "return": "script.data.val_2",
                         "timeout": "1000",
                         "api": "Namespace.DoSomething",
@@ -112,12 +113,12 @@
           }
         },
         {
-          "id": 24,
+          "id": 25,
           "type": "internal",
           "command": "goto test"
         },
         {
-          "id": 26,
+          "id": 27,
           "timeout": "20",
           "return": "script.data.val_3",
           "api": "SomeFun.DoIt",
@@ -127,105 +128,106 @@
       ]
     }
   },
-  "02": {
-    "id": "02",
+  "Name_02": {
+    "id": "ID_02",
     "data": {
       "val": 0,
       "val_2": "test_1",
       "val_3": {}
     },
+    "name": "Name_02",
     "root_scope": {
       "id": 0,
       "type": "scope",
       "instructions": [
         {
-          "id": 5,
+          "id": 6,
           "type": "if",
           "conditions": {
             "script.data.val_2 === \"test_1\"": [
               {
-                "id": 6,
+                "id": 7,
                 "type": "js",
                 "body": "script.data.val++"
               },
               {
-                "id": 7,
+                "id": 8,
                 "type": "if",
                 "conditions": {
                   "script.data.val_2 === \"test_1\"": [
                     {
-                      "id": 8,
+                      "id": 9,
                       "type": "js",
                       "body": "script.data.val++"
                     },
                     {
-                      "id": 9,
+                      "id": 10,
                       "type": "internal",
                       "command": "sleep 50"
                     },
                     {
-                      "id": 10,
+                      "id": 11,
                       "type": "js",
                       "body": "script.data.val += 2"
                     }
                   ],
                   "script.data.val_2 === \"test_2\"": [
                     {
-                      "id": 12,
+                      "id": 13,
                       "type": "js",
                       "body": "script.data.val++"
                     },
                     {
-                      "id": 13,
+                      "id": 14,
                       "type": "if",
                       "conditions": {
                         "script.data.val_2 === \"test_1\"": [
                           {
-                            "id": 14,
+                            "id": 15,
                             "type": "js",
                             "body": "script.data.val++"
                           },
                           {
-                            "id": 15,
+                            "id": 16,
                             "type": "internal",
                             "command": "sleep 50"
                           },
                           {
-                            "id": 16,
+                            "id": 17,
                             "type": "js",
                             "body": "script.data.val += 2"
                           }
                         ],
                         "script.data.val_2 === \"test_2\"": [
                           {
-                            "id": 18,
+                            "id": 19,
                             "type": "js",
                             "body": "script.data.val++"
                           },
                           {
-                            "id": 19,
+                            "id": 20,
                             "type": "internal",
                             "command": "sleep 50"
                           },
                           {
-                            "id": 20,
+                            "id": 21,
                             "type": "js",
                             "body": "script.data.val += 3"
                           }
                         ],
                         "": [
                           {
-                            "id": 22,
+                            "id": 23,
                             "type": "js",
                             "body": "script.data.val++"
                           },
                           {
-                            "id": 23,
+                            "id": 24,
                             "type": "internal",
                             "command": "sleep 50"
                           },
                           {
-                            "id": 24,
+                            "id": 25,
                             "type": "js",
                             "body": "script.data.val += 4"
                           }
@@ -233,24 +235,24 @@
                       }
                     },
                     {
-                      "id": 25,
+                      "id": 26,
                       "type": "js",
                       "body": "script.data.val += 3"
                     }
                   ],
                   "": [
                     {
-                      "id": 27,
+                      "id": 28,
                       "type": "js",
                       "body": "script.data.val++"
                     },
                     {
-                      "id": 28,
+                      "id": 29,
                       "type": "internal",
                       "command": "sleep 50"
                     },
                     {
-                      "id": 29,
+                      "id": 30,
                       "type": "js",
                       "body": "script.data.val += 4"
                     }
@@ -258,41 +260,41 @@
                 }
               },
               {
-                "id": 30,
+                "id": 31,
                 "type": "js",
                 "body": "script.data.val += 2"
               }
             ],
             "script.data.val_2 === \"test_2\"": [
               {
-                "id": 32,
+                "id": 33,
                 "type": "js",
                 "body": "script.data.val++"
               },
               {
-                "id": 33,
+                "id": 34,
                 "type": "internal",
                 "command": "sleep 50"
               },
               {
-                "id": 34,
+                "id": 35,
                 "type": "js",
                 "body": "script.data.val += 3"
               }
             ],
             "": [
               {
-                "id": 36,
+                "id": 37,
                 "type": "js",
                 "body": "script.data.val++"
               },
               {
-                "id": 37,
+                "id": 38,
                 "type": "internal",
                 "command": "sleep 50"
               },
               {
-                "id": 38,
+                "id": 39,
                 "type": "js",
                 "body": "script.data.val += 4"
               }
@@ -302,20 +304,21 @@
       ]
     }
   },
-  "03": {
-    "id": "03",
+  "Name_03": {
+    "id": "ID_03",
     "data": {},
+    "name": "Name_03",
     "root_scope": {
       "id": 0,
       "type": "scope",
       "instructions": [
         {
-          "id": 3,
+          "id": 4,
           "type": "if",
           "conditions": {
             "root.data.character_data.land_id !== root.data.character_data.default_land_id": [
               {
-                "id": 4,
+                "id": 5,
                 "api": "character.change_land",
                 "args": "land_id:root.data.character_data.default_land_id",
                 "type": "api"
@@ -323,7 +326,7 @@
             ],
             "root.data.character_data.energy < 100": [
               {
-                "id": 6,
+                "id": 7,
                 "api": "character.use_object",
                 "args": "id:\"test\"",
                 "type": "api"
@@ -334,20 +337,21 @@
       ]
     }
   },
-  "04": {
-    "id": "04",
+  "Name_04": {
+    "id": "ID_04",
     "data": {},
+    "name": "Name_04",
     "root_scope": {
       "id": 0,
       "type": "scope",
       "instructions": [
         {
-          "id": 3,
+          "id": 4,
           "type": "if",
           "conditions": {
             "root.data.character_data.land_id !== root.data.character_data.default_land_id": [
               {
-                "id": 4,
+                "id": 5,
                 "api": "character.change_land",
                 "args": "land_id:root.data.character_data.default_land_id",
                 "type": "api"
@@ -355,12 +359,12 @@
             ],
             "root.data.character_data.energy < 100": [
               {
-                "id": 6,
+                "id": 7,
                 "type": "if",
                 "conditions": {
                   "root.data.character_data.land_id !== root.data.character_data.default_land_id": [
                     {
-                      "id": 7,
+                      "id": 8,
                       "api": "character.change_land",
                       "args": "land_id:root.data.character_data.default_land_id",
                       "type": "api"
@@ -368,12 +372,12 @@
                   ],
                   "": [
                     {
-                      "id": 9,
+                      "id": 10,
                       "type": "if",
                       "conditions": {
                         "root.data.character_data.land_id !== root.data.character_data.default_land_id": [
                           {
-                            "id": 10,
+                            "id": 11,
                             "api": "character.change_land",
                             "args": "land_id:root.data.character_data.default_land_id",
                             "type": "api"
@@ -381,7 +385,7 @@
                         ],
                         "": [
                           {
-                            "id": 12,
+                            "id": 13,
                             "api": "character.use_object",
                             "args": "id:\"test\"",
                             "type": "api"

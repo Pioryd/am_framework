@@ -6,16 +6,24 @@ class System {
     this._source = source;
 
     if (this._source.id == null)
-      throw new Error("Unable to parse system: " + this._source);
+      throw new Error(`Unable to parse system: ${this._source}`);
 
     this._programs_list = [];
-    for (const id of this._source.programs) {
-      if (!(id in this._root.source.programs))
-        throw new Error(`System[${this._source.id}] not found program[${id}]`);
-      this._programs_list.push(
-        new Program(this._root, this._root.source.programs[id])
-      );
+    for (const name of this._source.programs) {
+      let found_source = null;
+      for (const source of Object.values(this._root.source.programs)) {
+        if (name === source.name) {
+          found_source = source;
+          break;
+        }
+      }
+      if (found_source === null)
+        throw new Error(
+          `System id[${this._source.id}] not found program name[${name}]`
+        );
+      this._programs_list.push(new Program(this._root, found_source));
     }
+
     // TODO
     // For now only one programs works only
     this._current_program =
@@ -32,6 +40,10 @@ class System {
 
   get_id() {
     return this._source.id;
+  }
+
+  get_name() {
+    return this._source.name;
   }
 }
 

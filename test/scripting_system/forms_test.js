@@ -17,11 +17,11 @@ describe("Forms test", () => {
     root.source.forms = forms_test_json.forms;
 
     for (const form_source of Object.values(root.source.forms)) {
-      for (const scripts_id of form_source.scripts) {
-        root.source.scripts[scripts_id] = Script.parse(
-          scripts_id,
+      for (const scripts_name of form_source.scripts) {
+        root.source.scripts[scripts_name] = Script.parse(
+          scripts_name,
           fs.readFileSync(
-            path.join(scripts_path_full_name, scripts_id + ".aml"),
+            path.join(scripts_path_full_name, scripts_name + ".aml"),
             "utf8",
             (err) => {
               if (err) throw new Error(err);
@@ -32,24 +32,24 @@ describe("Forms test", () => {
     }
   });
   it("Parse", () => {
-    const form = new Form(root, root.source.forms["Test_1"]);
+    const form = new Form(root, root.source.forms["ID_Test_1"]);
 
-    expect(form.get_id()).to.equal("Test_1");
+    expect(form.get_id()).to.equal("ID_Test_1");
     expect(form._source.rules.length).to.equal(7);
     expect(Object.keys(form._running_scripts).length).to.equal(1);
   });
   it("Process", () => {
-    const form = new Form(root, root.source.forms["Test_1"]);
+    const form = new Form(root, root.source.forms["ID_Test_1"]);
 
     expect(Object.keys(form._running_scripts).length).to.equal(1);
-    expect(form._running_scripts["test_script_N2"].data.val).to.equal(0);
+    expect(form._running_scripts["Name_test_script_N2"].data.val).to.equal(0);
     form.process(root);
-    expect(form._running_scripts["test_script_N2"].data.val).to.equal(1);
+    expect(form._running_scripts["Name_test_script_N2"].data.val).to.equal(1);
     form.process(root);
     expect(Object.keys(form._running_scripts).length).to.equal(0);
   });
   it("Rules", () => {
-    const form = new Form(root, root.source.forms["Test_1"]);
+    const form = new Form(root, root.source.forms["ID_Test_1"]);
 
     // form_init
     expect(Object.keys(form._running_scripts).length).to.equal(1);
@@ -58,7 +58,7 @@ describe("Forms test", () => {
     expect(Object.keys(form._running_scripts).length).to.equal(0);
 
     // script_run
-    form._run_script("test_script_N1");
+    form._run_script("Name_test_script_N1");
     expect(Object.keys(form._running_scripts).length).to.equal(2);
 
     form.process(root);
@@ -66,14 +66,16 @@ describe("Forms test", () => {
 
     // script_processed
     expect(Object.keys(form._running_scripts).length).to.equal(0);
-    form._run_script("test_script_N3");
+    form._run_script("Name_test_script_N3");
     expect(Object.keys(form._running_scripts).length).to.equal(1);
     form.process(root);
     expect(Object.keys(form._running_scripts).length).to.equal(1);
-    expect(Object.keys(form._running_scripts)[0]).to.equal("test_script_N2");
+    expect(Object.keys(form._running_scripts)[0]).to.equal(
+      "Name_test_script_N2"
+    );
   });
   it("Signals", () => {
-    const form = new Form(root, root.source.forms["Test_1"]);
+    const form = new Form(root, root.source.forms["ID_Test_1"]);
 
     // energy
     expect(Object.keys(form._running_scripts).length).to.equal(1);
@@ -83,7 +85,7 @@ describe("Forms test", () => {
     expect(Object.keys(form._running_scripts).length).to.equal(2);
   });
   it("Events", () => {
-    const form = new Form(root, root.source.forms["Test_1"]);
+    const form = new Form(root, root.source.forms["ID_Test_1"]);
 
     // time
     expect(Object.keys(form._running_scripts).length).to.equal(1);
@@ -93,7 +95,7 @@ describe("Forms test", () => {
     expect(Object.keys(form._running_scripts).length).to.equal(2);
   });
   it("Actions", () => {
-    const form = new Form(root, root.source.forms["Test_1"]);
+    const form = new Form(root, root.source.forms["ID_Test_1"]);
 
     // script_terminate
     expect(Object.keys(form._running_scripts).length).to.equal(1);
@@ -103,6 +105,6 @@ describe("Forms test", () => {
     // script_set_data
     root.event_emitter.emit("choice", 10);
     expect(Object.keys(form._running_scripts).length).to.equal(1);
-    expect(form._running_scripts["test_script_N2"].data.val).to.equal(10);
+    expect(form._running_scripts["Name_test_script_N2"].data.val).to.equal(10);
   });
 });

@@ -42,27 +42,35 @@ class Program {
     return this._source.id;
   }
 
-  _run_form(id) {
+  get_name() {
+    return this._source.name;
+  }
+
+  _run_form(name) {
     if (this._current_form != null)
-      if (id === this._current_form.get_id()) return;
+      if (name === this._current_form._source.name) return;
 
-    if (!(id in this._root.source.forms))
+    let found_source = null;
+    for (const source of Object.values(this._root.source.forms)) {
+      if (name === source.name) {
+        found_source = source;
+        break;
+      }
+    }
+    if (found_source === null)
+      throw new Error(`Program[${this._source.id}] not found form[${name}]`);
+
+    if (!this._source.forms.includes(name))
       throw new Error(
-        `Program[${this._source.id}] not found form[${id}] + ${JSON.stringify(
-          Object.keys(this._root.source.forms)
-        )}`
-      );
-    if (!this._source.forms.includes(id))
-      throw new Error(
-        `Program[${this._source.id}] do not contains form[${id}]`
+        `Program[${this._source.id}] do not contains form[${name}]`
       );
 
-    this._current_form = new Form(this._root, this._root.source.forms[id]);
+    this._current_form = new Form(this._root, found_source);
     this.event_emitter.emit("forms_count", 1);
   }
 
-  _terminate_form(id) {
-    if (id === this._current_form.get_id()) {
+  _terminate_form(name) {
+    if (name === this._current_form._source.name) {
       form.terminate();
       this._current_form = null;
       this.event_emitter.emit("forms_count", 0);

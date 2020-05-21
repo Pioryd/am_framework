@@ -1,7 +1,8 @@
 {
   "programs": {
-    "Test_1": {
-      "id": "Test_1",
+    "ID_Test_1": {
+      "id": "ID_Test_1",
+      "name": "Name_Test_1",
       "rules": [
         {
           "triggers": [
@@ -11,7 +12,7 @@
           ],
           "actions": [
             {
-              "form_run": { "value": "Test_form_1" }
+              "form_run": { "value": "Name_Test_form_1" }
             }
           ]
         },
@@ -23,7 +24,7 @@
           ],
           "actions": [
             {
-              "form_run": { "value": "Test_form_2" }
+              "form_run": { "value": "Name_Test_form_2" }
             }
           ]
         },
@@ -35,7 +36,7 @@
           ],
           "actions": [
             {
-              "form_terminate": { "value": "Test_form_1" }
+              "form_terminate": { "value": "Name_Test_form_1" }
             }
           ]
         },
@@ -52,19 +53,21 @@
           ]
         }
       ],
-      "forms": ["Test_form_1", "Test_form_2"]
+      "forms": ["Name_Test_form_1", "Name_Test_form_2"]
     }
   },
   "forms": {
-    "Test_form_1": {
-      "id": "Test_form_1",
+    "ID_Test_form_1": {
+      "id": "ID_Test_form_1",
+      "name": "Name_Test_form_1",
       "rules": [],
       "signals": [],
       "events": [],
       "scripts": []
     },
-    "Test_form_2": {
-      "id": "Test_form_2",
+    "ID_Test_form_2": {
+      "id": "ID_Test_form_2",
+      "name": "Name_Test_form_1",
       "rules": [],
       "signals": [],
       "events": [],

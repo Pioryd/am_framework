@@ -33,30 +33,30 @@ describe("Script Parser", () => {
     it("01", () => {
       expect(
         JSON.stringify(
-          Script.parse("01", script_parser_script_scripts_map["01"])
+          Script.parse("ID_01", script_parser_script_scripts_map["Name_01"])
         )
-      ).to.equal(JSON.stringify(script_parser_json_source["01"]));
+      ).to.equal(JSON.stringify(script_parser_json_source["Name_01"]));
     });
     it("02", () => {
       expect(
         JSON.stringify(
-          Script.parse("02", script_parser_script_scripts_map["02"])
+          Script.parse("ID_02", script_parser_script_scripts_map["Name_02"])
         )
-      ).to.equal(JSON.stringify(script_parser_json_source["02"]));
+      ).to.equal(JSON.stringify(script_parser_json_source["Name_02"]));
     });
     it("03", () => {
       expect(
         JSON.stringify(
-          Script.parse("03", script_parser_script_scripts_map["03"])
+          Script.parse("ID_03", script_parser_script_scripts_map["Name_03"])
         )
-      ).to.equal(JSON.stringify(script_parser_json_source["03"]));
+      ).to.equal(JSON.stringify(script_parser_json_source["Name_03"]));
     });
     it("04", () => {
       expect(
         JSON.stringify(
-          Script.parse("04", script_parser_script_scripts_map["04"])
+          Script.parse("ID_04", script_parser_script_scripts_map["Name_04"])
         )
-      ).to.equal(JSON.stringify(script_parser_json_source["04"]));
+      ).to.equal(JSON.stringify(script_parser_json_source["Name_04"]));
     });
   });
 });

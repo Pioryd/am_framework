@@ -1,13 +1,15 @@
 {
   "systems": {
-    "Test_system": {
-      "id": "Test_system",
-      "programs": ["Test_program"]
+    "Name_Test_system": {
+      "id": "ID_Test_system",
+      "name": "Name_Test_system",
+      "programs": ["Name_Test_program"]
     }
   },
   "programs": {
-    "Test_program": {
-      "id": "Test_program",
+    "Name_Test_program": {
+      "id": "ID_Test_program",
+      "name": "Name_Test_program",
       "rules": [],
       "signals": [],
       "events": [],
