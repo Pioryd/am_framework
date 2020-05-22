@@ -107,8 +107,8 @@ module.exports = {
   am_script: {
     db_data: { url: "mongodb://127.0.0.1:27017", name: "am_data" },
     actions: ["data", "update"],
-    init: { id: "", source: `data\r\n` },
-    validate: "aml"
+    init: { id: "", source: `name\r\ndata\r\n` },
+    validate: "script"
   },
   admin_script: {
     db_data: { manager: "admin_scripts" },

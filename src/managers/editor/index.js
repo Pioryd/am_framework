@@ -24,7 +24,7 @@ class Editor {
   }
 
   validate(object, name) {
-    if (this.data_config[name].validate === "aml") {
+    if (this.data_config[name].validate === "script") {
       AML.Script.parse(object.id, object.source);
     } else {
       const rule = this.data_config[name].validate;
