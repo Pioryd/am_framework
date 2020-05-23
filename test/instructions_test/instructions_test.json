@@ -1,7 +1,7 @@
 {
-  "Test_js": {
-    "type": "script",
-    "id": "Test_js",
+  "ID_Test_js": {
+    "id": "ID_Test_js",
+    "name": "Name_Test_js",
     "data": { "val": 0 },
     "root_scope": {
       "type": "scope",
@@ -11,9 +11,9 @@
       ]
     }
   },
-  "Test_scope": {
-    "type": "script",
-    "id": "Test_scope",
+  "ID_Test_scope": {
+    "id": "ID_Test_scope",
+    "name": "Name_Test_scope",
     "data": { "val": 0 },
     "root_scope": {
       "type": "scope",
@@ -25,9 +25,9 @@
       ]
     }
   },
-  "Test_scope_if": {
-    "type": "script",
-    "id": "Test_scope_if",
+  "ID_Test_scope_if": {
+    "id": "ID_Test_scope_if",
+    "name": "Name_Test_scope_if",
     "data": { "val": 0 },
     "root_scope": {
       "type": "if",
@@ -72,9 +72,9 @@
       }
     }
   },
-  "Test_scope_while": {
-    "type": "script",
-    "id": "Test_scope_while",
+  "ID_Test_scope_while": {
+    "id": "ID_Test_scope_while",
+    "name": "Name_Test_scope_while",
     "data": { "val": 0 },
     "root_scope": {
       "type": "while",
@@ -94,9 +94,9 @@
       ]
     }
   },
-  "Test_scope_for": {
-    "type": "script",
-    "id": "Test_scope_for",
+  "ID_Test_scope_for": {
+    "id": "ID_Test_scope_for",
+    "name": "Name_Test_scope_for",
     "data": { "val": 0 },
     "root_scope": {
       "type": "for",
@@ -108,9 +108,9 @@
       ]
     }
   },
-  "Test_internal_break": {
-    "type": "script",
-    "id": "Test_internal_break",
+  "ID_Test_internal_break": {
+    "id": "ID_Test_internal_break",
+    "name": "Name_Test_internal_break",
     "data": { "val": 0, "val_2": 0 },
     "root_scope": {
       "type": "scope",
@@ -212,9 +212,9 @@
       ]
     }
   },
-  "Test_internal_continue": {
-    "type": "script",
-    "id": "Test_internal_continue",
+  "ID_Test_internal_continue": {
+    "id": "ID_Test_internal_continue",
+    "name": "Name_Test_internal_continue",
     "data": { "val": 0, "val_2": 0 },
     "root_scope": {
       "type": "scope",
@@ -299,9 +299,9 @@
       ]
     }
   },
-  "Test_internal_sleep": {
-    "type": "script",
-    "id": "Test_internal_sleep",
+  "ID_Test_internal_sleep": {
+    "id": "ID_Test_internal_sleep",
+    "name": "Name_Test_internal_sleep",
     "data": { "val": 0 },
     "root_scope": {
       "type": "scope",
@@ -325,9 +325,9 @@
       ]
     }
   },
-  "Test_label_and_goto": {
-    "type": "script",
-    "id": "Test_label_and_goto",
+  "ID_Test_label_and_goto": {
+    "id": "ID_Test_label_and_goto",
+    "name": "Name_Test_label_and_goto",
     "data": { "val": 0, "val_2": 0 },
     "root_scope": {
       "type": "scope",
@@ -474,9 +474,9 @@
       ]
     }
   },
-  "Test_unhandled_internal": {
-    "type": "script",
-    "id": "Test_unhandled_internal",
+  "ID_Test_unhandled_internal": {
+    "id": "ID_Test_unhandled_internal",
+    "name": "Name_Test_unhandled_internal",
     "data": { "val": 0 },
     "root_scope": {
       "type": "if",
@@ -504,145 +504,6 @@
           }
         ]
       }
-    }
-  },
-  "Test_timeout_scope": {
-    "type": "script",
-    "id": "Test_timeout_scope",
-    "data": { "val": 0 },
-    "root_scope": {
-      "type": "scope",
-      "id": "Test_timeout_scope_0",
-      "instructions": [
-        {
-          "type": "js",
-          "id": "Test_timeout_scope_1",
-          "body": "script.data.val++"
-        },
-        {
-          "type": "script",
-          "timeout": 40,
-          "script": "Test_internal_sleep",
-          "id": "Test_timeout_scope_2"
-        },
-        {
-          "type": "js",
-          "id": "Test_timeout_scope_3",
-          "body": "script.data.val++"
-        }
-      ]
-    }
-  },
-  "Test_timeout_if": {
-    "type": "script",
-    "id": "Test_timeout_if",
-    "data": { "val": 0 },
-    "root_scope": {
-      "type": "if",
-      "id": "Test_timeout_if_0",
-      "conditions": {
-        "script.data.val === 0": [
-          {
-            "type": "js",
-            "id": "Test_timeout_if_1",
-            "body": "script.data.val++"
-          },
-          {
-            "type": "script",
-            "timeout": 40,
-            "script": "Test_internal_sleep",
-            "id": "Test_timeout_if_2"
-          },
-          {
-            "type": "js",
-            "id": "Test_timeout_if_3",
-            "body": "script.data.val++"
-          }
-        ]
-      }
-    }
-  },
-  "Test_timeout_while": {
-    "type": "script",
-    "id": "Test_timeout_while",
-    "data": { "val": 0 },
-    "root_scope": {
-      "type": "while",
-      "id": "Test_timeout_while_0",
-      "condition": "script.data.val < 3",
-      "instructions": [
-        {
-          "type": "js",
-          "id": "Test_timeout_while_1",
-          "body": "script.data.val++"
-        },
-        {
-          "type": "script",
-          "timeout": 40,
-          "script": "Test_internal_sleep",
-          "id": "Test_timeout_while_2"
-        },
-        {
-          "type": "js",
-          "id": "Test_timeout_while_3",
-          "body": "script.data.val++"
-        }
-      ]
-    }
-  },
-  "Test_timeout_for": {
-    "type": "script",
-    "id": "Test_timeout_for",
-    "data": { "val": 0 },
-    "root_scope": {
-      "type": "for",
-      "id": "Test_timeout_for_0",
-      "condition": "script.data.i = 0; script.data.i < 1; script.data.i++",
-      "instructions": [
-        {
-          "type": "js",
-          "id": "Test_timeout_for_1",
-          "body": "script.data.val++"
-        },
-        {
-          "type": "script",
-          "timeout": 40,
-          "script": "Test_internal_sleep",
-          "id": "Test_timeout_for_2"
-        },
-        {
-          "type": "js",
-          "id": "Test_timeout_for_3",
-          "body": "script.data.val++"
-        }
-      ]
-    }
-  },
-  "Test_timeout_script": {
-    "type": "script",
-    "id": "Test_timeout_script",
-    "data": { "val": 0 },
-    "root_scope": {
-      "type": "scope",
-      "id": "Test_timeout_script_0",
-      "instructions": [
-        {
-          "type": "js",
-          "id": "Test_timeout_script_1",
-          "body": "script.data.val++"
-        },
-        {
-          "type": "script",
-          "timeout": 20,
-          "script": "Test_timeout_scope",
-          "id": "Test_timeout_script_2"
-        },
-        {
-          "type": "js",
-          "id": "Test_timeout_script_3",
-          "body": "script.data.val++"
-        }
-      ]
     }
   }
 }

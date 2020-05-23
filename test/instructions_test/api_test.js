@@ -14,7 +14,7 @@ describe("Test instruction - Api", () => {
   describe("Return_value", () => {
     it("01 - Not received", () => {
       const script = helper.get_script({
-        id: "Test_api",
+        id: "ID_Test_api",
         manual_poll: true
       });
 
@@ -29,7 +29,7 @@ describe("Test instruction - Api", () => {
     });
     it("02 - Received immediately.", () => {
       const script = helper.get_script({
-        id: "Test_api",
+        id: "ID_Test_api",
         manual_poll: false
       });
 
@@ -38,6 +38,7 @@ describe("Test instruction - Api", () => {
         const { return_code } = script.process(null, helper.root);
         while_return_code = return_code;
       }
+
       expect(script.data.val).to.deep.equal(2);
       expect(script.data.add_min_max).to.deep.equal(6);
     });
@@ -46,7 +47,7 @@ describe("Test instruction - Api", () => {
         " before second time.",
       () => {
         const script = helper.get_script({
-          id: "Test_api",
+          id: "ID_Test_api",
           manual_poll: true
         });
 
@@ -67,7 +68,7 @@ describe("Test instruction - Api", () => {
     );
     it("04 - Received before timeout and before script is processed.", () => {
       const script = helper.get_script({
-        id: "Test_api",
+        id: "ID_Test_api",
         manual_poll: true
       });
 
@@ -96,7 +97,7 @@ describe("Test instruction - Api", () => {
     });
     it("05 - Received after timeout and before script is processed.", () => {
       const script = helper.get_script({
-        id: "Test_api",
+        id: "ID_Test_api",
         manual_poll: true
       });
 

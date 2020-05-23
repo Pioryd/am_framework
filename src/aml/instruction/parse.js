@@ -5,10 +5,9 @@ const Scope_IF = require("./scope_if");
 const Scope_WHILE = require("./scope_while");
 const Scope_FOR = require("./scope_for");
 const Internal = require("./internal");
-const Script = require("./script");
 const Api = require("./api");
 
-function parse(form, instruction) {
+function parse_instruction(script, instruction) {
   const instructions_map = {
     internal: parse_instruction_internal,
     js: parse_instruction_js,
@@ -16,12 +15,10 @@ function parse(form, instruction) {
     if: parse_instruction_if,
     while: parse_instruction_while,
     for: parse_instruction_for,
-    script: parse_instruction_script,
     api: parse_instruction_api
   };
 
   let type = instruction.type;
-  if (type == null && "root_scope" in instruction) type = "script";
 
   if (!(type in instructions_map)) {
     throw new Error(
@@ -31,14 +28,14 @@ function parse(form, instruction) {
           null,
           2
         )}]` +
-        ` of form[${form.get_id()}]`
+        ` of script name:[${script.get_name()}] ID:[${script.get_id()}]`
     );
   }
 
-  return instructions_map[type](form, instruction);
+  return instructions_map[type](script, instruction);
 }
 
-function parse_instruction_internal(form, instruction) {
+function parse_instruction_internal(script, instruction) {
   if (instruction.command == null || instruction.id == null)
     throw new Error("Unable to parse_instruction_internal: " + instruction);
 
@@ -52,7 +49,7 @@ function parse_instruction_internal(form, instruction) {
   return internal;
 }
 
-function parse_instruction_js(form, instruction) {
+function parse_instruction_js(script, instruction) {
   if (instruction.body == null || instruction.id == null)
     throw new Error("Unable to parse_instruction_js: " + instruction);
 
@@ -62,7 +59,7 @@ function parse_instruction_js(form, instruction) {
   return js;
 }
 
-function parse_instruction_scope(form, instruction) {
+function parse_instruction_scope(script, instruction) {
   if (instruction.instructions == null || instruction.id == null)
     throw new Error("Unable to parse_instruction: " + instruction);
 
@@ -70,12 +67,12 @@ function parse_instruction_scope(form, instruction) {
   scope._id = instruction.id;
   scope._timeout = instruction.timeout;
   for (const source of instruction.instructions)
-    scope._childs.push(parse(form, source));
+    scope._childs.push(parse_instruction(script, source));
 
   return scope;
 }
 
-function parse_instruction_if(form, instruction) {
+function parse_instruction_if(script, instruction) {
   if (instruction.conditions == null || instruction.id == null)
     throw new Error("Unable to parse_instruction_if: " + instruction);
 
@@ -87,7 +84,8 @@ function parse_instruction_if(form, instruction) {
   )) {
     const childs = [];
 
-    for (const source of instructions_source) childs.push(parse(form, source));
+    for (const source of instructions_source)
+      childs.push(parse_instruction(script, source));
 
     scope_if._conditions.push({
       fn: Util.string_to_function(
@@ -100,7 +98,7 @@ function parse_instruction_if(form, instruction) {
   return scope_if;
 }
 
-function parse_instruction_while(form, instruction) {
+function parse_instruction_while(script, instruction) {
   if (
     instruction.condition == null ||
     instruction.instructions == null ||
@@ -118,12 +116,12 @@ function parse_instruction_while(form, instruction) {
   );
 
   for (const source of instruction.instructions)
-    scope_while._childs.push(parse(form, source));
+    scope_while._childs.push(parse_instruction(script, source));
 
   return scope_while;
 }
 
-function parse_instruction_for(form, instruction) {
+function parse_instruction_for(script, instruction) {
   if (
     instruction.condition == null ||
     instruction.instructions == null ||
@@ -153,53 +151,12 @@ function parse_instruction_for(form, instruction) {
     );
 
   for (const source of instruction.instructions)
-    scope_for._childs.push(parse(form, source));
+    scope_for._childs.push(parse_instruction(script, source));
 
   return scope_for;
 }
 
-function parse_instruction_script(form, instruction) {
-  if (instruction.id == null)
-    throw new Error(
-      `Not found {id}. Unable to parse_instruction_script: [${JSON.stringify(
-        instruction,
-        null,
-        2
-      )}]`
-    );
-
-  let data = instruction.data;
-  let root_scope = instruction.root_scope;
-  if (data == null || root_scope == null) {
-    for (const script_source of form._source.scripts) {
-      if (script_source.id === instruction.script) {
-        data = script_source.data;
-        root_scope = script_source.root_scope;
-        break;
-      }
-    }
-  }
-
-  if (data == null || root_scope == null)
-    throw new Error(
-      `Not found {data} or {root_scope}.` +
-        ` Unable to parse_instruction_script: [${JSON.stringify(
-          instruction,
-          null,
-          2
-        )}]`
-    );
-
-  const script = new Script();
-  script._id = instruction.id;
-  script._root = form._root;
-  script._timeout = instruction.timeout;
-  script.data = JSON.parse(JSON.stringify(data)); // Can be shared
-  script._root_scope = parse(form, root_scope);
-  return script;
-}
-
-function parse_instruction_api(form, instruction) {
+function parse_instruction_api(script, instruction) {
   if (instruction.api == null || instruction.id == null)
     throw new Error("Unable to parse_instruction_api: " + instruction);
 
@@ -212,7 +169,7 @@ function parse_instruction_api(form, instruction) {
     `script.add_return_data(` +
     `  {query_id, timeout: ${timeout}, key: "${return_data_key}"});` +
     `root.process_api(` +
-    `  "${instruction.api}", script._id, query_id, ${timeout}, ${args});`;
+    `  "${instruction.api}", script.get_id(), query_id, ${timeout}, ${args});`;
 
   const api = new Api();
   api._id = instruction.id;
@@ -220,4 +177,4 @@ function parse_instruction_api(form, instruction) {
   return api;
 }
 
-module.exports = parse;
+module.exports = parse_instruction;

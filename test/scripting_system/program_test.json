@@ -57,7 +57,7 @@
     }
   },
   "forms": {
-    "ID_Test_form_1": {
+    "Name_Test_form_1": {
       "id": "ID_Test_form_1",
       "name": "Name_Test_form_1",
       "rules": [],
@@ -65,9 +65,9 @@
       "events": [],
       "scripts": []
     },
-    "ID_Test_form_2": {
+    "Name_Test_form_2": {
       "id": "ID_Test_form_2",
-      "name": "Name_Test_form_1",
+      "name": "Name_Test_form_2",
       "rules": [],
       "signals": [],
       "events": [],

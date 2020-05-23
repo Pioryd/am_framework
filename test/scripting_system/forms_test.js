@@ -5,41 +5,44 @@ const { Util } = require("../../src/util");
 const Root = require("../../src/aml/root");
 const Form = require("../../src/aml/form");
 const Script = require("../../src/aml/script");
-
+const to_json = require("../../src/aml/script/to_json");
 const forms_full_name = path.join(__dirname, "forms_test.json");
 const scripts_path_full_name = path.join(__dirname, "forms_scripts");
 
+let form_source = {};
+let scripts = {};
+
 const root = new Root();
+root.get_source = (type, name) => {
+  return scripts[name];
+};
 
 describe("Forms test", () => {
   before(() => {
-    const forms_test_json = Util.read_from_json(forms_full_name);
-    root.source.forms = forms_test_json.forms;
+    form_source = Util.read_from_json(forms_full_name)["ID_Test_1"];
 
-    for (const form_source of Object.values(root.source.forms)) {
-      for (const scripts_name of form_source.scripts) {
-        root.source.scripts[scripts_name] = Script.parse(
-          scripts_name,
-          fs.readFileSync(
-            path.join(scripts_path_full_name, scripts_name + ".aml"),
-            "utf8",
-            (err) => {
-              if (err) throw new Error(err);
-            }
-          )
-        );
-      }
+    for (const scripts_name of form_source.scripts) {
+      scripts[scripts_name] = to_json(
+        `ID_${scripts_name}`,
+        fs.readFileSync(
+          path.join(scripts_path_full_name, scripts_name + ".aml"),
+          "utf8",
+          (err) => {
+            if (err) throw new Error(err);
+          }
+        )
+      );
     }
   });
   it("Parse", () => {
-    const form = new Form(root, root.source.forms["ID_Test_1"]);
+    const form = new Form(root, form_source);
 
     expect(form.get_id()).to.equal("ID_Test_1");
     expect(form._source.rules.length).to.equal(7);
     expect(Object.keys(form._running_scripts).length).to.equal(1);
   });
   it("Process", () => {
-    const form = new Form(root, root.source.forms["ID_Test_1"]);
+    const form = new Form(root, form_source);
 
     expect(Object.keys(form._running_scripts).length).to.equal(1);
     expect(form._running_scripts["Name_test_script_N2"].data.val).to.equal(0);
@@ -49,7 +52,7 @@ describe("Forms test", () => {
     expect(Object.keys(form._running_scripts).length).to.equal(0);
   });
   it("Rules", () => {
-    const form = new Form(root, root.source.forms["ID_Test_1"]);
+    const form = new Form(root, form_source);
 
     // form_init
     expect(Object.keys(form._running_scripts).length).to.equal(1);
@@ -75,7 +78,7 @@ describe("Forms test", () => {
     );
   });
   it("Signals", () => {
-    const form = new Form(root, root.source.forms["ID_Test_1"]);
+    const form = new Form(root, form_source);
 
     // energy
     expect(Object.keys(form._running_scripts).length).to.equal(1);
@@ -85,7 +88,7 @@ describe("Forms test", () => {
     expect(Object.keys(form._running_scripts).length).to.equal(2);
   });
   it("Events", () => {
-    const form = new Form(root, root.source.forms["ID_Test_1"]);
+    const form = new Form(root, form_source);
 
     // time
     expect(Object.keys(form._running_scripts).length).to.equal(1);
@@ -95,7 +98,7 @@ describe("Forms test", () => {
     expect(Object.keys(form._running_scripts).length).to.equal(2);
   });
   it("Actions", () => {
-    const form = new Form(root, root.source.forms["ID_Test_1"]);
+    const form = new Form(root, form_source);
 
     // script_terminate
     expect(Object.keys(form._running_scripts).length).to.equal(1);

@@ -1,24 +1,26 @@
 const ObjectID = require("bson-objectid");
+const _ = require("lodash");
+const EventEmitter = require("events");
+
 const ReturnData = require("./return_data");
 const System = require("./system");
-const EventEmitter = require("events");
+
 const logger = require("../logger").create_logger({
   module_name: "am_framework",
   file_name: __filename
 });
-/**
- * NOTE!
- *  Very important is [terminate()]. Not terminated have still
- *  connected listeners.
- */
 
 class Root {
   constructor() {
     this.system = null;
-    this.source = { systems: {}, programs: {}, forms: {}, scripts: {} };
-    this.process_api = () => logger.error("Not set process_api");
-    this.get_data = () => {
+
+    // Data set by update functions
+    this._process_api = () => logger.error("Not set process_api");
+    this._get_data = () => {
       return {};
+    };
+    this._get_source = (type, name) => {
+      throw new Error(`Not found source type[${type}] with name[${name}]`);
     };
     this.ext = {};
 
@@ -29,10 +31,9 @@ class Root {
   }
 
   get data() {
-    return this.get_data();
+    return this._get_data();
   }
-
-  set data(new_data) {}
+  set data(data) {}
 
   generate_unique_id() {
     return ObjectID().toHexString();
@@ -46,24 +47,28 @@ class Root {
     if (this.system != null) this.system.terminate();
   }
 
-  install_system(source) {
-    this.system = new System(this, source);
+  update_aml(data) {
+    data = _.merge({ systems: {}, programs: {}, forms: {}, scripts: {} }, data);
+
+    for (const source of Object.values(data.systems)) {
+      // only one system per root
+      if (this.system != null) this.system.terminate();
+      this.system = new System(this, source);
+    }
+    for (const source of Object.values(data.programs)) {
+      if (
+        this.system != null &&
+        this.system._source.programs.includes(source.name)
+      ) {
+      }
+    }
+    for (const program of this.data.programs) _update_program(program);
+    for (const form of this.data.forms) _update_form(form);
+    for (const script of this.data.scripts) _update_script(script);
   }
 
-  install_programs(programs_source) {
-    this.source.programs = programs_source;
-  }
-
-  install_forms(forms_source) {
-    this.source.forms = forms_source;
-  }
-
-  install_scripts(scripts_source) {
-    this.source.scripts = scripts_source;
-  }
-
-  install_api(process_api_fn) {
-    this.process_api = (fn_full_name, script_id, query_id, timeout, args) => {
+  update_process_api(process_api_fn) {
+    this._process_api = (fn_full_name, script_id, query_id, timeout, args) => {
       process_api_fn({
         root: this,
         fn_full_name,
@@ -75,12 +80,16 @@ class Root {
     };
   }
 
-  install_data_getter(get_data) {
-    this.get_data = get_data;
+  update_data_getter(get_data) {
+    this._get_data = get_data;
   }
 
-  install_ext(source) {
-    this.ext = { ...this.ext, ...source };
+  update_data_getter(get_source) {
+    this._get_source = get_source;
+  }
+
+  update_ext(source) {
+    this.ext = _.merge(this.ext, source);
   }
 }
 

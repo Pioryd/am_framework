@@ -1,17 +1,22 @@
 const stringify = require("json-stringify-safe");
-const { Util } = require("../util");
+const { Util } = require("../../util");
 
-function get_indent_level(line) {
-  let spaces = 0;
-  for (let i = 0; i < line.length; i++) {
-    if (line.charAt(i) === " ") spaces++;
-    else break;
-  }
-
-  return Math.floor(spaces / 2);
-}
+const logger = require("../../logger").create_logger({
+  module_name: "am_framework",
+  file_name: __filename
+});
 
 function get_instruction_source(start_index, lines) {
+  const get_indent_level = function (line) {
+    let spaces = 0;
+    for (let i = 0; i < line.length; i++) {
+      if (line.charAt(i) === " ") spaces++;
+      else break;
+    }
+
+    return Math.floor(spaces / 2);
+  };
+
   let index = start_index;
   let instruction;
   const instruction_index_list = [];
@@ -104,7 +109,7 @@ function parse_header(start_index, lines) {
   return { instructions_start_index: index, parsed_header };
 }
 
-function _parse_api_source(source) {
+function parse_api_source(source) {
   const parsed_api = {};
   const splitted = source.replace(/  +/g, " ").split(" ");
 
@@ -165,7 +170,7 @@ function parse_source(source) {
     parsed_source = { type: instruction_type, condition: instruction_body };
   } else if (instruction_type === "api") {
     parsed_source = {
-      ..._parse_api_source(instruction_body),
+      ...parse_api_source(instruction_body),
       type: instruction_type
     };
   } else {
@@ -304,19 +309,16 @@ function parse_instructions(start_index, lines) {
   return { root_scope };
 }
 
-module.exports = {
-  parse: (id, source) => {
-    const lines = source.split("\r\n");
-    const header_start_index = 0;
+module.exports = (id, source) => {
+  const lines = source.split("\r\n");
+  const header_start_index = 0;
 
-    const { instructions_start_index, parsed_header } = parse_header(
-      header_start_index,
-      lines
-    );
+  const { instructions_start_index, parsed_header } = parse_header(
+    header_start_index,
+    lines
+  );
 
-    const { root_scope } = parse_instructions(instructions_start_index, lines);
+  const { root_scope } = parse_instructions(instructions_start_index, lines);
 
-    return { id, ...parsed_header, root_scope };
-  },
-  validate: () => {}
+  return { id, ...parsed_header, root_scope };
 };

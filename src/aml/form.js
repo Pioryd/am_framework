@@ -1,5 +1,5 @@
 const { RETURN_CODE } = require("./instruction/return_code");
-const parse = require("./instruction/parse");
+const Script = require("./script");
 const RulesManager = require("./rules_manager");
 const logger = require("../logger").create_logger({
   module_name: "am_framework",
@@ -16,10 +16,7 @@ class Form {
     this._source = source;
     this.event_emitter = this._root.event_emitter;
 
-    if (source.id == null) throw new Error("Unable to parse form: " + source);
-
     this._running_scripts = {};
-    this._listeners_list = [];
 
     this._rules_manager = new RulesManager(this.event_emitter, (...args) => {
       this._process_actions(...args);
@@ -30,17 +27,18 @@ class Form {
   }
 
   terminate() {
+    for (const script of Object.values(this._running_scripts))
+      script.terminate();
+    this._running_scripts = {};
     this._rules_manager.terminate();
-    this._signals_manager.terminate();
-    this._events_manager.terminate();
   }
 
   process() {
-    // Proces running scripts
-    for (const [name, script] of Object.entries(this._running_scripts)) {
-      const return_value = script.process(null, this._root);
+    for (const script of Object.values(this._running_scripts)) {
+      const return_value = script.process();
+
       if (return_value.return_code === RETURN_CODE.PROCESSED)
-        this._terminate_script(name);
+        this._terminate_script(script.get_name());
     }
 
     return { return_code: RETURN_CODE.PROCESSED };
@@ -57,18 +55,10 @@ class Form {
   _run_script(name) {
     if (name in this._running_scripts) return;
 
-    let found_source = null;
-    for (const source of Object.values(this._root.source.scripts)) {
-      if (name === source.name) {
-        found_source = source;
-        break;
-      }
-    }
-
-    if (found_source === null)
-      throw new Error(`Unable to run script name[${name}]`);
-
-    this._running_scripts[name] = parse(this, found_source);
+    this._running_scripts[name] = new Script(
+      this._root,
+      this._root.get_source("script", name)
+    );
 
     this.event_emitter.emit("script_run", name);
   }

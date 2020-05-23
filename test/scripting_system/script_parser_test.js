@@ -2,7 +2,7 @@ const { expect, config } = require("chai");
 const path = require("path");
 const fs = require("fs");
 const { Util } = require("../../src/util");
-const Script = require("../../src/aml/script");
+const to_json = require("../../src/aml/script/to_json");
 
 const script_parser_json_full_name = path.join(__dirname, "script_parser.json");
 const script_parser_directory_script_full_name = path.join(
@@ -33,28 +33,28 @@ describe("Script Parser", () => {
     it("01", () => {
       expect(
         JSON.stringify(
-          Script.parse("ID_01", script_parser_script_scripts_map["Name_01"])
+          to_json("ID_01", script_parser_script_scripts_map["Name_01"])
         )
       ).to.equal(JSON.stringify(script_parser_json_source["Name_01"]));
     });
     it("02", () => {
       expect(
         JSON.stringify(
-          Script.parse("ID_02", script_parser_script_scripts_map["Name_02"])
+          to_json("ID_02", script_parser_script_scripts_map["Name_02"])
         )
       ).to.equal(JSON.stringify(script_parser_json_source["Name_02"]));
     });
     it("03", () => {
       expect(
         JSON.stringify(
-          Script.parse("ID_03", script_parser_script_scripts_map["Name_03"])
+          to_json("ID_03", script_parser_script_scripts_map["Name_03"])
         )
       ).to.equal(JSON.stringify(script_parser_json_source["Name_03"]));
     });
     it("04", () => {
       expect(
         JSON.stringify(
-          Script.parse("ID_04", script_parser_script_scripts_map["Name_04"])
+          to_json("ID_04", script_parser_script_scripts_map["Name_04"])
         )
       ).to.equal(JSON.stringify(script_parser_json_source["Name_04"]));
     });

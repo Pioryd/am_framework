@@ -1,7 +1,7 @@
 const path = require("path");
 const { Util } = require("../../src/util");
 const Root = require("../../src/aml/root");
-const parse = require("../../src/aml/instruction/parse");
+const Script = require("../../src/aml/script");
 
 const scripts_full_name = path.join(__dirname, "api_test.json");
 
@@ -9,6 +9,7 @@ class Helper {
   constructor() {
     this.root = new Root();
     this.api = {};
+    this.scripts = Util.read_from_json(scripts_full_name);
     this.options = { manual_poll: false };
     this.received_data_list = [];
   }
@@ -20,10 +21,7 @@ class Helper {
 
   get_script(options) {
     this.options = options;
-    return parse(
-      this.root.source.forms["Test_form"],
-      this._get_script_by_id(this.options.id)
-    );
+    return new Script(this.root, this.scripts[this.options.id]);
   }
 
   manual_poll() {
@@ -32,19 +30,9 @@ class Helper {
       this.root.return_data.insert(this.received_data_list.pop());
   }
 
-  _get_script_by_id(id) {
-    for (const script of this.root.source.forms["Test_form"]._source.scripts)
-      if (script.id === id) return script;
-    throw new Error(`Script[${id}] not found.`);
-  }
-
   _setup_root() {
     this.root = new Root();
-    const scripts_source = Util.read_from_json(scripts_full_name);
 
-    this.root.source.forms = {
-      Test_form: { _source: { scripts: [] }, _root: this.root }
-    };
     this.root.process_api = (
       fn_full_name,
       script_id,
@@ -56,9 +44,6 @@ class Helper {
     this.root.generate_unique_id = () => {
       return "1";
     };
-
-    for (const script of Object.values(scripts_source))
-      this.root.source.forms["Test_form"]._source.scripts.push(script);
   }
 
   _process_api({ fn_full_name, script_id, query_id, timeout, args }) {

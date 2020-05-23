@@ -2,34 +2,24 @@ const { expect, config } = require("chai");
 const path = require("path");
 const { Util } = require("../../src/util");
 const { Stopper } = require("../../src/stopper");
-const { Stopwatch } = require("../../src/stopwatch");
 const Root = require("../../src/aml/root");
-const parse = require("../../src/aml/instruction/parse");
+const Script = require("../../src/aml/script");
 const { RETURN_CODE } = require("../../src/aml/instruction/return_code");
 
 const scripts_full_name = path.join(__dirname, "instructions_test.json");
 
 const root = new Root();
-
-function get_script_by_id(id) {
-  for (const script of root.forms["Test_form"]._source.scripts)
-    if (script.id === id) return script;
-}
+root.generate_unique_id = () => {
+  return "1";
+};
+let scripts_source = {};
 
 describe("Scripting system test", () => {
   before(() => {
-    const scripts_source = Util.read_from_json(scripts_full_name);
-
-    root.forms = { Test_form: { _source: { scripts: [] }, _root: root } };
-    root.generate_unique_id = () => {
-      return "1";
-    };
-
-    for (const script of Object.values(scripts_source))
-      root.forms["Test_form"]._source.scripts.push(script);
+    scripts_source = Util.read_from_json(scripts_full_name);
   });
   it("Test instruction - JS", () => {
-    const script = parse(root.forms["Test_form"], get_script_by_id("Test_js"));
+    const script = new Script(root, scripts_source["ID_Test_js"]);
     expect(script.data.val).to.equal(0);
     {
       const { return_code } = script.process(null, root);
@@ -38,11 +28,7 @@ describe("Scripting system test", () => {
     expect(script.data.val).to.equal(1);
   });
   it("Test instruction - Scope", () => {
-    const script = parse(
-      root.forms["Test_form"],
-      get_script_by_id("Test_scope")
-    );
-
+    const script = new Script(root, scripts_source["ID_Test_scope"]);
     expect(script.data.val).to.equal(0);
     expect(script._root_scope._current_child_index).to.equal(0);
     for (let i = 0; i < 2; i++) {
@@ -60,10 +46,7 @@ describe("Scripting system test", () => {
   });
   describe("Test instruction - Scope_IF", () => {
     it("First condition", () => {
-      const script = parse(
-        root.forms["Test_form"],
-        get_script_by_id("Test_scope_if")
-      );
+      const script = new Script(root, scripts_source["ID_Test_scope_if"]);
 
       for (let i = 0; i < 2; i++) {
         const { return_code } = script.process(null, root);
@@ -79,10 +62,7 @@ describe("Scripting system test", () => {
       expect(script.data.val).to.deep.equal(3);
     });
     it("Second condition", () => {
-      const script = parse(
-        root.forms["Test_form"],
-        get_script_by_id("Test_scope_if")
-      );
+      const script = new Script(root, scripts_source["ID_Test_scope_if"]);
 
       script.data.val = 1;
       for (let i = 0; i < 2; i++) {
@@ -99,10 +79,7 @@ describe("Scripting system test", () => {
       expect(script.data.val).to.deep.equal(5);
     });
     it("Third condition", () => {
-      const script = parse(
-        root.forms["Test_form"],
-        get_script_by_id("Test_scope_if")
-      );
+      const script = new Script(root, scripts_source["ID_Test_scope_if"]);
 
       script.data.val = 10;
       for (let i = 0; i < 2; i++) {
@@ -120,10 +97,7 @@ describe("Scripting system test", () => {
     });
   });
   it("Test instruction - Scope_WHILE", () => {
-    const script = parse(
-      root.forms["Test_form"],
-      get_script_by_id("Test_scope_while")
-    );
+    const script = new Script(root, scripts_source["ID_Test_scope_while"]);
 
     for (let i = 0; i < 6; i++) {
       const { return_code } = script.process(null, root);
@@ -137,10 +111,7 @@ describe("Scripting system test", () => {
   });
 
   it("Test instruction - Scope_FOR", () => {
-    const script = parse(
-      root.forms["Test_form"],
-      get_script_by_id("Test_scope_for")
-    );
+    const script = new Script(root, scripts_source["ID_Test_scope_for"]);
 
     for (let i = 0; i < 5; i++) {
       const { return_code } = script.process(null, root);
@@ -161,10 +132,7 @@ describe("Scripting system test", () => {
   });
   describe("Test instruction - Internal", () => {
     it("break", () => {
-      const script = parse(
-        root.forms["Test_form"],
-        get_script_by_id("Test_internal_break")
-      );
+      const script = new Script(root, scripts_source["ID_Test_internal_break"]);
 
       // For
       for (let i = 0; i < 6; i++) {
@@ -188,9 +156,9 @@ describe("Scripting system test", () => {
       expect(script.data.val_2).to.deep.equal(1);
     });
     it("continue", () => {
-      const script = parse(
-        root.forms["Test_form"],
-        get_script_by_id("Test_internal_continue")
+      const script = new Script(
+        root,
+        scripts_source["ID_Test_internal_continue"]
       );
 
       // Scope for
@@ -221,10 +189,7 @@ describe("Scripting system test", () => {
       expect(script.data.val_2).to.deep.equal(0);
     });
     it("sleep 50", () => {
-      const script = parse(
-        root.forms["Test_form"],
-        get_script_by_id("Test_internal_sleep")
-      );
+      const script = new Script(root, scripts_source["ID_Test_internal_sleep"]);
 
       const stopper = new Stopper();
       {
@@ -242,10 +207,7 @@ describe("Scripting system test", () => {
       expect(script.data.val).to.deep.equal(2);
     });
     it("label and goto", () => {
-      const script = parse(
-        root.forms["Test_form"],
-        get_script_by_id("Test_label_and_goto")
-      );
+      const script = new Script(root, scripts_source["ID_Test_label_and_goto"]);
 
       /**
        *   TODO
@@ -290,9 +252,9 @@ describe("Scripting system test", () => {
       expect(script.data.val_2).to.deep.equal(1);
     });
     it("unhandled_internal", () => {
-      const script = parse(
-        root.forms["Test_form"],
-        get_script_by_id("Test_unhandled_internal")
+      const script = new Script(
+        root,
+        scripts_source["ID_Test_unhandled_internal"]
       );
 
       script.data.val = 0;
@@ -313,81 +275,6 @@ describe("Scripting system test", () => {
       expect(() => {
         script.process(null, root);
       }).to.throw();
-    });
-  });
-  describe("Timeout", () => {
-    it("timeout - Scope", () => {
-      const script = parse(
-        root.forms["Test_form"],
-        get_script_by_id("Test_timeout_scope")
-      );
-
-      // Scope
-      let while_return_code = RETURN_CODE.PROCESSING;
-      while (while_return_code === RETURN_CODE.PROCESSING) {
-        const { return_code } = script.process(null, root);
-        while_return_code = return_code;
-      }
-      expect(script.data.val).to.deep.equal(3);
-    });
-
-    it("timeout - If", () => {
-      const script = parse(
-        root.forms["Test_form"],
-        get_script_by_id("Test_timeout_if")
-      );
-
-      // If
-      while_return_code = RETURN_CODE.PROCESSING;
-      while (while_return_code === RETURN_CODE.PROCESSING) {
-        const { return_code } = script.process(null, root);
-        while_return_code = return_code;
-      }
-      expect(script.data.val).to.deep.equal(3);
-    });
-
-    it("timeout - While", () => {
-      const script = parse(
-        root.forms["Test_form"],
-        get_script_by_id("Test_timeout_while")
-      );
-
-      // If
-      while_return_code = RETURN_CODE.PROCESSING;
-      while (while_return_code === RETURN_CODE.PROCESSING) {
-        const { return_code } = script.process(null, root);
-        while_return_code = return_code;
-      }
-      expect(script.data.val).to.deep.equal(3);
-    });
-
-    it("timeout - For", () => {
-      const script = parse(
-        root.forms["Test_form"],
-        get_script_by_id("Test_timeout_for")
-      );
-
-      // If
-      while_return_code = RETURN_CODE.PROCESSING;
-      while (while_return_code === RETURN_CODE.PROCESSING) {
-        const { return_code } = script.process(null, root);
-        while_return_code = return_code;
-      }
-      expect(script.data.val).to.deep.equal(3);
-    });
-    it("timeout - Script", () => {
-      const script = parse(
-        root.forms["Test_form"],
-        get_script_by_id("Test_timeout_script")
-      );
-
-      // Script inside script inside script
-      while_return_code = RETURN_CODE.PROCESSING;
-      while (while_return_code === RETURN_CODE.PROCESSING) {
-        const { return_code } = script.process(null, root);
-        while_return_code = return_code;
-      }
-      expect(script.data.val).to.deep.equal(4);
     });
   });
 });

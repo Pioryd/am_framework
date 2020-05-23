@@ -11,31 +11,30 @@ class Program {
     this._source = source;
     this.event_emitter = this._root.event_emitter;
 
-    if (source.id == null)
-      throw new Error("Unable to parse program: " + source);
-
-    this._current_form = null;
-
+    this._running_forms = {};
     this._rules_manager = new RulesManager(this.event_emitter, (...args) => {
       this._process_actions(...args);
     });
-
     this._rules_manager.parse(this._source.rules);
 
-    this.event_emitter.emit("forms_count", 0);
+    this.event_emitter.emit(
+      "forms_count",
+      Object.values(this._running_forms).length
+    );
   }
 
   terminate() {
-    this._current_form.terminate();
-    this._current_form = null;
+    for (const form of Object.values(this._running_forms)) form.terminate();
+    this._running_forms = {};
+    this._rules_manager.terminate();
   }
 
   process() {
-    if (this._current_form != null) {
-      this._current_form.process();
-    } else {
-      this.event_emitter.emit("forms_count", 0);
-    }
+    for (const form of Object.values(this._running_forms)) form.process();
+    this.event_emitter.emit(
+      "forms_count",
+      Object.values(this._running_forms).length
+    );
   }
 
   get_id() {
@@ -47,34 +46,35 @@ class Program {
   }
 
   _run_form(name) {
-    if (this._current_form != null)
-      if (name === this._current_form._source.name) return;
-
-    let found_source = null;
-    for (const source of Object.values(this._root.source.forms)) {
-      if (name === source.name) {
-        found_source = source;
-        break;
-      }
-    }
-    if (found_source === null)
-      throw new Error(`Program[${this._source.id}] not found form[${name}]`);
+    if (name in this._running_forms) return;
 
     if (!this._source.forms.includes(name))
       throw new Error(
-        `Program[${this._source.id}] do not contains form[${name}]`
+        `AML:Program[${this._source.id}] do not contains AML:Form name[${name}]`
       );
 
-    this._current_form = new Form(this._root, found_source);
-    this.event_emitter.emit("forms_count", 1);
+    this._running_forms[name] = new Form(
+      this._root,
+      this._root.get_source("form", name)
+    );
+
+    this.event_emitter.emit(
+      "forms_count",
+      Object.values(this._running_forms).length
+    );
   }
 
   _terminate_form(name) {
-    if (name === this._current_form._source.name) {
-      form.terminate();
-      this._current_form = null;
-      this.event_emitter.emit("forms_count", 0);
-    }
+    const form = this._running_forms[name];
+    if (form == null) return;
+
+    form.terminate();
+    delete this._running_forms[name];
+
+    this.event_emitter.emit(
+      "forms_count",
+      Object.values(this._running_forms).length
+    );
   }
 
   _process_actions(actions, value) {
@@ -88,7 +88,7 @@ class Program {
         this._terminate_form(action_value.value);
       } else {
         throw new Error(
-          `Unknown action[${action_name}] of program[${this.get_id()}]`
+          `Unknown action[${action_name}] of AML:Program id[${this.get_id()}]`
         );
       }
     }

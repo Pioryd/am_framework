@@ -1,13 +1,25 @@
+const to_json = require("./to_json");
+const parse_instruction = require("../instruction");
 const { Stopwatch } = require("../../stopwatch");
-const { RETURN_CODE } = require("./return_code");
+const { RETURN_CODE } = require("../instruction/return_code");
+
+const logger = require("../../logger").create_logger({
+  module_name: "am_framework",
+  file_name: __filename
+});
+/**
+ * NOTE!
+ *  Very important is [terminate()] form. Not terminated form have still
+ *  connected listeners.
+ */
 
 class Script {
-  constructor() {
-    this._root = null;
-    this._id = null;
-    this._name = "";
-    this._root_scope = {};
-    this.data = {};
+  constructor(root, source) {
+    this._root = root;
+    this._source = source;
+
+    this._root_scope = parse_instruction(this, this._source.root_scope);
+    this.data = JSON.parse(JSON.stringify(this._source.data));
 
     this._sleep_timer = {
       enabled: false,
@@ -21,16 +33,10 @@ class Script {
     this._timeout_list = { instructions: {}, return_data_list: [] };
   }
 
-  get_id() {
-    return this._id;
-  }
-
-  process(script, root) {
-    const current_script = script != null ? script : this;
-
+  process() {
     this.print_debug();
 
-    if (current_script == this) this.check_return_data(current_script, root);
+    this.check_return_data();
 
     // Internal:sleep
     if (this._sleep_timer.enabled) {
@@ -43,7 +49,7 @@ class Script {
 
     // Internal:goto
     if (this._goto_find.enabled) {
-      const { return_code } = this._root_scope.process(current_script, root);
+      const { return_code } = this._root_scope.process(this, this._root);
 
       if (!this._goto_find.enabled) {
         return { return_code };
@@ -53,8 +59,8 @@ class Script {
     }
 
     const { return_code, internal } = this._root_scope.process(
-      current_script,
-      root
+      this,
+      this._root
     );
 
     if (internal === "goto") {
@@ -105,12 +111,13 @@ class Script {
     };
   }
 
-  check_return_data(script, root) {
-    const received_return_data_list = root.return_data.pop(script._id);
+  check_return_data() {
+    const received_return_data_list = this._root.return_data.pop(this.get_id());
 
     for (const received_return_data of received_return_data_list) {
-      const script_return_data =
-        script._timeout_list.return_data_list[received_return_data.query_id];
+      const script_return_data = this._timeout_list.return_data_list[
+        received_return_data.query_id
+      ];
       if (script_return_data == null) continue;
 
       if (!script_return_data.stopwatch.is_elapsed())
@@ -118,9 +125,7 @@ class Script {
           `this.data.${script_return_data.key} = ${received_return_data.value}`
         );
 
-      delete script._timeout_list.return_data_list[
-        received_return_data.query_id
-      ];
+      delete this._timeout_list.return_data_list[received_return_data.query_id];
     }
   }
 
@@ -136,9 +141,17 @@ class Script {
 
     console.log(
       `Program[${program_id}]->Form[${form_id}]->` +
-        `Script[${this.get_id()}]->` +
+        `Script name:[${this.get_name()}] ID:[${this.get_id()}]->` +
         (line_number != null ? `Line[${line_number}]` : `start process`)
     );
+  }
+
+  get_id() {
+    return this._source.id;
+  }
+
+  get_name() {
+    return this._source.name;
   }
 }
 

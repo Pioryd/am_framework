@@ -1,105 +1,103 @@
 {
-  "forms": {
-    "ID_Test_1": {
-      "id": "ID_Test_1",
-      "name": "Name_Test_1",
-      "rules": [
-        {
-          "triggers": [
-            {
-              "form_init": { "value": "Name_Test_1" }
+  "ID_Test_1": {
+    "id": "ID_Test_1",
+    "name": "Name_Test_1",
+    "rules": [
+      {
+        "triggers": [
+          {
+            "form_init": { "value": "Name_Test_1" }
+          }
+        ],
+        "actions": [
+          {
+            "script_run": { "value": "Name_test_script_N2" }
+          }
+        ]
+      },
+      {
+        "triggers": [
+          {
+            "script_run": { "value": "Name_test_script_N1" }
+          }
+        ],
+        "actions": [
+          {
+            "script_run": { "value": "Name_test_script_N2" }
+          }
+        ]
+      },
+      {
+        "triggers": [
+          {
+            "script_processed": { "value": "Name_test_script_N3" }
+          }
+        ],
+        "actions": [
+          {
+            "script_run": { "value": "Name_test_script_N2" }
+          }
+        ]
+      },
+      {
+        "triggers": [
+          {
+            "energy": { "min": "0", "max": "80" }
+          }
+        ],
+        "actions": [
+          {
+            "script_run": { "value": "Name_test_script_N1" }
+          }
+        ]
+      },
+      {
+        "triggers": [
+          {
+            "stres": { "value": 85 }
+          }
+        ],
+        "actions": [
+          {
+            "script_terminate": { "value": "Name_test_script_N2" }
+          }
+        ]
+      },
+      {
+        "triggers": [
+          {
+            "choice": { "any": {} }
+          }
+        ],
+        "actions": [
+          {
+            "script_run": { "value": "Name_test_script_N2" }
+          },
+          {
+            "script_set_data": {
+              "script": "Name_test_script_N2",
+              "data": "val"
             }
-          ],
-          "actions": [
-            {
-              "script_run": { "value": "Name_test_script_N2" }
-            }
-          ]
-        },
-        {
-          "triggers": [
-            {
-              "script_run": { "value": "Name_test_script_N1" }
-            }
-          ],
-          "actions": [
-            {
-              "script_run": { "value": "Name_test_script_N2" }
-            }
-          ]
-        },
-        {
-          "triggers": [
-            {
-              "script_processed": { "value": "Name_test_script_N3" }
-            }
-          ],
-          "actions": [
-            {
-              "script_run": { "value": "Name_test_script_N2" }
-            }
-          ]
-        },
-        {
-          "triggers": [
-            {
-              "energy": { "min": "0", "max": "80" }
-            }
-          ],
-          "actions": [
-            {
-              "script_run": { "value": "Name_test_script_N1" }
-            }
-          ]
-        },
-        {
-          "triggers": [
-            {
-              "stres": { "value": 85 }
-            }
-          ],
-          "actions": [
-            {
-              "script_terminate": { "value": "Name_test_script_N2" }
-            }
-          ]
-        },
-        {
-          "triggers": [
-            {
-              "choice": { "any": {} }
-            }
-          ],
-          "actions": [
-            {
-              "script_run": { "value": "Name_test_script_N2" }
-            },
-            {
-              "script_set_data": {
-                "script": "Name_test_script_N2",
-                "data": "val"
-              }
-            }
-          ]
-        },
-        {
-          "triggers": [
-            {
-              "time": { "min": "1580926960000", "max": "1580934160000" }
-            }
-          ],
-          "actions": [
-            {
-              "script_run": { "value": "Name_test_script_N1" }
-            }
-          ]
-        }
-      ],
-      "scripts": [
-        "Name_test_script_N1",
-        "Name_test_script_N2",
-        "Name_test_script_N3"
-      ]
-    }
+          }
+        ]
+      },
+      {
+        "triggers": [
+          {
+            "time": { "min": "1580926960000", "max": "1580934160000" }
+          }
+        ],
+        "actions": [
+          {
+            "script_run": { "value": "Name_test_script_N1" }
+          }
+        ]
+      }
+    ],
+    "scripts": [
+      "Name_test_script_N1",
+      "Name_test_script_N2",
+      "Name_test_script_N3"
+    ]
   }
 }
