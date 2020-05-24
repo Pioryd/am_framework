@@ -1,9 +1,3 @@
-/**
- * NOTE!
- *  Very important is [terminate()]. Not terminated have still
- *  connected listeners.
- */
-
 class RulesManager {
   constructor(event_emitter, process_actions) {
     this.event_emitter = event_emitter;

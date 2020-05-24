@@ -3,9 +3,9 @@ const _ = require("lodash");
 const EventEmitter = require("events");
 
 const ReturnData = require("./return_data");
-const System = require("./system");
+const System = require("../system");
 
-const logger = require("../logger").create_logger({
+const logger = require("../../logger").create_logger({
   module_name: "am_framework",
   file_name: __filename
 });
