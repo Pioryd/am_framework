@@ -1,15 +1,11 @@
 const { RETURN_CODE } = require("./return_code");
-const logger = require("../../logger").create_logger({
-  module_name: "am_framework",
-  file_name: __filename
-});
 
 class Scope {
-  constructor() {
-    this._id = null;
-    this._childs = [];
+  constructor({ id, childs }) {
+    this._id = id;
+    this._childs = childs || [];
+
     this._current_child_index = 0;
-    this._debug_info = {};
   }
 
   _reset() {

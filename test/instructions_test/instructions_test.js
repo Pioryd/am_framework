@@ -4,7 +4,7 @@ const { Util } = require("../../src/util");
 const { Stopper } = require("../../src/stopper");
 const Root = require("../../src/aml/root");
 const Script = require("../../src/aml/script");
-const { RETURN_CODE } = require("../../src/aml/instruction/return_code");
+const { RETURN_CODE } = require("../../src/aml/script/instruction/return_code");
 
 const scripts_full_name = path.join(__dirname, "instructions_test.json");
 

@@ -1,11 +1,6 @@
 const stringify = require("json-stringify-safe");
 const { Util } = require("../../util");
 
-const logger = require("../../logger").create_logger({
-  module_name: "am_framework",
-  file_name: __filename
-});
-
 function get_instruction_source(start_index, lines) {
   const get_indent_level = function (line) {
     let spaces = 0;

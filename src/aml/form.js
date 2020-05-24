@@ -1,29 +1,24 @@
-const { RETURN_CODE } = require("./instruction/return_code");
+const { RETURN_CODE } = require("./script/instruction/return_code");
 const Script = require("./script");
 const RulesManager = require("./rules_manager");
-const logger = require("../logger").create_logger({
-  module_name: "am_framework",
-  file_name: __filename
-});
-/**
- * NOTE!
- *  Very important is [terminate()] form. Not terminated form have still
- *  connected listeners.
- */
+
 class Form {
   constructor(root, source) {
     this._root = root;
     this._source = source;
-    this.event_emitter = this._root.event_emitter;
 
     this._running_scripts = {};
+    this._debug_current_form = null;
 
-    this._rules_manager = new RulesManager(this.event_emitter, (...args) => {
-      this._process_actions(...args);
-    });
+    this._rules_manager = new RulesManager(
+      this._root._event_emitter,
+      (...args) => {
+        this._process_actions(...args);
+      }
+    );
     this._rules_manager.parse(this._source.rules);
 
-    this.event_emitter.emit("form_init", this.get_name());
+    this._root.emit("form_init", this.get_name());
   }
 
   terminate() {
@@ -60,12 +55,12 @@ class Form {
       this._root.get_source("script", name)
     );
 
-    this.event_emitter.emit("script_run", name);
+    this._root.emit("script_run", name);
   }
 
   _terminate_script(name) {
     delete this._running_scripts[name];
-    this.event_emitter.emit("script_processed", name);
+    this._root.emit("script_processed", name);
   }
 
   _process_actions(actions, value) {

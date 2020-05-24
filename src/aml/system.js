@@ -5,10 +5,11 @@ class System {
     this._root = root;
     this._source = source;
 
-    this.programs = {};
+    this._programs = {};
+    this._debug_current_program = null;
 
     for (const name of this._source.programs) {
-      this.programs[name] = new Program(
+      this._programs[name] = new Program(
         this._root,
         this._root.get_source("program", name)
       );
@@ -16,12 +17,15 @@ class System {
   }
 
   terminate() {
-    for (const program of Object.values(this.programs)) program.terminate();
-    this.programs = {};
+    for (const program of Object.values(this._programs)) program.terminate();
+    this._programs = {};
   }
 
   process() {
-    for (const program of Object.values(this.programs)) program.process();
+    for (const program of Object.values(this._programs)) {
+      this._debug_current_program = program;
+      program.process();
+    }
   }
 
   get_id() {

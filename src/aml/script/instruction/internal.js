@@ -1,8 +1,4 @@
 const { RETURN_CODE } = require("./return_code");
-const logger = require("../../logger").create_logger({
-  module_name: "am_framework",
-  file_name: __filename
-});
 
 /**
  * Commands:
@@ -21,10 +17,10 @@ const logger = require("../../logger").create_logger({
  *      - Start counting on called in script
  */
 class Internal {
-  constructor() {
-    this._id = null;
-    this._command = "";
-    this._arg = "";
+  constructor({ id, command, arg }) {
+    this._id = id;
+    this._command = command;
+    this._arg = arg;
   }
 
   process(script, root) {

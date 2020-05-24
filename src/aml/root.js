@@ -12,7 +12,11 @@ const logger = require("../logger").create_logger({
 
 class Root {
   constructor() {
-    this.system = null;
+    this._system = null;
+    this._event_emitter = new EventEmitter();
+
+    this.return_data = new ReturnData();
+    this.options = { debug_enabled: false };
 
     // Data set by update functions
     this._process_api = () => logger.error("Not set process_api");
@@ -23,11 +27,6 @@ class Root {
       throw new Error(`Not found source type[${type}] with name[${name}]`);
     };
     this.ext = {};
-
-    this._debug_enabled = false;
-
-    this.return_data = new ReturnData();
-    this.event_emitter = new EventEmitter();
   }
 
   get data() {
@@ -40,11 +39,15 @@ class Root {
   }
 
   process() {
-    if (this.system != null) this.system.process();
+    if (this._system != null) this._system.process();
   }
 
   terminate() {
-    if (this.system != null) this.system.terminate();
+    if (this._system != null) this._system.terminate();
+  }
+
+  emit(...args) {
+    this._event_emitter.emit(...args);
   }
 
   update_aml(data) {
@@ -52,13 +55,13 @@ class Root {
 
     for (const source of Object.values(data.systems)) {
       // only one system per root
-      if (this.system != null) this.system.terminate();
-      this.system = new System(this, source);
+      if (this._system != null) this._system.terminate();
+      this._system = new System(this, source);
     }
     for (const source of Object.values(data.programs)) {
       if (
-        this.system != null &&
-        this.system._source.programs.includes(source.name)
+        this._system != null &&
+        this._system._source.programs.includes(source.name)
       ) {
       }
     }

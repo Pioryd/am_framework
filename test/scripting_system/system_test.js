@@ -23,6 +23,6 @@ describe("System test", () => {
     const system = new System(root, source.systems["Name_Test_system"]);
 
     expect(system.get_id()).to.equal("ID_Test_system");
-    expect(Object.values(system.programs).length).to.equal(1);
+    expect(Object.values(system._programs).length).to.equal(1);
   });
 });

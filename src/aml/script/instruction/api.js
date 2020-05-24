@@ -1,9 +1,9 @@
 const { RETURN_CODE } = require("./return_code");
 
 class Api {
-  constructor() {
-    this._id = null;
-    this._fn = () => {};
+  constructor({ id, fn }) {
+    this._id = id;
+    this._fn = fn || (() => {});
   }
 
   process(script, root) {

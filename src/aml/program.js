@@ -1,26 +1,21 @@
 const RulesManager = require("./rules_manager");
 const Form = require("./form");
-const logger = require("../logger").create_logger({
-  module_name: "am_framework",
-  file_name: __filename
-});
 
 class Program {
   constructor(root, source) {
     this._root = root;
     this._source = source;
-    this.event_emitter = this._root.event_emitter;
 
     this._running_forms = {};
-    this._rules_manager = new RulesManager(this.event_emitter, (...args) => {
-      this._process_actions(...args);
-    });
+    this._rules_manager = new RulesManager(
+      this._root._event_emitter,
+      (...args) => {
+        this._process_actions(...args);
+      }
+    );
     this._rules_manager.parse(this._source.rules);
 
-    this.event_emitter.emit(
-      "forms_count",
-      Object.values(this._running_forms).length
-    );
+    this._root.emit("forms_count", Object.values(this._running_forms).length);
   }
 
   terminate() {
@@ -30,11 +25,11 @@ class Program {
   }
 
   process() {
-    for (const form of Object.values(this._running_forms)) form.process();
-    this.event_emitter.emit(
-      "forms_count",
-      Object.values(this._running_forms).length
-    );
+    for (const form of Object.values(this._running_forms)) {
+      this._debug_current_form = form;
+      form.process();
+    }
+    this._root.emit("forms_count", Object.values(this._running_forms).length);
   }
 
   get_id() {
@@ -58,10 +53,7 @@ class Program {
       this._root.get_source("form", name)
     );
 
-    this.event_emitter.emit(
-      "forms_count",
-      Object.values(this._running_forms).length
-    );
+    this._root.emit("forms_count", Object.values(this._running_forms).length);
   }
 
   _terminate_form(name) {
@@ -71,10 +63,7 @@ class Program {
     form.terminate();
     delete this._running_forms[name];
 
-    this.event_emitter.emit(
-      "forms_count",
-      Object.values(this._running_forms).length
-    );
+    this._root.emit("forms_count", Object.values(this._running_forms).length);
   }
 
   _process_actions(actions, value) {

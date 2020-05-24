@@ -1,13 +1,9 @@
 const { RETURN_CODE } = require("./return_code");
-const logger = require("../../logger").create_logger({
-  module_name: "am_framework",
-  file_name: __filename
-});
 
 class JS {
-  constructor() {
-    this._id = null;
-    this._fn = () => {};
+  constructor({ id, fn }) {
+    this._id = id;
+    this._fn = fn || (() => {});
   }
 
   process(script, root) {

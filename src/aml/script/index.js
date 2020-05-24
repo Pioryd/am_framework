@@ -1,17 +1,6 @@
-const to_json = require("./to_json");
-const parse_instruction = require("../instruction");
+const parse_instruction = require("./instruction/parse");
 const { Stopwatch } = require("../../stopwatch");
-const { RETURN_CODE } = require("../instruction/return_code");
-
-const logger = require("../../logger").create_logger({
-  module_name: "am_framework",
-  file_name: __filename
-});
-/**
- * NOTE!
- *  Very important is [terminate()] form. Not terminated form have still
- *  connected listeners.
- */
+const { RETURN_CODE } = require("./instruction/return_code");
 
 class Script {
   constructor(root, source) {
@@ -27,16 +16,15 @@ class Script {
     };
 
     this._goto_find = { enabled: false, label_name: "" };
-
-    this._debug_enabled = false;
-
     this._timeout_list = { instructions: {}, return_data_list: [] };
+
+    this.options = { debug_enabled: false };
   }
 
   process() {
     this.print_debug();
 
-    this.check_return_data();
+    this._check_return_data();
 
     // Internal:sleep
     if (this._sleep_timer.enabled) {
@@ -70,7 +58,7 @@ class Script {
     } else if (internal === "continue") {
       throw new Error("Unable to find [continue]");
     } else if (return_code === RETURN_CODE.PROCESSED) {
-      this.clear_return_data();
+      this._clear_return_data();
       return { return_code };
     } else {
       return { return_code };
@@ -111,7 +99,32 @@ class Script {
     };
   }
 
-  check_return_data() {
+  print_debug(line_number) {
+    if (!this.options.debug_enabled && !this._root.options.debug_enabled)
+      return;
+
+    const { _debug_current_program } = this._root.system;
+    const { _debug_current_form } = _debug_current_program;
+
+    console.log(
+      `Program [${_debug_current_program.get_id()}` +
+        `/${_debug_current_program.get_id()}]` +
+        `->Form name[${_debug_current_form.get_name()}` +
+        `/${_debug_current_form.get_id()}]` +
+        `->Script name:[${this.get_name()}/${this.get_id()}]` +
+        (line_number != null ? `Line[${line_number}]` : `start process`)
+    );
+  }
+
+  get_id() {
+    return this._source.id;
+  }
+
+  get_name() {
+    return this._source.name;
+  }
+
+  _check_return_data() {
     const received_return_data_list = this._root.return_data.pop(this.get_id());
 
     for (const received_return_data of received_return_data_list) {
@@ -129,29 +142,8 @@ class Script {
     }
   }
 
-  clear_return_data() {
+  _clear_return_data() {
     this._timeout_list.return_data_list = [];
-  }
-
-  print_debug(line_number) {
-    if (!this._debug_enabled && !this._root._debug_enabled) return;
-
-    const program_id = this._root.system._current_program.get_id();
-    const form_id = this._root.system._current_program._current_form.get_id();
-
-    console.log(
-      `Program[${program_id}]->Form[${form_id}]->` +
-        `Script name:[${this.get_name()}] ID:[${this.get_id()}]->` +
-        (line_number != null ? `Line[${line_number}]` : `start process`)
-    );
-  }
-
-  get_id() {
-    return this._source.id;
-  }
-
-  get_name() {
-    return this._source.name;
   }
 }
 

@@ -1,4 +1,4 @@
-const { Util } = require("../../util");
+const { Util } = require("../../../util");
 const Scope = require("./scope");
 const JS = require("./js");
 const Scope_IF = require("./scope_if");
@@ -41,53 +41,45 @@ function parse_instruction_internal(script, instruction) {
 
   const [command, arg] = instruction.command.split(" ");
 
-  const internal = new Internal();
-  internal._id = instruction.id;
-  internal._command = command;
-  internal._arg = arg;
-
-  return internal;
+  return new Internal({ id: instruction.id, command, arg });
 }
 
 function parse_instruction_js(script, instruction) {
   if (instruction.body == null || instruction.id == null)
     throw new Error("Unable to parse_instruction_js: " + instruction);
 
-  const js = new JS();
-  js._id = instruction.id;
-  js._fn = Util.string_to_function(`(script, root){${instruction.body};}`);
-  return js;
+  return new JS({
+    id: instruction.id,
+    fn: Util.string_to_function(`(script, root){${instruction.body};}`)
+  });
 }
 
 function parse_instruction_scope(script, instruction) {
   if (instruction.instructions == null || instruction.id == null)
     throw new Error("Unable to parse_instruction: " + instruction);
 
-  const scope = new Scope();
-  scope._id = instruction.id;
-  scope._timeout = instruction.timeout;
-  for (const source of instruction.instructions)
-    scope._childs.push(parse_instruction(script, source));
+  const initialization_data = { id: instruction.id, childs: [] };
 
-  return scope;
+  for (const source of instruction.instructions)
+    initialization_data.childs.push(parse_instruction(script, source));
+
+  return new Scope(initialization_data);
 }
 
 function parse_instruction_if(script, instruction) {
   if (instruction.conditions == null || instruction.id == null)
     throw new Error("Unable to parse_instruction_if: " + instruction);
 
-  const scope_if = new Scope_IF();
-  scope_if._id = instruction.id;
-  scope_if._timeout = instruction.timeout;
+  const initialization_data = { id: instruction.id, conditions: [] };
+
   for (const [fn_source, instructions_source] of Object.entries(
     instruction.conditions
   )) {
     const childs = [];
-
     for (const source of instructions_source)
       childs.push(parse_instruction(script, source));
 
-    scope_if._conditions.push({
+    initialization_data.conditions.push({
       fn: Util.string_to_function(
         `(script, root){return ${fn_source === "" ? "true" : fn_source};}`
       ),
@@ -95,7 +87,7 @@ function parse_instruction_if(script, instruction) {
     });
   }
 
-  return scope_if;
+  return new Scope_IF(initialization_data);
 }
 
 function parse_instruction_while(script, instruction) {
@@ -106,19 +98,18 @@ function parse_instruction_while(script, instruction) {
   )
     throw new Error("Unable to parse_instruction_while: " + instruction);
 
-  const scope_while = new Scope_WHILE();
-  scope_while._id = instruction.id;
-  scope_while._timeout = instruction.timeout;
-  scope_while._condition = Util.string_to_function(
+  const initialization_data = { id: instruction.id, childs: [] };
+
+  initialization_data.condition = Util.string_to_function(
     `(script, root){return ${
       instruction.condition === "" ? "true" : instruction.condition
     };}`
   );
 
   for (const source of instruction.instructions)
-    scope_while._childs.push(parse_instruction(script, source));
+    initialization_data.childs.push(parse_instruction(script, source));
 
-  return scope_while;
+  return new Scope_WHILE(initialization_data);
 }
 
 function parse_instruction_for(script, instruction) {
@@ -134,26 +125,26 @@ function parse_instruction_for(script, instruction) {
     condition_source,
     increment_source
   ] = instruction.condition.split(";");
-  const scope_for = new Scope_FOR();
-  scope_for._id = instruction.id;
-  scope_for._timeout = instruction.timeout;
+
+  const initialization_data = { id: instruction.id, childs: [] };
+
   if (init_source !== "")
-    scope_for._init = Util.string_to_function(
+    initialization_data.init = Util.string_to_function(
       `(script, root){${init_source};}`
     );
   if (condition_source !== "")
-    scope_for._condition = Util.string_to_function(
+    initialization_data.condition = Util.string_to_function(
       `(script, root){return ${condition_source};}`
     );
   if (increment_source !== "")
-    scope_for._increment = Util.string_to_function(
+    initialization_data.increment = Util.string_to_function(
       `(script, root){${increment_source};}`
     );
 
   for (const source of instruction.instructions)
-    scope_for._childs.push(parse_instruction(script, source));
+    initialization_data.childs.push(parse_instruction(script, source));
 
-  return scope_for;
+  return new Scope_FOR(initialization_data);
 }
 
 function parse_instruction_api(script, instruction) {
@@ -171,10 +162,10 @@ function parse_instruction_api(script, instruction) {
     `root.process_api(` +
     `  "${instruction.api}", script.get_id(), query_id, ${timeout}, ${args});`;
 
-  const api = new Api();
-  api._id = instruction.id;
-  api._fn = Util.string_to_function(`(script, root){${body}}`);
-  return api;
+  return new Api({
+    id: instruction.id,
+    fn: Util.string_to_function(`(script, root){${body}}`)
+  });
 }
 
 module.exports = parse_instruction;
