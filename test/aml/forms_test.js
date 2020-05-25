@@ -13,7 +13,7 @@ let form_source = {};
 let scripts = {};
 
 const root = new Root();
-root.get_source = (type, name) => {
+root.get_source = ({ type, name }) => {
   return scripts[name];
 };
 

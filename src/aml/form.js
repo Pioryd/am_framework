@@ -2,6 +2,11 @@ const { RETURN_CODE } = require("./script/instruction/return_code");
 const Script = require("./script");
 const RulesManager = require("./rules_manager");
 
+const logger = require("../logger").create_logger({
+  module_name: "am_framework",
+  file_name: __filename
+});
+
 class Form {
   constructor(root, source) {
     this._root = root;
@@ -23,7 +28,8 @@ class Form {
 
   terminate() {
     for (const script of Object.values(this._running_scripts))
-      script.terminate();
+      this._terminate_script(script.get_name());
+
     this._running_scripts = {};
     this._rules_manager.terminate();
   }
@@ -39,6 +45,25 @@ class Form {
     return { return_code: RETURN_CODE.PROCESSED };
   }
 
+  update(data) {
+    if (data.type !== "script") {
+      for (const script of Object.values(this._running_scripts))
+        script.update(data);
+      return;
+    }
+
+    const source = this._root.get_source(data);
+
+    const running_script = this._running_scripts[data.name];
+    if (running_script != null) {
+      if (running_script.get_id() === source.id) return;
+      else this._terminate_script(data.name);
+    }
+
+    this._run_script(data.name);
+    return;
+  }
+
   get_id() {
     return this._source.id;
   }
@@ -50,12 +75,17 @@ class Form {
   _run_script(name) {
     if (name in this._running_scripts) return;
 
-    this._running_scripts[name] = new Script(
-      this._root,
-      this._root.get_source("script", name)
-    );
+    try {
+      this._running_scripts[name] = new Script(
+        this._root,
+        this._root.get_source({ type: "script", name })
+      );
 
-    this._root.emit("script_run", name);
+      this._root.emit("script_run", name);
+    } catch (e) {
+      if (this._root.options.debug_enabled)
+        logger.debug(`Unable to run script name[${name}]. \n${e}\n${e.stack}`);
+    }
   }
 
   _terminate_script(name) {

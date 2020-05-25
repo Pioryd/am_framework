@@ -2,6 +2,11 @@ const parse_instruction = require("./instruction/parse");
 const { Stopwatch } = require("../../stopwatch");
 const { RETURN_CODE } = require("./instruction/return_code");
 
+const logger = require("../../logger").create_logger({
+  module_name: "am_framework",
+  file_name: __filename
+});
+
 class Script {
   constructor(root, source) {
     this._root = root;
@@ -20,6 +25,8 @@ class Script {
 
     this.options = { debug_enabled: false };
   }
+
+  terminate() {}
 
   process() {
     this.print_debug();
@@ -106,7 +113,7 @@ class Script {
     const { _debug_current_program } = this._root.system;
     const { _debug_current_form } = _debug_current_program;
 
-    console.log(
+    logger.debug(
       `Program [${_debug_current_program.get_id()}` +
         `/${_debug_current_program.get_id()}]` +
         `->Form name[${_debug_current_form.get_name()}` +

@@ -9,7 +9,7 @@ const system_full_name = path.join(__dirname, "system_test.json");
 let system_test_json = {};
 let source = {};
 const root = new Root();
-root.get_source = (type, name) => {
+root.get_source = ({ type, name }) => {
   if (type === "system") return source.systems[name];
   else if (type === "program") return source.programs[name];
 };

@@ -23,7 +23,7 @@ class Root {
     this._get_data = () => {
       return {};
     };
-    this._get_source = (type, name) => {
+    this.get_source = ({ type, name }) => {
       throw new Error(`Not found source type[${type}] with name[${name}]`);
     };
     this.ext = {};
@@ -50,27 +50,23 @@ class Root {
     this._event_emitter.emit(...args);
   }
 
-  update_aml(data) {
-    data = _.merge({ systems: {}, programs: {}, forms: {}, scripts: {} }, data);
-
-    for (const source of Object.values(data.systems)) {
-      // only one system per root
-      if (this._system != null) this._system.terminate();
-      this._system = new System(this, source);
-    }
-    for (const source of Object.values(data.programs)) {
-      if (
-        this._system != null &&
-        this._system._source.programs.includes(source.name)
-      ) {
+  update(data) {
+    if (data.type !== "system" && this._system != null) {
+      this._system.update(data);
+    } else {
+      try {
+        if (this._system != null) this._system.terminate();
+        this._system = new System(this, this.get_source(data));
+      } catch (e) {
+        if (this.options.debug_enabled)
+          logger.debug(
+            `Unable to run system name[${data.name}]. \n${e}\n${e.stack}`
+          );
       }
     }
-    for (const program of this.data.programs) _update_program(program);
-    for (const form of this.data.forms) _update_form(form);
-    for (const script of this.data.scripts) _update_script(script);
   }
 
-  update_process_api(process_api_fn) {
+  install_process_api(process_api_fn) {
     this._process_api = (fn_full_name, script_id, query_id, timeout, args) => {
       process_api_fn({
         root: this,
@@ -83,15 +79,15 @@ class Root {
     };
   }
 
-  update_data_getter(get_data) {
+  install_data_getter(get_data) {
     this._get_data = get_data;
   }
 
-  update_data_getter(get_source) {
-    this._get_source = get_source;
+  install_source_getter(get_source) {
+    this.get_source = get_source;
   }
 
-  update_ext(source) {
+  install_ext(source) {
     this.ext = _.merge(this.ext, source);
   }
 }

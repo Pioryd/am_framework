@@ -8,7 +8,7 @@ class RulesManager {
   }
 
   terminate() {
-    this._remove_all_listeners();
+    this.remove_all_listeners();
   }
 
   add_listener(name, fn) {
