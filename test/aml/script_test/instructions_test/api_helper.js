@@ -1,7 +1,7 @@
 const path = require("path");
-const { Util } = require("../../src/util");
-const Root = require("../../src/aml/root");
-const Script = require("../../src/aml/script");
+const { Util } = require("../../../../src/util");
+const Root = require("../../../../src/aml/root");
+const Script = require("../../../../src/aml/script");
 
 const scripts_full_name = path.join(__dirname, "api_test.json");
 

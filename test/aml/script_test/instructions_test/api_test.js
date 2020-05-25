@@ -1,9 +1,11 @@
 const { expect, config } = require("chai");
-const { Util } = require("../../src/util");
-const { Stopper } = require("../../src/stopper");
-const { Stopwatch } = require("../../src/stopwatch");
+const { Util } = require("../../../../src/util");
+const { Stopper } = require("../../../../src/stopper");
+const { Stopwatch } = require("../../../../src/stopwatch");
 const Helper = require("./api_helper");
-const { RETURN_CODE } = require("../../src/aml/script/instruction/return_code");
+const {
+  RETURN_CODE
+} = require("../../../../src/aml/script/instruction/return_code");
 
 const helper = new Helper();
 

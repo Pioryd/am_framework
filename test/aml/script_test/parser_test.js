@@ -1,13 +1,13 @@
 const { expect, config } = require("chai");
 const path = require("path");
 const fs = require("fs");
-const { Util } = require("../../src/util");
-const to_json = require("../../src/aml/script/to_json");
+const { Util } = require("../../../src/util");
+const to_json = require("../../../src/aml/script/to_json");
 
-const script_parser_json_full_name = path.join(__dirname, "script_parser.json");
+const script_parser_json_full_name = path.join(__dirname, "parser.json");
 const script_parser_directory_script_full_name = path.join(
   __dirname,
-  "script_parser_scripts"
+  "parser_scripts"
 );
 
 let script_parser_json_source = null;

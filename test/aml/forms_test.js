@@ -7,7 +7,7 @@ const Form = require("../../src/aml/form");
 const Script = require("../../src/aml/script");
 const to_json = require("../../src/aml/script/to_json");
 const forms_full_name = path.join(__dirname, "forms_test.json");
-const scripts_path_full_name = path.join(__dirname, "forms_scripts");
+const scripts_path_full_name = path.join(__dirname, "forms_test");
 
 let form_source = {};
 let scripts = {};
