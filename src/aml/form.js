@@ -1,5 +1,6 @@
 const { RETURN_CODE } = require("./script/instruction/return_code");
 const Script = require("./script");
+const script_to_json = require("./script/to_json");
 const RulesManager = require("./rules_manager");
 
 const logger = require("../logger").create_logger({
@@ -52,16 +53,15 @@ class Form {
       return;
     }
 
-    const source = this._root.get_source(data);
+    this._root.get_source_async(data, (source) => {
+      const running_script = this._running_scripts[data.name];
+      if (running_script != null) {
+        if (running_script.get_id() === source.id) return;
+        else this._terminate_script(data.name);
+      }
 
-    const running_script = this._running_scripts[data.name];
-    if (running_script != null) {
-      if (running_script.get_id() === source.id) return;
-      else this._terminate_script(data.name);
-    }
-
-    this._run_script(data.name);
-    return;
+      this._run_script(data.name);
+    });
   }
 
   get_id() {
@@ -75,17 +75,18 @@ class Form {
   _run_script(name) {
     if (name in this._running_scripts) return;
 
-    try {
-      this._running_scripts[name] = new Script(
-        this._root,
-        this._root.get_source({ type: "script", name })
-      );
+    this._root.get_source_async({ type: "script", name }, (source) => {
+      try {
+        this._running_scripts[name] = new Script(this._root, source);
 
-      this._root.emit("script_run", name);
-    } catch (e) {
-      if (this._root.options.debug_enabled)
-        logger.debug(`Unable to run script name[${name}]. \n${e}\n${e.stack}`);
-    }
+        this._root.emit("script_run", name);
+      } catch (e) {
+        if (this._root.options.debug_enabled)
+          logger.debug(
+            `Unable to run script name[${name}]. \n${e}\n${e.stack}`
+          );
+      }
+    });
   }
 
   _terminate_script(name) {

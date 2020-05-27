@@ -110,7 +110,7 @@ class Script {
     if (!this.options.debug_enabled && !this._root.options.debug_enabled)
       return;
 
-    const { _debug_current_program } = this._root.system;
+    const { _debug_current_program } = this._root._system;
     const { _debug_current_form } = _debug_current_program;
 
     logger.debug(

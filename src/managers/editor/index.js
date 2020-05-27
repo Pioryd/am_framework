@@ -1,8 +1,6 @@
 const ObjectID = require("bson-objectid");
 const Ajv = require("ajv");
-const { Util } = require("../../util");
 const _ = require("lodash");
-const { unflatten } = require("flat");
 
 const { DB } = require("./db");
 
@@ -47,13 +45,13 @@ class Editor {
     return this.data_config[name].actions.includes(action);
   }
 
-  get_data(name, callback) {
+  get_data(name, callback, id) {
     if (!(name in this.data_config)) return;
 
     if ("manager" in this.data_config[name].db_data) {
-      this._manager_get_data(name, callback);
+      this._manager_get_data(name, callback, id);
     } else {
-      this._db_get_data(name, callback);
+      this._db_get_data(name, callback, id);
     }
   }
 
@@ -87,13 +85,26 @@ class Editor {
     return true;
   }
 
-  _db_get_data(name, callback) {
+  _db_get_data(name, callback, id) {
     const { db_data } = this.data_config[name];
     const key = db_data.url + db_data.name;
 
-    this.db_map[key].get_all_async(name, ({ error, results, objects_list }) => {
-      if (callback != null) callback(objects_list);
-    });
+    if (id != null) {
+      this.db_map[key].get_async(
+        name,
+        id,
+        ({ error, results, objects_list }) => {
+          if (callback != null) callback(objects_list);
+        }
+      );
+    } else {
+      this.db_map[key].get_all_async(
+        name,
+        ({ error, results, objects_list }) => {
+          if (callback != null) callback(objects_list);
+        }
+      );
+    }
   }
 
   _db_update_data({ action, object, name, old_id, new_id }, callback) {
@@ -181,11 +192,11 @@ class Editor {
 
   _db_process_data({ name, object }, callback) {}
 
-  _manager_get_data(name, callback) {
+  _manager_get_data(name, callback, id) {
     const db_manager = this.root_module.managers[
       this.data_config[name].db_data.manager
     ];
-    db_manager.editor_data(callback);
+    db_manager.editor_data(callback, id);
   }
 
   _manager_update_data({ action, object, name, old_id, new_id }, callback) {

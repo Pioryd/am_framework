@@ -38,9 +38,15 @@ class AdminScripts {
 
   poll() {}
 
-  editor_data(callback) {
+  editor_data(callback, id) {
     this.reload_scripts(() => {
-      callback(Object.values(this.get_scripts_map()));
+      if (id != null) {
+        callback(
+          Object.values(this.get_scripts_map()).find((el) => el.id === id)
+        );
+      } else {
+        callback(Object.values(this.get_scripts_map()));
+      }
     });
   }
 

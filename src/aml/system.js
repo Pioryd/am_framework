@@ -11,6 +11,7 @@ class System {
     this._source = source;
 
     this._running_programs = {};
+
     for (const name of this._source.programs)
       this.update({ type: "program", name });
 
@@ -38,22 +39,22 @@ class System {
       return;
     }
 
-    try {
-      const source = this._root.get_source(data);
+    this._root.get_source_async(data, (source) => {
+      try {
+        const running_program = this._running_programs[data.name];
+        if (running_program != null) {
+          if (running_program.get_id() === source.id) return;
+          else running_program.terminate();
+        }
 
-      const running_program = this._running_programs[data.name];
-      if (running_program != null) {
-        if (running_program.get_id() === source.id) return;
-        else running_program.terminate();
+        this._running_programs[data.name] = new Program(this._root, source);
+      } catch (e) {
+        if (this._root.options.debug_enabled)
+          logger.debug(
+            `Unable to run program name[${data.name}]. \n${e}\n${e.stack}`
+          );
       }
-
-      this._running_programs[data.name] = new Program(this._root, source);
-    } catch (e) {
-      if (this._root.options.debug_enabled)
-        logger.debug(
-          `Unable to run program name[${data.name}]. \n${e}\n${e.stack}`
-        );
-    }
+    });
   }
 
   get_id() {

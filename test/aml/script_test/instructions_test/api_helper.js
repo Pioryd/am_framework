@@ -39,14 +39,13 @@ class Helper {
       query_id,
       timeout,
       args
-    ) =>
-      this._process_api({ fn_full_name, script_id, query_id, timeout, args });
+    ) => this.process_api({ fn_full_name, script_id, query_id, timeout, args });
     this.root.generate_unique_id = () => {
       return "1";
     };
   }
 
-  _process_api({ fn_full_name, script_id, query_id, timeout, args }) {
+  process_api({ fn_full_name, script_id, query_id, timeout, args }) {
     let debug_fn = "Not found api fn";
     try {
       let api = null;

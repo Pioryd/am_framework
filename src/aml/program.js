@@ -43,15 +43,15 @@ class Program {
       return;
     }
 
-    const source = this._root.get_source(data);
+    this._root.get_source_async(data, (source) => {
+      const running_form = this._running_forms[data.name];
+      if (running_form != null) {
+        if (running_form.get_id() === source.id) return;
+        else this._terminate_form(data.name);
+      }
 
-    const running_form = this._running_forms[data.name];
-    if (running_form != null) {
-      if (running_form.get_id() === source.id) return;
-      else this._terminate_form(data.name);
-    }
-
-    this._run_form(data.name);
+      this._run_form(data.name);
+    });
   }
 
   get_id() {
@@ -65,22 +65,24 @@ class Program {
   _run_form(name) {
     if (name in this._running_forms) return;
 
-    try {
-      if (!this._source.forms.includes(name))
-        throw new Error(
-          `AML:Program[${this._source.id}] do not contains AML:Form name[${name}]`
+    this._root.get_source_async({ type: "form", name }, (source) => {
+      try {
+        if (!this._source.forms.includes(name))
+          throw new Error(
+            `AML:Program[${this._source.id}] do not contains AML:Form name[${name}]`
+          );
+
+        this._running_forms[name] = new Form(this._root, source);
+
+        this._root.emit(
+          "forms_count",
+          Object.values(this._running_forms).length
         );
-
-      this._running_forms[name] = new Form(
-        this._root,
-        this._root.get_source({ type: "form", name })
-      );
-
-      this._root.emit("forms_count", Object.values(this._running_forms).length);
-    } catch (e) {
-      if (this._root.options.debug_enabled)
-        logger.debug(`Unable to run form name[${name}]. \n${e}\n${e.stack}`);
-    }
+      } catch (e) {
+        if (this._root.options.debug_enabled)
+          logger.debug(`Unable to run form name[${name}]. \n${e}\n${e.stack}`);
+      }
+    });
   }
 
   _terminate_form(name) {
