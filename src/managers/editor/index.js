@@ -8,7 +8,7 @@ const logger = require("../../logger").create_logger({
   module_name: "am_framework",
   file_name: __filename
 });
-const { AML } = require("../../aml");
+const script_to_json = require("../../aml/script/to_json");
 
 const default_data_config = require("./default_data_config");
 
@@ -23,7 +23,7 @@ class Editor {
 
   validate(object, name) {
     if (this.data_config[name].validate === "script") {
-      AML.Script.parse(object.id, object.source);
+      script_to_json(object.id, object.source);
     } else {
       const rule = this.data_config[name].validate;
       const ajv = new Ajv({ allErrors: true });
