@@ -2,7 +2,7 @@ module.exports = {
   am_form: {
     db_data: { url: "mongodb://127.0.0.1:27017", name: "am_data" },
     actions: ["data", "update"],
-    init: { id: "", rules: [], scripts: [] },
+    init: { id: "", name: "", rules: [], scripts: [] },
     validate: {
       properties: {
         id: {
@@ -43,7 +43,7 @@ module.exports = {
   am_program: {
     db_data: { url: "mongodb://127.0.0.1:27017", name: "am_data" },
     actions: ["data", "update"],
-    init: { id: "", rules: [], forms: [] },
+    init: { id: "", name: "", rules: [], forms: [] },
     validate: {
       properties: {
         id: {
@@ -76,15 +76,15 @@ module.exports = {
             type: "string"
           }
         }
-      }
-    },
-    required: ["id", "name", "rules", "forms"],
-    additionalProperties: false
+      },
+      required: ["id", "name", "rules", "forms"],
+      additionalProperties: false
+    }
   },
   am_system: {
     db_data: { url: "mongodb://127.0.0.1:27017", name: "am_data" },
     actions: ["data", "update"],
-    init: { id: "", programs: [] },
+    init: { id: "", name: "", programs: [] },
     validate: {
       properties: {
         id: {
