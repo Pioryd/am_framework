@@ -112,6 +112,12 @@ class Form {
           `Unknown action[${action_name}] of form ID[${this.get_id()}]`
         );
       }
+
+      if (this._root.options.debug_enabled) {
+        logger.debug(
+          `Action [${action_name}] -> [${JSON.stringify(action_value)}]`
+        );
+      }
     }
   }
 }
