@@ -21,9 +21,16 @@ class AppModule extends EventEmitter {
   }
 
   // The order is important for logic
-  setup_managers({ managers, order }) {
+  setup_managers({ managers, order, black_list }) {
     // this.managers is used before setup_managers, object cannot be overwritten
     for (const [key, value] of Object.entries(managers)) {
+      if (black_list != null && black_list.includes(key)) {
+        logger.info(`Manager name [${key}] is blacklisted.`);
+        order.initialize = order.initialize.filter((e) => e !== key);
+        order.terminate = order.initialize.filter((e) => e !== key);
+        order.poll = order.initialize.filter((e) => e !== key);
+        continue;
+      }
       if (!order.initialize.includes(key))
         throw new Error(`Order[initialize] not include manager[${key}]`);
       if (!order.terminate.includes(key))

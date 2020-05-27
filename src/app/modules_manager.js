@@ -110,7 +110,8 @@ class ModulesManager {
       }
       app_module.setup_managers({
         managers,
-        order: module_schema.managers_order
+        order: module_schema.managers_order,
+        black_list: module_schema.managers_blacklist
       });
 
       this.modules_map[module_name] = app_module;
