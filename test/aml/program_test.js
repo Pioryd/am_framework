@@ -8,9 +8,9 @@ const programs_full_name = path.join(__dirname, "program_test.json");
 
 let source = {};
 const root = new Root();
-root.get_source = ({ type, name }) => {
-  if (type === "form") return source.forms[name];
-  else if (type === "program") return source.programs[name];
+root.get_source_async = ({ type, name }, callback) => {
+  if (type === "form") callback(source.forms[name]);
+  else if (type === "program") callback(source.programs[name]);
 };
 
 describe("Program test", () => {

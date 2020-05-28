@@ -9,9 +9,9 @@ const system_full_name = path.join(__dirname, "system_test.json");
 let system_test_json = {};
 let source = {};
 const root = new Root();
-root.get_source = ({ type, name }) => {
-  if (type === "system") return source.systems[name];
-  else if (type === "program") return source.programs[name];
+root.get_source_async = ({ type, name }, callback) => {
+  if (type === "system") callback(source.systems[name]);
+  else if (type === "program") callback(source.programs[name]);
 };
 describe("System test", () => {
   before(() => {
@@ -23,6 +23,6 @@ describe("System test", () => {
     const system = new System(root, source.systems["Name_Test_system"]);
 
     expect(system.get_id()).to.equal("ID_Test_system");
-    expect(Object.values(system._programs).length).to.equal(1);
+    expect(Object.values(system._running_programs).length).to.equal(1);
   });
 });

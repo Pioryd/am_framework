@@ -13,8 +13,8 @@ let form_source = {};
 let scripts = {};
 
 const root = new Root();
-root.get_source = ({ type, name }) => {
-  return scripts[name];
+root.get_source_async = ({ type, name }, callback) => {
+  callback(scripts[name]);
 };
 
 describe("Forms test", () => {

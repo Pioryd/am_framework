@@ -1,6 +1,6 @@
 const { RETURN_CODE } = require("./script/instruction/return_code");
 const Script = require("./script");
-const script_to_json = require("./script/to_json");
+
 const RulesManager = require("./rules_manager");
 
 const logger = require("../logger").create_logger({
@@ -90,6 +90,7 @@ class Form {
   }
 
   _terminate_script(name) {
+    this._running_scripts[name].terminate();
     delete this._running_scripts[name];
     this._root.emit("script_processed", name);
   }
