@@ -93,11 +93,6 @@
           }
         ]
       }
-    ],
-    "scripts": [
-      "Name_test_script_N1",
-      "Name_test_script_N2",
-      "Name_test_script_N3"
     ]
   }
 }

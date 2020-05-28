@@ -3,8 +3,7 @@
     "ID_system_0": {
       "id": "ID_system_0",
       "name": "Name_system",
-      "rules": [],
-      "programs": ["Name_program_NONE"]
+      "rules": []
     },
     "ID_system_1": {
       "id": "ID_system_1",
@@ -22,16 +21,14 @@
             }
           ]
         }
-      ],
-      "programs": ["Name_program"]
+      ]
     }
   },
   "program": {
     "ID_program_0": {
       "id": "ID_program_0",
       "name": "Name_program",
-      "rules": [],
-      "forms": ["Name_form_NONE"]
+      "rules": []
     },
     "ID_program_1": {
       "id": "ID_program_1",
@@ -49,16 +46,14 @@
             }
           ]
         }
-      ],
-      "forms": ["Name_form"]
+      ]
     }
   },
   "form": {
     "ID_form_0": {
       "id": "ID_form_0",
       "name": "Name_form",
-      "rules": [],
-      "scripts": ["Name_script_NONE"]
+      "rules": []
     },
     "ID_form_1": {
       "id": "ID_form_1",
@@ -76,8 +71,7 @@
             }
           ]
         }
-      ],
-      "scripts": ["Name_script"]
+      ]
     }
   },
   "script": {

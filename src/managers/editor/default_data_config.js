@@ -2,7 +2,7 @@ module.exports = {
   am_form: {
     db_data: { url: "mongodb://127.0.0.1:27017", name: "am_data" },
     actions: ["data", "update"],
-    init: { id: "", name: "", rules: [], scripts: [] },
+    init: { id: "", name: "", rules: [] },
     validate: {
       properties: {
         id: {
@@ -28,22 +28,16 @@ module.exports = {
             },
             additionalProperties: false
           }
-        },
-        scripts: {
-          type: "array",
-          items: {
-            type: "string"
-          }
         }
       },
-      required: ["id", "name", "rules", "scripts"],
+      required: ["id", "name", "rules"],
       additionalProperties: false
     }
   },
   am_program: {
     db_data: { url: "mongodb://127.0.0.1:27017", name: "am_data" },
     actions: ["data", "update"],
-    init: { id: "", name: "", rules: [], forms: [] },
+    init: { id: "", name: "", rules: [] },
     validate: {
       properties: {
         id: {
@@ -69,22 +63,16 @@ module.exports = {
             },
             additionalProperties: false
           }
-        },
-        forms: {
-          type: "array",
-          items: {
-            type: "string"
-          }
         }
       },
-      required: ["id", "name", "rules", "forms"],
+      required: ["id", "name", "rules"],
       additionalProperties: false
     }
   },
   am_system: {
     db_data: { url: "mongodb://127.0.0.1:27017", name: "am_data" },
     actions: ["data", "update"],
-    init: { id: "", name: "", programs: [] },
+    init: { id: "", name: "", rules: [] },
     validate: {
       properties: {
         id: {
@@ -93,14 +81,26 @@ module.exports = {
         name: {
           type: "string"
         },
-        programs: {
+        rules: {
           type: "array",
           items: {
-            type: "string"
+            type: "object",
+            properties: {
+              type: {
+                type: "string"
+              },
+              triggers: {
+                type: "array"
+              },
+              actions: {
+                type: "array"
+              }
+            },
+            additionalProperties: false
           }
         }
       },
-      required: ["id", "name", "programs"],
+      required: ["id", "name", "rules"],
       additionalProperties: false
     }
   },

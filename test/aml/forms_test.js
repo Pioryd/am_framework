@@ -21,7 +21,11 @@ describe("Forms test", () => {
   before(() => {
     form_source = Util.read_from_json(forms_full_name)["ID_Test_1"];
 
-    for (const scripts_name of form_source.scripts) {
+    for (const scripts_name of [
+      "Name_test_script_N1",
+      "Name_test_script_N2",
+      "Name_test_script_N3"
+    ]) {
       scripts[scripts_name] = to_json(
         `ID_${scripts_name}`,
         fs.readFileSync(

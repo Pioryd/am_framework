@@ -16,8 +16,7 @@
             }
           ]
         }
-      ],
-      "programs": ["Name_Test_program"]
+      ]
     }
   },
   "programs": {
@@ -26,8 +25,7 @@
       "name": "Name_Test_program",
       "rules": [],
       "signals": [],
-      "events": [],
-      "forms": []
+      "events": []
     }
   }
 }

@@ -24,6 +24,5 @@ describe("Program test", () => {
 
     expect(program.get_id()).to.equal("ID_Test_1");
     expect(program._source.rules.length).to.equal(4);
-    expect(program._source.forms.length).to.equal(2);
   });
 });

@@ -67,11 +67,6 @@ class Program {
 
     this._root.get_source_async({ type: "form", name }, (source) => {
       try {
-        if (!this._source.forms.includes(name))
-          throw new Error(
-            `AML:Program[${this._source.id}] do not contains AML:Form name[${name}]`
-          );
-
         this._running_forms[name] = new Form(this._root, source);
 
         this._root.emit(
