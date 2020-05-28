@@ -24,7 +24,7 @@ class Form {
     );
     this._rules_manager.parse(this._source.rules);
 
-    this._root.emit("form_init", this.get_name());
+    this._root.emit("form_initialize", this.get_name());
   }
 
   terminate() {
@@ -33,6 +33,8 @@ class Form {
 
     this._running_scripts = {};
     this._rules_manager.terminate();
+
+    this._root.emit("form_terminate", this.get_name());
   }
 
   process() {
@@ -42,6 +44,8 @@ class Form {
       if (return_value.return_code === RETURN_CODE.PROCESSED)
         this._terminate_script(script.get_name());
     }
+
+    this._root.emit("form_process", this.get_name());
 
     return { return_code: RETURN_CODE.PROCESSED };
   }
@@ -78,8 +82,6 @@ class Form {
     this._root.get_source_async({ type: "script", name }, (source) => {
       try {
         this._running_scripts[name] = new Script(this._root, source);
-
-        this._root.emit("script_run", name);
       } catch (e) {
         if (this._root.options.debug_enabled)
           logger.debug(
@@ -92,7 +94,6 @@ class Form {
   _terminate_script(name) {
     this._running_scripts[name].terminate();
     delete this._running_scripts[name];
-    this._root.emit("script_processed", name);
   }
 
   _process_actions(actions, value) {
@@ -100,14 +101,10 @@ class Form {
       const action_name = Object.keys(action)[0];
       const action_value = action[action_name];
 
-      if (action_name === "script_run") {
+      if (action_name === "script_initialize") {
         this._run_script(action_value.value);
       } else if (action_name === "script_terminate") {
         this._terminate_script(action_value.value);
-      } else if (action_name === "script_set_data") {
-        this._running_scripts[action_value.script].data[
-          action_value.data
-        ] = value;
       } else {
         throw new Error(
           `Unknown action[${action_name}] of form ID[${this.get_id()}]`

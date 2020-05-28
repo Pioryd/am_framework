@@ -12,12 +12,12 @@
         {
           "triggers": [
             {
-              "system_init": { "value": "Name_system" }
+              "system_initialize": { "value": "Name_system" }
             }
           ],
           "actions": [
             {
-              "program_run": { "value": "Name_program" }
+              "program_initialize": { "value": "Name_program" }
             }
           ]
         }
@@ -37,12 +37,12 @@
         {
           "triggers": [
             {
-              "forms_count": { "value": 0 }
+              "program_initialize": { "value": "Name_program" }
             }
           ],
           "actions": [
             {
-              "form_run": { "value": "Name_form" }
+              "form_initialize": { "value": "Name_form" }
             }
           ]
         }
@@ -62,12 +62,12 @@
         {
           "triggers": [
             {
-              "form_init": { "value": "Name_form" }
+              "form_initialize": { "value": "Name_form" }
             }
           ],
           "actions": [
             {
-              "script_run": { "value": "Name_script" }
+              "script_initialize": { "value": "Name_script" }
             }
           ]
         }

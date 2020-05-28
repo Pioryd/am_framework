@@ -20,13 +20,14 @@ class Program {
     );
     this._rules_manager.parse(this._source.rules);
 
-    this._root.emit("forms_count", Object.values(this._running_forms).length);
+    this._root.emit("program_initialize", this.get_name());
   }
 
   terminate() {
     for (const form of Object.values(this._running_forms)) form.terminate();
     this._running_forms = {};
     this._rules_manager.terminate();
+    this._root.emit("program_terminate", this.get_name());
   }
 
   process() {
@@ -34,7 +35,7 @@ class Program {
       this._debug_current_form = form;
       form.process();
     }
-    this._root.emit("forms_count", Object.values(this._running_forms).length);
+    this._root.emit("program_process", this.get_name());
   }
 
   update(data) {
@@ -68,11 +69,6 @@ class Program {
     this._root.get_source_async({ type: "form", name }, (source) => {
       try {
         this._running_forms[name] = new Form(this._root, source);
-
-        this._root.emit(
-          "forms_count",
-          Object.values(this._running_forms).length
-        );
       } catch (e) {
         if (this._root.options.debug_enabled)
           logger.debug(`Unable to run form name[${name}]. \n${e}\n${e.stack}`);
@@ -86,8 +82,6 @@ class Program {
 
     form.terminate();
     delete this._running_forms[name];
-
-    this._root.emit("forms_count", Object.values(this._running_forms).length);
   }
 
   _process_actions(actions, value) {
@@ -95,13 +89,13 @@ class Program {
       const action_name = Object.keys(action)[0];
       const action_value = action[action_name];
 
-      if (action_name === "form_run") {
+      if (action_name === "form_initialize") {
         this._run_form(action_value.value);
       } else if (action_name === "form_terminate") {
         this._terminate_form(action_value.value);
       } else {
         throw new Error(
-          `Unknown action[${action_name}] of AML:Program id[${this.get_id()}]`
+          `Unknown action[${action_name}] of program id[${this.get_id()}]`
         );
       }
 

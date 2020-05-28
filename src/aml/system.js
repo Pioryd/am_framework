@@ -22,13 +22,14 @@ class System {
 
     this._debug_current_program = null;
 
-    this._root.emit("system_init", this.get_name());
+    this._root.emit("system_initialize", this.get_name());
   }
 
   terminate() {
     for (const program of Object.values(this._running_programs))
       if (program != null) program.terminate();
     this._running_programs = {};
+    this._root.emit("system_terminate", this.get_name());
   }
 
   process() {
@@ -37,6 +38,7 @@ class System {
       this._debug_current_program = program;
       program.process();
     }
+    this._root.emit("system_process", this.get_name());
   }
 
   update(data) {
@@ -79,7 +81,6 @@ class System {
   _terminate_program() {
     this._running_programs[name].terminate();
     delete this._running_programs[name];
-    this._root.emit("program_terminated", name);
   }
 
   _process_actions(actions, value) {
@@ -87,7 +88,7 @@ class System {
       const action_name = Object.keys(action)[0];
       const action_value = action[action_name];
 
-      if (action_name === "program_run") {
+      if (action_name === "program_initialize") {
         this._run_program(action_value.value);
       } else if (action_name === "program_terminate") {
         this._terminate_program(action_value.value);

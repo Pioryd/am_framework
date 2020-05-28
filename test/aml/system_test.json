@@ -7,12 +7,12 @@
         {
           "triggers": [
             {
-              "system_init": { "value": "Name_Test_system" }
+              "system_initialize": { "value": "Name_Test_system" }
             }
           ],
           "actions": [
             {
-              "program_run": { "value": "Name_Test_program" }
+              "program_initialize": { "value": "Name_Test_program" }
             }
           ]
         }

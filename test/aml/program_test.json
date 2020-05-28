@@ -7,12 +7,12 @@
         {
           "triggers": [
             {
-              "forms_count": { "value": 0 }
+              "program_initialize": { "value": "Name_Test_1" }
             }
           ],
           "actions": [
             {
-              "form_run": { "value": "Name_Test_form_1" }
+              "form_initialize": { "value": "Name_Test_form_1" }
             }
           ]
         },
@@ -24,7 +24,7 @@
           ],
           "actions": [
             {
-              "form_run": { "value": "Name_Test_form_2" }
+              "form_initialize": { "value": "Name_Test_form_2" }
             }
           ]
         },

@@ -42,7 +42,7 @@ describe("Forms test", () => {
     const form = new Form(root, form_source);
 
     expect(form.get_id()).to.equal("ID_Test_1");
-    expect(form._source.rules.length).to.equal(7);
+    expect(form._source.rules.length).to.equal(6);
     expect(Object.keys(form._running_scripts).length).to.equal(1);
   });
   it("Process", () => {
@@ -108,10 +108,5 @@ describe("Forms test", () => {
     expect(Object.keys(form._running_scripts).length).to.equal(1);
     root.emit("stres", 85);
     expect(Object.keys(form._running_scripts).length).to.equal(0);
-
-    // script_set_data
-    root.emit("choice", 10);
-    expect(Object.keys(form._running_scripts).length).to.equal(1);
-    expect(form._running_scripts["Name_test_script_N2"].data.val).to.equal(10);
   });
 });

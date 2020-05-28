@@ -24,11 +24,17 @@ class Script {
     this._timeout_list = { instructions: {}, return_data_list: [] };
 
     this.options = { debug_enabled: false };
+
+    this._root.emit("script_initialize", this.get_name());
   }
 
-  terminate() {}
+  terminate() {
+    this._root.emit("script_terminate", this.get_name());
+  }
 
   process() {
+    this._root.emit("script_process", this.get_name());
+
     this.print_debug();
 
     this._check_return_data();

@@ -3,7 +3,7 @@ const path = require("path");
 const { Util } = require("../../src/util");
 const Root = require("../../src/aml/root");
 
-const DEBUG_ENABLED = true;
+const DEBUG_ENABLED = false;
 const source_full_name = path.join(__dirname, "update_test.json");
 
 let source = {};
