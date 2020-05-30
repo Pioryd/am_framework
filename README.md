@@ -1,7 +1,5 @@
 # Artificial Mind Framework
 
-![Web Client GUI](https://github.com/Pioryd/am_framework/blob/master/.github/web_client.png)
-
 ## Install
 
 ```powershell
