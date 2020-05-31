@@ -24,7 +24,7 @@ require("am_framework").run_app(__dirname);
 
 ## More
 
-- [Documentation](https://pioryd.github.io/)
+- Documentation(soon)
 - [Tutorials](https://pioryd.github.io/)
 
 ## More informations at [Artificial Mind](https://pioryd.github.io/)
