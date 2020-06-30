@@ -30,7 +30,7 @@ describe("Update test", () => {
     root.source_ids = {
       system: { Name_system: "ID_system_0" },
       program: { Name_program: "ID_program_0" },
-      form: { Name_form: "ID_form_0" },
+      module: { Name_module: "ID_module_0" },
       script: { Name_script: "ID_script_0" }
     };
     root.update("system", source.system["ID_system_0"]);
@@ -44,7 +44,7 @@ describe("Update test", () => {
       root.source_ids = {
         system: { Name_system: "ID_system_0" },
         program: { Name_program: "ID_program_0" },
-        form: { Name_form: "ID_form_0" },
+        module: { Name_module: "ID_module_0" },
         script: { Name_script: "ID_script_0" }
       };
       root.update("system", source.system["ID_system_0"]);
@@ -60,19 +60,19 @@ describe("Update test", () => {
       root.source_ids = {
         system: { Name_system: "ID_system_1" },
         program: { Name_program: "ID_program_1" },
-        form: { Name_form: "ID_form_1" },
+        module: { Name_module: "ID_module_1" },
         script: { Name_script: "ID_script_1" }
       };
       root.update("system", source.system["ID_system_1"]);
 
       const { _running_programs } = root._system;
-      const { _running_forms } = _running_programs["Name_program"];
-      const { _running_scripts } = _running_forms["Name_form"];
+      const { _running_modules } = _running_programs["Name_program"];
+      const { _running_scripts } = _running_modules["Name_module"];
 
       expect(Object.keys(_running_programs).length).to.equal(1);
       expect(Object.keys(_running_programs)[0]).to.equal("Name_program");
-      expect(Object.keys(_running_forms).length).to.equal(1);
-      expect(Object.keys(_running_forms)[0]).to.equal("Name_form");
+      expect(Object.keys(_running_modules).length).to.equal(1);
+      expect(Object.keys(_running_modules)[0]).to.equal("Name_module");
       expect(Object.keys(_running_scripts).length).to.equal(1);
       expect(Object.keys(_running_scripts)[0]).to.equal("Name_script");
     }
@@ -84,27 +84,27 @@ describe("Update test", () => {
     root.source_ids = {
       system: { Name_system: "ID_system_1" },
       program: { Name_program: "ID_program_1" },
-      form: { Name_form: "ID_form_1" },
+      module: { Name_module: "ID_module_1" },
       script: { Name_script: "ID_script_1" }
     };
     root.update("system", source.system["ID_system_1"]);
 
     const { _running_programs } = root._system;
-    const { _running_forms } = _running_programs["Name_program"];
-    const { _running_scripts } = _running_forms["Name_form"];
+    const { _running_modules } = _running_programs["Name_program"];
+    const { _running_scripts } = _running_modules["Name_module"];
 
     aml_data_index = 0;
     root.source_ids = {
       system: { Name_system: "ID_system_0" },
       program: { Name_program: "ID_program_0" },
-      form: { Name_form: "ID_form_0" },
+      module: { Name_module: "ID_module_0" },
       script: { Name_script: "ID_script_0" }
     };
 
     root.update("script", source.script["ID_script_0"]);
     expect(Object.values(_running_scripts)[0].get_id()).to.equal("ID_script_0");
-    root.update("form", source.form["ID_form_0"]);
-    expect(Object.values(_running_forms)[0].get_id()).to.equal("ID_form_0");
+    root.update("module", source.module["ID_module_0"]);
+    expect(Object.values(_running_modules)[0].get_id()).to.equal("ID_module_0");
     root.update("program", source.program["ID_program_0"]);
     expect(Object.values(_running_programs)[0].get_id()).to.equal(
       "ID_program_0"

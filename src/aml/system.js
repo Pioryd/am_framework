@@ -94,7 +94,7 @@ class System {
         this._terminate_program(action_value.value);
       } else {
         throw new Error(
-          `Unknown action[${action_name}] of form ID[${this.get_id()}]`
+          `Unknown action[${action_name}] of module ID[${this.get_id()}]`
         );
       }
 

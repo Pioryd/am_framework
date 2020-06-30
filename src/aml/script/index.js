@@ -117,13 +117,13 @@ class Script {
       return;
 
     const { _debug_current_program } = this._root._system;
-    const { _debug_current_form } = _debug_current_program;
+    const { _debug_current_module } = _debug_current_program;
 
     logger.debug(
       `Program [${_debug_current_program.get_id()}` +
         `/${_debug_current_program.get_id()}]` +
-        `->Form name[${_debug_current_form.get_name()}` +
-        `/${_debug_current_form.get_id()}]` +
+        `->Module name[${_debug_current_module.get_name()}` +
+        `/${_debug_current_module.get_id()}]` +
         `->Script name:[${this.get_name()}/${this.get_id()}]` +
         (line_number != null ? `Line[${line_number}]` : `start process`)
     );

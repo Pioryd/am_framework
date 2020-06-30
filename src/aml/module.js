@@ -8,13 +8,13 @@ const logger = require("../logger").create_logger({
   file_name: __filename
 });
 
-class Form {
+class Module {
   constructor(root, source) {
     this._root = root;
     this._source = source;
 
     this._running_scripts = {};
-    this._debug_current_form = null;
+    this._debug_current_module = null;
 
     this._rules_manager = new RulesManager(
       this._root._event_emitter,
@@ -24,7 +24,7 @@ class Form {
     );
     this._rules_manager.parse(this._source.rules);
 
-    this._root.emit("form_initialize", this.get_name());
+    this._root.emit("module_initialize", this.get_name());
   }
 
   terminate() {
@@ -34,7 +34,7 @@ class Form {
     this._running_scripts = {};
     this._rules_manager.terminate();
 
-    this._root.emit("form_terminate", this.get_name());
+    this._root.emit("module_terminate", this.get_name());
   }
 
   process() {
@@ -45,7 +45,7 @@ class Form {
         this._terminate_script(script.get_name());
     }
 
-    this._root.emit("form_process", this.get_name());
+    this._root.emit("module_process", this.get_name());
 
     return { return_code: RETURN_CODE.PROCESSED };
   }
@@ -107,7 +107,7 @@ class Form {
         this._terminate_script(action_value.value);
       } else {
         throw new Error(
-          `Unknown action[${action_name}] of form ID[${this.get_id()}]`
+          `Unknown action[${action_name}] of module ID[${this.get_id()}]`
         );
       }
 
@@ -120,4 +120,4 @@ class Form {
   }
 }
 
-module.exports = Form;
+module.exports = Module;

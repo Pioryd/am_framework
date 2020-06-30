@@ -20,7 +20,7 @@ class Root {
 
     // TODO
     // Cleanup source_ids
-    this.source_ids = { system: {}, program: {}, form: {}, script: {} };
+    this.source_ids = { system: {}, program: {}, module: {}, script: {} };
 
     // Data set by update functions
     this.process_api = () => logger.error("Not set process_api");

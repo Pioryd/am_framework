@@ -42,27 +42,27 @@
           ],
           "actions": [
             {
-              "form_initialize": { "value": "Name_form" }
+              "module_initialize": { "value": "Name_module" }
             }
           ]
         }
       ]
     }
   },
-  "form": {
-    "ID_form_0": {
-      "id": "ID_form_0",
-      "name": "Name_form",
+  "module": {
+    "ID_module_0": {
+      "id": "ID_module_0",
+      "name": "Name_module",
       "rules": []
     },
-    "ID_form_1": {
-      "id": "ID_form_1",
-      "name": "Name_form",
+    "ID_module_1": {
+      "id": "ID_module_1",
+      "name": "Name_module",
       "rules": [
         {
           "triggers": [
             {
-              "form_initialize": { "value": "Name_form" }
+              "module_initialize": { "value": "Name_module" }
             }
           ],
           "actions": [

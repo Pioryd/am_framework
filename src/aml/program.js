@@ -1,5 +1,5 @@
 const RulesManager = require("./rules_manager");
-const Form = require("./form");
+const Module = require("./module");
 
 const logger = require("../logger").create_logger({
   module_name: "am_framework",
@@ -11,7 +11,7 @@ class Program {
     this._root = root;
     this._source = source;
 
-    this._running_forms = {};
+    this._running_modules = {};
     this._rules_manager = new RulesManager(
       this._root._event_emitter,
       (...args) => {
@@ -24,34 +24,36 @@ class Program {
   }
 
   terminate() {
-    for (const form of Object.values(this._running_forms)) form.terminate();
-    this._running_forms = {};
+    for (const module of Object.values(this._running_modules))
+      module.terminate();
+    this._running_modules = {};
     this._rules_manager.terminate();
     this._root.emit("program_terminate", this.get_name());
   }
 
   process() {
-    for (const form of Object.values(this._running_forms)) {
-      this._debug_current_form = form;
-      form.process();
+    for (const module of Object.values(this._running_modules)) {
+      this._debug_current_module = module;
+      module.process();
     }
     this._root.emit("program_process", this.get_name());
   }
 
   update(data) {
-    if (data.type !== "form") {
-      for (const form of Object.values(this._running_forms)) form.update(data);
+    if (data.type !== "module") {
+      for (const module of Object.values(this._running_modules))
+        module.update(data);
       return;
     }
 
     this._root.get_source_async(data, (source) => {
-      const running_form = this._running_forms[data.name];
-      if (running_form != null) {
-        if (running_form.get_id() === source.id) return;
-        else this._terminate_form(data.name);
+      const running_module = this._running_modules[data.name];
+      if (running_module != null) {
+        if (running_module.get_id() === source.id) return;
+        else this._terminate_module(data.name);
       }
 
-      this._run_form(data.name);
+      this._run_module(data.name);
     });
   }
 
@@ -63,25 +65,27 @@ class Program {
     return this._source.name;
   }
 
-  _run_form(name) {
-    if (name in this._running_forms) return;
+  _run_module(name) {
+    if (name in this._running_modules) return;
 
-    this._root.get_source_async({ type: "form", name }, (source) => {
+    this._root.get_source_async({ type: "module", name }, (source) => {
       try {
-        this._running_forms[name] = new Form(this._root, source);
+        this._running_modules[name] = new Module(this._root, source);
       } catch (e) {
         if (this._root.options.debug_enabled)
-          logger.debug(`Unable to run form name[${name}]. \n${e}\n${e.stack}`);
+          logger.debug(
+            `Unable to run module name[${name}]. \n${e}\n${e.stack}`
+          );
       }
     });
   }
 
-  _terminate_form(name) {
-    const form = this._running_forms[name];
-    if (form == null) return;
+  _terminate_module(name) {
+    const module = this._running_modules[name];
+    if (module == null) return;
 
-    form.terminate();
-    delete this._running_forms[name];
+    module.terminate();
+    delete this._running_modules[name];
   }
 
   _process_actions(actions, value) {
@@ -89,10 +93,10 @@ class Program {
       const action_name = Object.keys(action)[0];
       const action_value = action[action_name];
 
-      if (action_name === "form_initialize") {
-        this._run_form(action_value.value);
-      } else if (action_name === "form_terminate") {
-        this._terminate_form(action_value.value);
+      if (action_name === "module_initialize") {
+        this._run_module(action_value.value);
+      } else if (action_name === "module_terminate") {
+        this._terminate_module(action_value.value);
       } else {
         throw new Error(
           `Unknown action[${action_name}] of program id[${this.get_id()}]`

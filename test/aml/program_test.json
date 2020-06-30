@@ -12,7 +12,7 @@
           ],
           "actions": [
             {
-              "form_initialize": { "value": "Name_Test_form_1" }
+              "module_initialize": { "value": "Name_Test_module_1" }
             }
           ]
         },
@@ -24,7 +24,7 @@
           ],
           "actions": [
             {
-              "form_initialize": { "value": "Name_Test_form_2" }
+              "module_initialize": { "value": "Name_Test_module_2" }
             }
           ]
         },
@@ -36,7 +36,7 @@
           ],
           "actions": [
             {
-              "form_terminate": { "value": "Name_Test_form_1" }
+              "module_terminate": { "value": "Name_Test_module_1" }
             }
           ]
         },
@@ -48,24 +48,24 @@
           ],
           "actions": [
             {
-              "form_terminate": { "value": "unknown_form" }
+              "module_terminate": { "value": "unknown_module" }
             }
           ]
         }
       ]
     }
   },
-  "forms": {
-    "Name_Test_form_1": {
-      "id": "ID_Test_form_1",
-      "name": "Name_Test_form_1",
+  "modules": {
+    "Name_Test_module_1": {
+      "id": "ID_Test_module_1",
+      "name": "Name_Test_module_1",
       "rules": [],
       "signals": [],
       "events": []
     },
-    "Name_Test_form_2": {
-      "id": "ID_Test_form_2",
-      "name": "Name_Test_form_2",
+    "Name_Test_module_2": {
+      "id": "ID_Test_module_2",
+      "name": "Name_Test_module_2",
       "rules": [],
       "signals": [],
       "events": []
