@@ -1,5 +1,5 @@
 module.exports = {
-  am_form: {
+  am_module: {
     db_data: { url: "mongodb://127.0.0.1:27017", name: "am_data" },
     actions: ["data", "update"],
     init: { id: "", name: "", rules: [] },
