@@ -20,7 +20,7 @@ describe("Program test", () => {
     source.programs = program_test_json.programs;
   });
   it("Parse", () => {
-    const program = new Program(root, source.programs["ID_Test_1"]);
+    const program = new Program(root, source.programs["ID_Test_1"], {});
 
     expect(program.get_id()).to.equal("ID_Test_1");
     expect(program._source.rules.length).to.equal(4);

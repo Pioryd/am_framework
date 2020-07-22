@@ -21,7 +21,13 @@ class Helper {
 
   get_script(options) {
     this.options = options;
-    return new Script(this.root, this.scripts[this.options.id]);
+    return new Script(this.root, this.scripts[this.options.id], {
+      _parent: {
+        _parent: { _parent: { get_id: () => {} }, get_id: () => {} },
+        get_id: () => {}
+      },
+      get_id: () => {}
+    });
   }
 
   manual_poll() {
@@ -33,32 +39,27 @@ class Helper {
   _setup_root() {
     this.root = new Root();
 
-    this.root.process_api = (
-      fn_full_name,
-      script_id,
-      query_id,
-      timeout,
-      args
-    ) => this.process_api({ fn_full_name, script_id, query_id, timeout, args });
+    this.root.process_api = (fn_full_name, aml, query_id, timeout, args) =>
+      this.process_api({ fn_full_name, aml, query_id, timeout, args });
     this.root.generate_unique_id = () => {
       return "1";
     };
   }
 
-  process_api({ fn_full_name, script_id, query_id, timeout, args }) {
+  process_api({ fn_full_name, aml, query_id, timeout, args }) {
     let debug_fn = "Not found api fn";
     try {
       let api = null;
       eval(`api = this.api.${fn_full_name}`);
       if (api == null) throw new Error(`API[${fn_full_name}] not found`);
 
-      api({ fn_full_name, script_id, query_id, timeout, args });
+      api({ fn_full_name, aml, query_id, timeout, args });
     } catch (e) {
       console.error(
         `API - unable to call function(${e.message}): ${debug_fn.toString()}.` +
           ` Args[${JSON.stringify({
             fn_full_name,
-            script_id,
+            aml,
             query_id,
             timeout,
             args
@@ -70,7 +71,7 @@ class Helper {
 
   _setup_api() {
     this.api = {
-      add_min_max: ({ fn_full_name, script_id, query_id, timeout, args }) => {
+      add_min_max: ({ fn_full_name, aml, query_id, timeout, args }) => {
         if (this.options.receive_lock) return;
 
         // Send -> "process_api" (From MAM to ServerApi)
@@ -78,10 +79,10 @@ class Helper {
         // Server api -> remote (From ServerApi to MAM)
         const value = args.min + args.max;
         // Parse -> "process_api" (MAM)
-        //const { script_id, query_id, value } = data;
+        //const { aml, query_id, value } = data;
 
         const received_data = {
-          script_id,
+          aml,
           query_id,
           value
         };

@@ -8,9 +8,12 @@ const logger = require("../../logger").create_logger({
 });
 
 class Script {
-  constructor(root, source) {
+  constructor(root, source, parent) {
+    if (parent == null) throw new Error("Parent is null.");
+
     this._root = root;
     this._source = source;
+    this._parent = parent;
 
     this._root_scope = parse_instruction(this, this._source.root_scope);
     this.data = JSON.parse(JSON.stringify(this._source.data));
@@ -138,7 +141,12 @@ class Script {
   }
 
   _check_return_data() {
-    const received_return_data_list = this._root.return_data.pop(this.get_id());
+    const received_return_data_list = this._root.return_data.pop({
+      script: this.get_id(),
+      module: this._parent.get_id(),
+      program: this._parent._parent.get_id(),
+      system: this._parent._parent._parent.get_id()
+    });
 
     for (const received_return_data of received_return_data_list) {
       const script_return_data = this._timeout_list.return_data_list[

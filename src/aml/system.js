@@ -68,7 +68,7 @@ class System {
           else running_program.terminate();
         }
 
-        this._running_programs[name] = new Program(this._root, source);
+        this._running_programs[name] = new Program(this._root, source, this);
       } catch (e) {
         if (this._root.options.debug_enabled)
           logger.debug(

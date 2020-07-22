@@ -16,12 +16,26 @@ root.generate_unique_id = () => {
 };
 let scripts_source = {};
 
+function get_scripts_parent() {
+  return {
+    _parent: {
+      _parent: { _parent: { get_id: () => {} }, get_id: () => {} },
+      get_id: () => {}
+    },
+    get_id: () => {}
+  };
+}
+
 describe("Scripting system test", () => {
   before(() => {
     scripts_source = Util.read_from_json(scripts_full_name);
   });
   it("Test instruction - JS", () => {
-    const script = new Script(root, scripts_source["ID_Test_js"]);
+    const script = new Script(
+      root,
+      scripts_source["ID_Test_js"],
+      get_scripts_parent()
+    );
     expect(script.data.val).to.equal(0);
     {
       const { return_code } = script.process(null, root);
@@ -30,7 +44,11 @@ describe("Scripting system test", () => {
     expect(script.data.val).to.equal(1);
   });
   it("Test instruction - Scope", () => {
-    const script = new Script(root, scripts_source["ID_Test_scope"]);
+    const script = new Script(
+      root,
+      scripts_source["ID_Test_scope"],
+      get_scripts_parent()
+    );
     expect(script.data.val).to.equal(0);
     expect(script._root_scope._current_child_index).to.equal(0);
     for (let i = 0; i < 2; i++) {
@@ -48,7 +66,11 @@ describe("Scripting system test", () => {
   });
   describe("Test instruction - Scope_IF", () => {
     it("First condition", () => {
-      const script = new Script(root, scripts_source["ID_Test_scope_if"]);
+      const script = new Script(
+        root,
+        scripts_source["ID_Test_scope_if"],
+        get_scripts_parent()
+      );
 
       for (let i = 0; i < 2; i++) {
         const { return_code } = script.process(null, root);
@@ -64,7 +86,11 @@ describe("Scripting system test", () => {
       expect(script.data.val).to.deep.equal(3);
     });
     it("Second condition", () => {
-      const script = new Script(root, scripts_source["ID_Test_scope_if"]);
+      const script = new Script(
+        root,
+        scripts_source["ID_Test_scope_if"],
+        get_scripts_parent()
+      );
 
       script.data.val = 1;
       for (let i = 0; i < 2; i++) {
@@ -81,7 +107,11 @@ describe("Scripting system test", () => {
       expect(script.data.val).to.deep.equal(5);
     });
     it("Third condition", () => {
-      const script = new Script(root, scripts_source["ID_Test_scope_if"]);
+      const script = new Script(
+        root,
+        scripts_source["ID_Test_scope_if"],
+        get_scripts_parent()
+      );
 
       script.data.val = 10;
       for (let i = 0; i < 2; i++) {
@@ -99,7 +129,11 @@ describe("Scripting system test", () => {
     });
   });
   it("Test instruction - Scope_WHILE", () => {
-    const script = new Script(root, scripts_source["ID_Test_scope_while"]);
+    const script = new Script(
+      root,
+      scripts_source["ID_Test_scope_while"],
+      get_scripts_parent()
+    );
 
     for (let i = 0; i < 6; i++) {
       const { return_code } = script.process(null, root);
@@ -113,7 +147,11 @@ describe("Scripting system test", () => {
   });
 
   it("Test instruction - Scope_FOR", () => {
-    const script = new Script(root, scripts_source["ID_Test_scope_for"]);
+    const script = new Script(
+      root,
+      scripts_source["ID_Test_scope_for"],
+      get_scripts_parent()
+    );
 
     for (let i = 0; i < 5; i++) {
       const { return_code } = script.process(null, root);
@@ -134,7 +172,11 @@ describe("Scripting system test", () => {
   });
   describe("Test instruction - Internal", () => {
     it("break", () => {
-      const script = new Script(root, scripts_source["ID_Test_internal_break"]);
+      const script = new Script(
+        root,
+        scripts_source["ID_Test_internal_break"],
+        get_scripts_parent()
+      );
 
       // For
       for (let i = 0; i < 6; i++) {
@@ -160,7 +202,8 @@ describe("Scripting system test", () => {
     it("continue", () => {
       const script = new Script(
         root,
-        scripts_source["ID_Test_internal_continue"]
+        scripts_source["ID_Test_internal_continue"],
+        get_scripts_parent()
       );
 
       // Scope for
@@ -191,7 +234,11 @@ describe("Scripting system test", () => {
       expect(script.data.val_2).to.deep.equal(0);
     });
     it("sleep 50", () => {
-      const script = new Script(root, scripts_source["ID_Test_internal_sleep"]);
+      const script = new Script(
+        root,
+        scripts_source["ID_Test_internal_sleep"],
+        get_scripts_parent()
+      );
 
       const stopper = new Stopper();
       {
@@ -209,7 +256,11 @@ describe("Scripting system test", () => {
       expect(script.data.val).to.deep.equal(2);
     });
     it("label and goto", () => {
-      const script = new Script(root, scripts_source["ID_Test_label_and_goto"]);
+      const script = new Script(
+        root,
+        scripts_source["ID_Test_label_and_goto"],
+        get_scripts_parent()
+      );
 
       /**
        *   TODO
@@ -256,7 +307,8 @@ describe("Scripting system test", () => {
     it("unhandled_internal", () => {
       const script = new Script(
         root,
-        scripts_source["ID_Test_unhandled_internal"]
+        scripts_source["ID_Test_unhandled_internal"],
+        get_scripts_parent()
       );
 
       script.data.val = 0;

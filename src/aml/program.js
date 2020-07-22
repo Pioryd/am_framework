@@ -7,9 +7,12 @@ const logger = require("../logger").create_logger({
 });
 
 class Program {
-  constructor(root, source) {
+  constructor(root, source, parent) {
+    if (parent == null) throw new Error("Parent is null.");
+
     this._root = root;
     this._source = source;
+    this._parent = parent;
 
     this._running_modules = {};
     this._rules_manager = new RulesManager(
@@ -70,7 +73,7 @@ class Program {
 
     this._root.get_source_async({ type: "module", name }, (source) => {
       try {
-        this._running_modules[name] = new Module(this._root, source);
+        this._running_modules[name] = new Module(this._root, source, this);
       } catch (e) {
         if (this._root.options.debug_enabled)
           logger.debug(

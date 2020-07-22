@@ -9,9 +9,12 @@ const logger = require("../logger").create_logger({
 });
 
 class Module {
-  constructor(root, source) {
+  constructor(root, source, parent) {
+    if (parent == null) throw new Error("Parent is null.");
+
     this._root = root;
     this._source = source;
+    this._parent = parent;
 
     this._running_scripts = {};
     this._debug_current_module = null;
@@ -81,7 +84,7 @@ class Module {
 
     this._root.get_source_async({ type: "script", name }, (source) => {
       try {
-        this._running_scripts[name] = new Script(this._root, source);
+        this._running_scripts[name] = new Script(this._root, source, this);
       } catch (e) {
         if (this._root.options.debug_enabled)
           logger.debug(

@@ -156,11 +156,17 @@ function parse_instruction_api(script, instruction) {
   let args =
     "{" + (instruction.args != null ? instruction.args.toString() : "") + "}";
   let body =
+    `const aml = {` +
+    `  script: script.get_id(),` +
+    `  module: script._parent.get_id(),` +
+    `  program: script._parent._parent.get_id(),` +
+    `  system: script._parent._parent._parent.get_id(),` +
+    `};` +
     `const query_id = root.generate_unique_id();` +
     `script.add_return_data(` +
     `  {query_id, timeout: ${timeout}, key: "${return_data_key}"});` +
     `root.process_api(` +
-    `  "${instruction.api}", script.get_id(), query_id, ${timeout}, ${args});`;
+    `  "${instruction.api}", aml, query_id, ${timeout}, ${args});`;
 
   return new Api({
     id: instruction.id,

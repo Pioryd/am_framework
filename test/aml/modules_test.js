@@ -17,6 +17,13 @@ root.get_source_async = ({ type, name }, callback) => {
   callback(scripts[name]);
 };
 
+function get_module_parents() {
+  return {
+    _parent: { _parent: { get_id: () => {} }, get_id: () => {} },
+    get_id: () => {}
+  };
+}
+
 describe("Modules test", () => {
   before(() => {
     module_source = Util.read_from_json(modules_full_name)["ID_Test_1"];
@@ -39,14 +46,14 @@ describe("Modules test", () => {
     }
   });
   it("Parse", () => {
-    const module = new Module(root, module_source);
+    const module = new Module(root, module_source, get_module_parents());
 
     expect(module.get_id()).to.equal("ID_Test_1");
     expect(module._source.rules.length).to.equal(6);
     expect(Object.keys(module._running_scripts).length).to.equal(1);
   });
   it("Process", () => {
-    const module = new Module(root, module_source);
+    const module = new Module(root, module_source, get_module_parents());
 
     expect(Object.keys(module._running_scripts).length).to.equal(1);
     expect(module._running_scripts["Name_test_script_N2"].data.val).to.equal(0);
@@ -56,7 +63,7 @@ describe("Modules test", () => {
     expect(Object.keys(module._running_scripts).length).to.equal(0);
   });
   it("Rules", () => {
-    const module = new Module(root, module_source);
+    const module = new Module(root, module_source, get_module_parents());
 
     // module_init
     expect(Object.keys(module._running_scripts).length).to.equal(1);
@@ -82,7 +89,7 @@ describe("Modules test", () => {
     );
   });
   it("Signals", () => {
-    const module = new Module(root, module_source);
+    const module = new Module(root, module_source, get_module_parents());
 
     // energy
     expect(Object.keys(module._running_scripts).length).to.equal(1);
@@ -92,7 +99,7 @@ describe("Modules test", () => {
     expect(Object.keys(module._running_scripts).length).to.equal(2);
   });
   it("Events", () => {
-    const module = new Module(root, module_source);
+    const module = new Module(root, module_source, get_module_parents());
 
     // time
     expect(Object.keys(module._running_scripts).length).to.equal(1);
@@ -102,7 +109,7 @@ describe("Modules test", () => {
     expect(Object.keys(module._running_scripts).length).to.equal(2);
   });
   it("Actions", () => {
-    const module = new Module(root, module_source);
+    const module = new Module(root, module_source, get_module_parents());
 
     // script_terminate
     expect(Object.keys(module._running_scripts).length).to.equal(1);

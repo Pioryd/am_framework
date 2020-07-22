@@ -76,11 +76,11 @@ class Root {
   }
 
   install_process_api(process_api_fn) {
-    this.process_api = (fn_full_name, script_id, query_id, timeout, args) => {
+    this.process_api = (fn_full_name, aml, query_id, timeout, args) => {
       process_api_fn({
         root: this,
         fn_full_name,
-        script_id,
+        aml,
         query_id,
         timeout,
         args
