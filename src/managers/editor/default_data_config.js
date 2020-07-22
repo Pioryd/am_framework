@@ -28,9 +28,12 @@ module.exports = {
             },
             additionalProperties: false
           }
+        },
+        ai: {
+          type: "string"
         }
       },
-      required: ["id", "name", "rules"],
+      required: ["id", "name", "rules", "ai"],
       additionalProperties: false
     }
   },
@@ -63,9 +66,12 @@ module.exports = {
             },
             additionalProperties: false
           }
+        },
+        connections: {
+          type: "object"
         }
       },
-      required: ["id", "name", "rules"],
+      required: ["id", "name", "rules", "connections"],
       additionalProperties: false
     }
   },
