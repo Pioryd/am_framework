@@ -90,13 +90,9 @@ class Editor {
     const key = db_data.url + db_data.name;
 
     if (id != null) {
-      this.db_map[key].get_async(
-        name,
-        id,
-        ({ error, results, objects_list }) => {
-          if (callback != null) callback(objects_list);
-        }
-      );
+      this.db_map[key].get_async(name, id, ({ error, results, object }) => {
+        if (callback != null) callback(object);
+      });
     } else {
       this.db_map[key].get_all_async(
         name,
