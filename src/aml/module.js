@@ -33,10 +33,8 @@ class Module {
   terminate() {
     for (const script of Object.values(this._running_scripts))
       this._terminate_script(script.get_name());
-
     this._running_scripts = {};
     this._rules_manager.terminate();
-
     this._root.emit("module_terminate", this.get_name());
   }
 
@@ -53,22 +51,21 @@ class Module {
     return { return_code: RETURN_CODE.PROCESSED };
   }
 
-  update(data) {
-    if (data.type !== "script") {
-      for (const script of Object.values(this._running_scripts))
-        script.update(data);
-      return;
-    }
+  update() {
+    const aml_scripts_ids = Object.keys(
+      this._root.data.aml[this._parent._parent.get_id()][this._parent.get_id()][
+        this.get_id()
+      ]
+    );
 
-    this._root.get_source_async(data, (source) => {
-      const running_script = this._running_scripts[data.name];
-      if (running_script != null) {
-        if (running_script.get_id() === source.id) return;
-        else this._terminate_script(data.name);
+    for (const { name, running_script } of Object.entries(
+      this._running_scripts
+    )) {
+      if (!aml_scripts_ids.includes(running_script.get_id())) {
+        this._terminate_script(name);
+        this._run_script(name);
       }
-
-      this._run_script(data.name);
-    });
+    }
   }
 
   get_id() {
@@ -82,20 +79,34 @@ class Module {
   _run_script(name) {
     if (name in this._running_scripts) return;
 
-    this._root.get_source_async({ type: "script", name }, (source) => {
-      try {
-        this._running_scripts[name] = new Script(this._root, source, this);
-      } catch (e) {
-        if (this._root.options.debug_enabled)
-          logger.debug(
-            `Unable to run script name[${name}]. \n${e}\n${e.stack}`
-          );
+    this._root.get_source_async(
+      {
+        type: "script",
+        name,
+        id: Object.keys(
+          this._root.data.aml[this._parent._parent.get_id()][
+            this._parent.get_id()
+          ][this.get_id()]
+        )
+      },
+      (source) => {
+        try {
+          this._running_scripts[name] = new Script(this._root, source, this);
+        } catch (e) {
+          if (this._root.options.debug_enabled)
+            logger.debug(
+              `Unable to run script name[${name}]. \n${e}\n${e.stack}`
+            );
+        }
       }
-    });
+    );
   }
 
   _terminate_script(name) {
-    this._running_scripts[name].terminate();
+    const script = this._running_scripts[name];
+    if (script == null) return;
+
+    script.terminate();
     delete this._running_scripts[name];
   }
 

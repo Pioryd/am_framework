@@ -18,10 +18,6 @@ class Root {
     this.return_data = new ReturnData();
     this.options = { debug_enabled: false };
 
-    // TODO
-    // Cleanup source_ids
-    this.source_ids = { system: {}, program: {}, module: {}, script: {} };
-
     // Data set by update functions
     this.process_api = () => logger.error("Not set process_api");
     this._get_data = () => {
@@ -31,6 +27,8 @@ class Root {
       throw new Error(`Not found source type[${type}] with name[${name}]`);
     };
     this.ext = {};
+
+    this._event_emitter.on("aml", () => this.update());
   }
 
   get data() {
@@ -47,32 +45,49 @@ class Root {
   }
 
   terminate() {
-    if (this._system != null) this._system.terminate();
+    this._terminate_system();
   }
 
   emit(...args) {
     this._event_emitter.emit(...args);
   }
 
-  update(type, source) {
-    this.source_ids[type][source.name] = source.id;
-
-    if (type !== "system") {
-      if (this._system != null)
-        this._system.update({ type, name: source.name });
+  update() {
+    if (this.data.aml == null || Object.keys(this.data.aml).length === 0) {
+      if (this._system != null) this._terminate_system();
       return;
     }
+    const system_id = Object.keys(this.data.aml)[0];
 
-    try {
-      if (this._system != null) this._system.terminate();
-      this._system = new System(this, source);
-    } catch (e) {
-      if (this.options.debug_enabled)
-        logger.debug(
-          `Unable to run system name[${source.name}] id[${source.id}].` +
-            ` \n${e.stack}`
-        );
+    if (this._system != null && _.isEqual(system_id, this._system.get_id()))
+      return;
+
+    const create_new =
+      this._system == null || system_id !== this._system.get_id();
+
+    if (create_new) {
+      try {
+        this.get_source_async({ type: "system", id: system_id }, (source) => {
+          if (this._system != null) this._system.terminate();
+          this._system = new System(this, source);
+        });
+      } catch (e) {
+        if (this.options.debug_enabled)
+          logger.debug(
+            `Unable to run system name[${source.name}] id[${source.id}].` +
+              ` \n${e.stack}`
+          );
+      }
+    } else {
+      if (this._system != null) this._system.update();
     }
+  }
+
+  _terminate_system() {
+    if (this._system == null) return;
+
+    this._system.terminate();
+    this._system = null;
   }
 
   install_process_api(process_api_fn) {
@@ -93,18 +108,7 @@ class Root {
   }
 
   install_source_getter_async(get_source_async) {
-    this.get_source_async = ({ type, name }, callback) => {
-      const id = this.source_ids[type][name];
-      if (id == null) {
-        if (this.options.debug_enabled)
-          logger.debug(
-            `Not found id of source type[${type}] name[${name}]. ` +
-              `Ids:[${JSON.stringify(this.source_ids)}]`
-          );
-      } else {
-        get_source_async({ type, id }, callback);
-      }
-    };
+    this.get_source_async = get_source_async;
   }
 
   install_ext(source) {

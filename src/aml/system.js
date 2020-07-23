@@ -29,26 +29,31 @@ class System {
     for (const program of Object.values(this._running_programs))
       if (program != null) program.terminate();
     this._running_programs = {};
+    this._rules_manager.terminate();
     this._root.emit("system_terminate", this.get_name());
   }
 
   process() {
     for (const program of Object.values(this._running_programs)) {
-      if (program == null) continue;
       this._debug_current_program = program;
       program.process();
     }
     this._root.emit("system_process", this.get_name());
   }
 
-  update(data) {
-    if (data.type !== "program") {
-      for (const program of Object.values(this._running_programs))
-        program.update(data);
-      return;
-    }
+  update() {
+    const aml_programs_ids = Object.keys(this._root.data.aml[this.get_id()]);
 
-    this._run_program(data.name);
+    for (const { name, running_program } of Object.entries(
+      this._running_programs
+    )) {
+      if (!aml_programs_ids.includes(running_program.get_id())) {
+        this._terminate_program(name);
+        this._run_program(name);
+      } else {
+        running_program.update();
+      }
+    }
   }
 
   get_id() {
@@ -60,26 +65,32 @@ class System {
   }
 
   _run_program(name) {
-    this._root.get_source_async({ type: "program", name }, (source) => {
-      try {
-        const running_program = this._running_programs[name];
-        if (running_program != null) {
-          if (running_program.get_id() === source.id) return;
-          else running_program.terminate();
-        }
+    if (name in this._running_programs) return;
 
-        this._running_programs[name] = new Program(this._root, source, this);
-      } catch (e) {
-        if (this._root.options.debug_enabled)
-          logger.debug(
-            `Unable to run program name[${name}]. \n${e}\n${e.stack}`
-          );
+    this._root.get_source_async(
+      {
+        type: "program",
+        name,
+        id: Object.keys(this._root.data.aml[this.get_id()])
+      },
+      (source) => {
+        try {
+          this._running_programs[name] = new Program(this._root, source, this);
+        } catch (e) {
+          if (this._root.options.debug_enabled)
+            logger.debug(
+              `Unable to run program name[${name}]. \n${e}\n${e.stack}`
+            );
+        }
       }
-    });
+    );
   }
 
   _terminate_program() {
-    this._running_programs[name].terminate();
+    const program = this._running_programs[name];
+    if (program == null) return;
+
+    program.terminate();
     delete this._running_programs[name];
   }
 

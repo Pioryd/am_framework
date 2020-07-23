@@ -42,22 +42,21 @@ class Program {
     this._root.emit("program_process", this.get_name());
   }
 
-  update(data) {
-    if (data.type !== "module") {
-      for (const module of Object.values(this._running_modules))
-        module.update(data);
-      return;
-    }
+  update() {
+    const aml_modules_ids = Object.keys(
+      this._root.data.aml[this._parent.get_id()][this.get_id()]
+    );
 
-    this._root.get_source_async(data, (source) => {
-      const running_module = this._running_modules[data.name];
-      if (running_module != null) {
-        if (running_module.get_id() === source.id) return;
-        else this._terminate_module(data.name);
+    for (const { name, running_module } of Object.entries(
+      this._running_modules
+    )) {
+      if (!aml_modules_ids.includes(running_module.get_id())) {
+        this._terminate_module(name);
+        this._run_module(name);
+      } else {
+        running_module.update();
       }
-
-      this._run_module(data.name);
-    });
+    }
   }
 
   get_id() {
@@ -71,16 +70,25 @@ class Program {
   _run_module(name) {
     if (name in this._running_modules) return;
 
-    this._root.get_source_async({ type: "module", name }, (source) => {
-      try {
-        this._running_modules[name] = new Module(this._root, source, this);
-      } catch (e) {
-        if (this._root.options.debug_enabled)
-          logger.debug(
-            `Unable to run module name[${name}]. \n${e}\n${e.stack}`
-          );
+    this._root.get_source_async(
+      {
+        type: "module",
+        name,
+        id: Object.keys(
+          this._root.data.aml[this._parent.get_id()][this.get_id()]
+        )
+      },
+      (source) => {
+        try {
+          this._running_modules[name] = new Module(this._root, source, this);
+        } catch (e) {
+          if (this._root.options.debug_enabled)
+            logger.debug(
+              `Unable to run module name[${name}]. \n${e}\n${e.stack}`
+            );
+        }
       }
-    });
+    );
   }
 
   _terminate_module(name) {
