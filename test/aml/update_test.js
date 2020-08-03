@@ -7,14 +7,16 @@ const DEBUG_ENABLED = false;
 const source_full_name = path.join(__dirname, "update_test.json");
 
 let source = {};
-let aml_data_index = 1;
-
+const object_data = { aml: {} };
 const create_root = () => {
   const root = new Root();
   root.options.debug_enabled = DEBUG_ENABLED;
   root.install_source_getter_async(({ type, id }, callback) => {
     callback(source[type][id]);
   });
+  root._get_data = () => {
+    return object_data;
+  };
   return root;
 };
 
@@ -23,47 +25,30 @@ describe("Update test", () => {
     source = Util.read_from_json(source_full_name);
   });
   it("Update system only", () => {
+    object_data.aml = {};
     const root = create_root();
-
+    root._event_emitter.emit("aml");
     expect(root._system).to.equal(null);
-    aml_data_index = 0;
-    root.source_ids = {
-      system: { Name_system: "ID_system_0" },
-      program: { Name_program: "ID_program_0" },
-      module: { Name_module: "ID_module_0" },
-      script: { Name_script: "ID_script_0" }
-    };
-    root.update("system", source.system["ID_system_0"]);
+    object_data.aml = { ID_system_0: {} };
+    root._event_emitter.emit("aml");
     expect(root._system).to.not.equal(null);
   });
   it("Update system only and then update all full system", () => {
     const root = create_root();
 
     {
-      aml_data_index = 0;
-      root.source_ids = {
-        system: { Name_system: "ID_system_0" },
-        program: { Name_program: "ID_program_0" },
-        module: { Name_module: "ID_module_0" },
-        script: { Name_script: "ID_script_0" }
-      };
-      root.update("system", source.system["ID_system_0"]);
-
+      object_data.aml = { ID_system_0: {} };
+      root._event_emitter.emit("aml");
       const { _running_programs } = root._system;
-
       expect(root._system).to.not.equal(null);
       expect(Object.keys(_running_programs).length).to.equal(0);
     }
 
     {
-      aml_data_index = 1;
-      root.source_ids = {
-        system: { Name_system: "ID_system_1" },
-        program: { Name_program: "ID_program_1" },
-        module: { Name_module: "ID_module_1" },
-        script: { Name_script: "ID_script_1" }
+      object_data.aml = {
+        ID_system_1: { ID_program_1: { ID_module_1: { ID_script_1: {} } } }
       };
-      root.update("system", source.system["ID_system_1"]);
+      root._event_emitter.emit("aml");
 
       const { _running_programs } = root._system;
       const { _running_modules } = _running_programs["Name_program"];
@@ -80,36 +65,36 @@ describe("Update test", () => {
   it("Update full system and then update all start from scripts", () => {
     const root = create_root();
 
-    aml_data_index = 1;
-    root.source_ids = {
-      system: { Name_system: "ID_system_1" },
-      program: { Name_program: "ID_program_1" },
-      module: { Name_module: "ID_module_1" },
-      script: { Name_script: "ID_script_1" }
+    object_data.aml = {
+      ID_system_1: { ID_program_1: { ID_module_1: { ID_script_1: {} } } }
     };
-    root.update("system", source.system["ID_system_1"]);
+    root._event_emitter.emit("aml");
 
     const { _running_programs } = root._system;
     const { _running_modules } = _running_programs["Name_program"];
     const { _running_scripts } = _running_modules["Name_module"];
 
-    aml_data_index = 0;
-    root.source_ids = {
-      system: { Name_system: "ID_system_0" },
-      program: { Name_program: "ID_program_0" },
-      module: { Name_module: "ID_module_0" },
-      script: { Name_script: "ID_script_0" }
+    object_data.aml = {
+      ID_system_1: { ID_program_1: { ID_module_1: { ID_script_0: {} } } }
     };
-
-    root.update("script", source.script["ID_script_0"]);
+    root._event_emitter.emit("aml");
     expect(Object.values(_running_scripts)[0].get_id()).to.equal("ID_script_0");
-    root.update("module", source.module["ID_module_0"]);
+    object_data.aml = {
+      ID_system_1: { ID_program_1: { ID_module_0: { ID_script_0: {} } } }
+    };
+    root._event_emitter.emit("aml");
     expect(Object.values(_running_modules)[0].get_id()).to.equal("ID_module_0");
-    root.update("program", source.program["ID_program_0"]);
+    object_data.aml = {
+      ID_system_1: { ID_program_0: { ID_module_0: { ID_script_0: {} } } }
+    };
+    root._event_emitter.emit("aml");
     expect(Object.values(_running_programs)[0].get_id()).to.equal(
       "ID_program_0"
     );
-    root.update("system", source.system["ID_system_0"]);
+    object_data.aml = {
+      ID_system_0: { ID_program_0: { ID_module_0: { ID_script_0: {} } } }
+    };
+    root._event_emitter.emit("aml");
     expect(root._system.get_id()).to.equal("ID_system_0");
   });
 });

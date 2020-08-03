@@ -47,7 +47,7 @@ class Program {
       this._root.data.aml[this._parent.get_id()][this.get_id()]
     );
 
-    for (const { name, running_module } of Object.entries(
+    for (const [name, running_module] of Object.entries(
       this._running_modules
     )) {
       if (!aml_modules_ids.includes(running_module.get_id())) {
@@ -68,7 +68,8 @@ class Program {
   }
 
   _run_module(name) {
-    if (name in this._running_modules) return;
+    if (name in this._running_modules || !this._source.modules.includes(name))
+      return;
 
     this._root.get_source_async(
       {

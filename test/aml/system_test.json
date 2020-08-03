@@ -16,7 +16,8 @@
             }
           ]
         }
-      ]
+      ],
+      "programs": ["Name_Test_program"]
     }
   },
   "programs": {
@@ -24,8 +25,8 @@
       "id": "ID_Test_program",
       "name": "Name_Test_program",
       "rules": [],
-      "signals": [],
-      "events": []
+      "connections": {},
+      "modules": []
     }
   }
 }

@@ -67,11 +67,17 @@ module.exports = {
             additionalProperties: false
           }
         },
+        modules: {
+          type: "array",
+          items: {
+            type: "string"
+          }
+        },
         connections: {
           type: "object"
         }
       },
-      required: ["id", "name", "rules", "connections"],
+      required: ["id", "name", "rules", "modules", "connections"],
       additionalProperties: false
     }
   },
@@ -104,9 +110,15 @@ module.exports = {
             },
             additionalProperties: false
           }
+        },
+        programs: {
+          type: "array",
+          items: {
+            type: "string"
+          }
         }
       },
-      required: ["id", "name", "rules"],
+      required: ["id", "name", "rules", "programs"],
       additionalProperties: false
     }
   },

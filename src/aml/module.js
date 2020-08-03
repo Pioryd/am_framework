@@ -58,7 +58,7 @@ class Module {
       ]
     );
 
-    for (const { name, running_script } of Object.entries(
+    for (const [name, running_script] of Object.entries(
       this._running_scripts
     )) {
       if (!aml_scripts_ids.includes(running_script.get_id())) {

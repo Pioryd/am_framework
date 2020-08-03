@@ -3,7 +3,9 @@
     "ID_system_0": {
       "id": "ID_system_0",
       "name": "Name_system",
-      "rules": []
+      "rules": [],
+      "connections": {},
+      "programs": []
     },
     "ID_system_1": {
       "id": "ID_system_1",
@@ -21,14 +23,17 @@
             }
           ]
         }
-      ]
+      ],
+      "connections": {},
+      "programs": ["Name_program"]
     }
   },
   "program": {
     "ID_program_0": {
       "id": "ID_program_0",
       "name": "Name_program",
-      "rules": []
+      "rules": [],
+      "modules": []
     },
     "ID_program_1": {
       "id": "ID_program_1",
@@ -46,7 +51,8 @@
             }
           ]
         }
-      ]
+      ],
+      "modules": ["Name_module"]
     }
   },
   "module": {

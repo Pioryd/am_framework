@@ -44,7 +44,7 @@ class System {
   update() {
     const aml_programs_ids = Object.keys(this._root.data.aml[this.get_id()]);
 
-    for (const { name, running_program } of Object.entries(
+    for (const [name, running_program] of Object.entries(
       this._running_programs
     )) {
       if (!aml_programs_ids.includes(running_program.get_id())) {
@@ -65,7 +65,8 @@ class System {
   }
 
   _run_program(name) {
-    if (name in this._running_programs) return;
+    if (name in this._running_programs || !this._source.programs.includes(name))
+      return;
 
     this._root.get_source_async(
       {
@@ -86,7 +87,7 @@ class System {
     );
   }
 
-  _terminate_program() {
+  _terminate_program(name) {
     const program = this._running_programs[name];
     if (program == null) return;
 

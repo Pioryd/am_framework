@@ -41,7 +41,9 @@ class Root {
   }
 
   process() {
-    if (this._system != null) this._system.process();
+    if (this._system != null) {
+      this._system.process();
+    }
   }
 
   terminate() {
@@ -58,9 +60,6 @@ class Root {
       return;
     }
     const system_id = Object.keys(this.data.aml)[0];
-
-    if (this._system != null && _.isEqual(system_id, this._system.get_id()))
-      return;
 
     const create_new =
       this._system == null || system_id !== this._system.get_id();

@@ -52,23 +52,21 @@
             }
           ]
         }
-      ]
+      ],
+      "connections": {},
+      "modules": ["Name_Test_module_1", "Name_Test_module_2"]
     }
   },
   "modules": {
     "Name_Test_module_1": {
       "id": "ID_Test_module_1",
       "name": "Name_Test_module_1",
-      "rules": [],
-      "signals": [],
-      "events": []
+      "rules": []
     },
     "Name_Test_module_2": {
       "id": "ID_Test_module_2",
       "name": "Name_Test_module_2",
-      "rules": [],
-      "signals": [],
-      "events": []
+      "rules": []
     }
   }
 }

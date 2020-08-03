@@ -13,19 +13,41 @@ let module_source = {};
 let scripts = {};
 
 const root = new Root();
-root.get_source_async = ({ type, name }, callback) => {
-  callback(scripts[name]);
-};
 
 function get_module_parents() {
   return {
-    _parent: { _parent: { get_id: () => {} }, get_id: () => {} },
-    get_id: () => {}
+    _parent: {
+      get_id: () => {
+        return "system_id";
+      }
+    },
+    get_id: () => {
+      return "program_id";
+    }
   };
 }
 
 describe("Modules test", () => {
   before(() => {
+    const override_root = () => {
+      root.get_source_async = ({ type, name }, callback) => {
+        callback(scripts[name]);
+      };
+      root._get_data = () => {
+        return {
+          aml: {
+            system_id: {
+              program_id: {
+                ID_Test_1: {}
+              }
+            }
+          }
+        };
+      };
+    };
+
+    override_root();
+
     module_source = Util.read_from_json(modules_full_name)["ID_Test_1"];
 
     for (const scripts_name of [
@@ -52,6 +74,7 @@ describe("Modules test", () => {
     expect(module._source.rules.length).to.equal(6);
     expect(Object.keys(module._running_scripts).length).to.equal(1);
   });
+
   it("Process", () => {
     const module = new Module(root, module_source, get_module_parents());
 
