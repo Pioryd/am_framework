@@ -27,8 +27,8 @@ class AppModule extends EventEmitter {
       if (black_list != null && black_list.includes(key)) {
         logger.info(`Manager name [${key}] is blacklisted.`);
         order.initialize = order.initialize.filter((e) => e !== key);
-        order.terminate = order.initialize.filter((e) => e !== key);
-        order.poll = order.initialize.filter((e) => e !== key);
+        order.terminate = order.terminate.filter((e) => e !== key);
+        order.poll = order.poll.filter((e) => e !== key);
         continue;
       }
       if (!order.initialize.includes(key))
