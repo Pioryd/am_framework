@@ -40,7 +40,6 @@ class AppModule extends EventEmitter {
 
       this.managers[key] = value;
     }
-
     this.__order = order;
   }
   // Async
@@ -118,7 +117,15 @@ class AppModule extends EventEmitter {
       try {
         this.managers[manager_name].poll();
       } catch (e) {
-        logger.error({ manager_name }, e, e.stack);
+        logger.error(
+          {
+            manager_name,
+            this_manager: JSON.stringify(Object.keys(this.managers), null, 2),
+            this___order: JSON.stringify(Object.keys(this.__order), null, 2)
+          },
+          e,
+          e.stack
+        );
       }
     }
   }
