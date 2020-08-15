@@ -2,12 +2,14 @@ const Queue = require("./queue.js");
 const EventEmitter = require("events");
 
 class AI_Module {
-  constructor({ mirror }) {
+  constructor({ mirror, process_world_fn }) {
     this.event_emitter = new EventEmitter();
     this._queue_packets = new Queue();
     this.sockets = {};
     this.api = {};
+    this.data = {};
     this.mirror = mirror;
+    this.process_world_fn = process_world_fn;
   }
 
   initialize() {
