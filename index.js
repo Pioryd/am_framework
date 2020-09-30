@@ -6,9 +6,9 @@ const { Server } = require("./src/net/server");
 const { Client } = require("./src/net/client");
 const { Config } = require("./src/config");
 const { Database } = require("./src/database");
+const { Stopper } = require("./src/stopper");
 const { Stopwatch } = require("./src/stopwatch");
 const { Action } = require("./src/action");
-const AI_Module = require("./src/ai_module");
 const { create_logger } = require("./src/logger");
 const AML = require("./src/aml");
 const Managers = require("./src/managers");
@@ -22,9 +22,9 @@ module.exports = {
   Client,
   Config,
   Database,
+  Stopper,
   Stopwatch,
   Action,
-  AI_Module,
   create_logger,
   AML,
   Managers
