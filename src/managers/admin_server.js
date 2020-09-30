@@ -49,33 +49,6 @@ const parse_packet = {
     const json = JSON.parse(stringify(managers.admin_server.root_module.data));
     managers.admin_server.send(connection.get_id(), "module_data", { json });
   },
-  visual_data(connection, received_data, managers) {
-    const callback = (objects_list, message) => {
-      const modules_sockets = {};
-
-      for (const module of objects_list) {
-        if (modules_sockets[module.name] != null) continue;
-        if (managers.ai._ai_modules_classes[module.ai] == null)
-          throw `Not found module_ai [${
-            module.ai
-          }]. Module data[${JSON.stringify(module, null, 2)}]`;
-        const ai = new managers.ai._ai_modules_classes[module.ai]();
-        modules_sockets[module.name] = ai.sockets;
-      }
-
-      managers.admin_server.send(connection.get_id(), "visual_data", {
-        modules_sockets
-      });
-    };
-
-    const data_name = "am_module";
-    if (!managers.editor.has_action(data_name, "data")) {
-      const message = `Data[${data_name}] does not support action[${data}].`;
-      callback({}, message);
-    } else {
-      managers.editor.get_data(data_name, callback);
-    }
-  },
   editor_config(connection, received_data, managers) {
     managers.admin_server.send(connection.get_id(), "editor_config", {
       data_config: managers.editor.data_config
