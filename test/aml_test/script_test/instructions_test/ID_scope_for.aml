@@ -1,0 +1,6 @@
+name Name_Script
+data val:0
+
+for data.i = 0; data.i < 2; data.i++
+  js data.val++
+  js data.val++

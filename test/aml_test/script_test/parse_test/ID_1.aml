@@ -1,0 +1,32 @@
+name Name_1
+data val:0, val_2:"test_1", \
+    val_3:{}
+
+js data.val++
+label test
+if data.val_2 === "test_1"
+  js data.val++
+  sleep 50
+  js data.val += 2
+elif data.val_2 === "test_2"
+  js data.val = 0
+  for data.i = 0; data.i < 2; data.i++
+    js data.val++
+    continue
+else
+  js data.val = 0;
+  while data.val < 3
+    js data.val += 2
+    js data.val--; data.val--
+    break
+    for \
+        data.i = 0; data.i < 2; data.i++
+      api -r data.val_2 -t 1000    Namespace.DoSomething min:data.min, max:5
+goto \
+    test
+api -t 20 -r \
+    data.val_3 \
+    SomeFun.DoIt \
+    min:data.
+    min, max:"some    text"
+

@@ -4,6 +4,7 @@
 
 ```powershell
 npm install am_framework
+npm link
 ```
 
 ## Test
@@ -24,7 +25,7 @@ require("am_framework").run_app(__dirname);
 
 ## More
 
-- Documentation(soon)
+- [Documentation](https://pioryd.github.io/)
 - [Tutorials](https://pioryd.github.io/)
 
 ## More informations at [Artificial Mind](https://pioryd.github.io/)

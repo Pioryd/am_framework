@@ -1,0 +1,6 @@
+name Name_Script
+data val:0
+
+js data.val++
+js data.val++
+js data.val++

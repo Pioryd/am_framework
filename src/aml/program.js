@@ -7,12 +7,9 @@ const logger = require("../logger").create_logger({
 });
 
 class Program {
-  constructor(root, source, parent) {
-    if (parent == null) throw new Error("Parent is null.");
-
+  constructor(root, source) {
     this._root = root;
     this._source = source;
-    this._parent = parent;
 
     this._running_modules = {};
     this._rules_manager = new RulesManager(
@@ -22,6 +19,7 @@ class Program {
       }
     );
     this._rules_manager.parse(this._source.rules);
+    this._debug_current_module = {};
 
     this._root.emit("program_initialize", this.get_name());
   }
@@ -42,21 +40,20 @@ class Program {
     this._root.emit("program_process", this.get_name());
   }
 
-  update() {
-    const aml_modules_ids = Object.keys(
-      this._root.data.aml[this._parent.get_id()][this.get_id()]
-    );
-
-    for (const [name, running_module] of Object.entries(
-      this._running_modules
-    )) {
-      if (!aml_modules_ids.includes(running_module.get_id())) {
+  update(aml) {
+    for (const [name, module] of Object.entries(this._running_modules)) {
+      if (aml.modules[name] != module.get_id()) {
         this._terminate_module(name);
         this._run_module(name);
       } else {
-        running_module.update();
+        module.update(aml);
       }
     }
+  }
+
+  parse_return_data(data) {
+    for (const module of Object.values(this._running_modules))
+      module.parse_return_data(data);
   }
 
   get_id() {
@@ -72,13 +69,7 @@ class Program {
       return;
 
     this._root.get_source_async(
-      {
-        type: "module",
-        name,
-        id: Object.keys(
-          this._root.data.aml[this._parent.get_id()][this.get_id()]
-        )
-      },
+      { type: "module", id: this._root.mirror.aml.modules[name] },
       (source) => {
         try {
           this._running_modules[name] = new Module(this._root, source, this);

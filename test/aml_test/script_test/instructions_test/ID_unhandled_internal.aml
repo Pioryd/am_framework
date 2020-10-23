@@ -1,0 +1,9 @@
+name Name_Script
+data val:0
+
+if data.val === 0
+  break
+elif data.val === 1
+  continue
+elif data.val === 2
+  goto test

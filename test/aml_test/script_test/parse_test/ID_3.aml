@@ -1,0 +1,8 @@
+name Name_3
+data 
+
+if mirror.character_data.land_id !== mirror.character_data.default_land_id
+  api character.change_land land_id:mirror.character_data.default_land_id
+elif mirror.character_data.energy < 100
+  api character.use_object id:"test"
+ 

@@ -1,4 +1,5 @@
 const EventEmitter = require("events");
+const _ = require("lodash");
 const logger = require("../logger").create_logger({
   module_name: "am_framework",
   file_name: __filename
@@ -23,24 +24,31 @@ class AppModule extends EventEmitter {
   // The order is important for logic
   setup_managers({ managers, order, black_list }) {
     // this.managers is used before setup_managers, object cannot be overwritten
+
+    // [order] can be overwritten
+    this.__order = _.cloneDeep(order);
+
     for (const [key, value] of Object.entries(managers)) {
       if (black_list != null && black_list.includes(key)) {
         logger.info(`Manager name [${key}] is blacklisted.`);
-        order.initialize = order.initialize.filter((e) => e !== key);
-        order.terminate = order.terminate.filter((e) => e !== key);
-        order.poll = order.poll.filter((e) => e !== key);
+        this.__order.initialize = this.__order.initialize.filter(
+          (e) => e !== key
+        );
+        this.__order.terminate = this.__order.terminate.filter(
+          (e) => e !== key
+        );
+        this.__order.poll = this.__order.poll.filter((e) => e !== key);
         continue;
       }
-      if (!order.initialize.includes(key))
+      if (!this.__order.initialize.includes(key))
         throw new Error(`Order[initialize] not include manager[${key}]`);
-      if (!order.terminate.includes(key))
+      if (!this.__order.terminate.includes(key))
         throw new Error(`Order[terminate] not include manager[${key}]`);
-      if (!order.poll.includes(key))
+      if (!this.__order.poll.includes(key))
         throw new Error(`Order[poll] not include manager[${key}]`);
 
       this.managers[key] = value;
     }
-    this.__order = order;
   }
   // Async
   on_initialize() {
@@ -120,6 +128,7 @@ class AppModule extends EventEmitter {
         logger.error(
           {
             manager_name,
+            this___order_poll: this.__order.poll,
             this_manager: JSON.stringify(Object.keys(this.managers), null, 2),
             this___order: JSON.stringify(Object.keys(this.__order), null, 2)
           },

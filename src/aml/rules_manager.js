@@ -1,3 +1,8 @@
+const logger = require("../logger").create_logger({
+  module_name: "am_framework",
+  file_name: __filename
+});
+
 class RulesManager {
   constructor(event_emitter, process_actions) {
     this.event_emitter = event_emitter;
@@ -47,7 +52,11 @@ class RulesManager {
 
         if ("min" in trigger_value && "max" in trigger_value) {
           this.add_listener(trigger_name, (value) => {
-            if (value >= trigger_value.min && value <= trigger_value.max) {
+            if (
+              typeof value === "number" &&
+              value >= trigger_value.min &&
+              value <= trigger_value.max
+            ) {
               if (this._check_trigger_priority(trigger_name, priority))
                 this.process_actions(rule_source.actions, value);
             } else {
@@ -56,7 +65,10 @@ class RulesManager {
           });
         } else if ("value" in trigger_value) {
           this.add_listener(trigger_name, (value) => {
-            if (value === trigger_value.value) {
+            if (
+              typeof value === typeof trigger_value.value &&
+              value === trigger_value.value
+            ) {
               if (this._check_trigger_priority(trigger_name, priority))
                 this.process_actions(rule_source.actions, value);
             } else {
@@ -70,8 +82,9 @@ class RulesManager {
           });
         } else {
           throw new Error(
-            `Wrong trigger[${trigger_name}] value: ${trigger_value}` +
-              ` of rule[${rule_source}]`
+            `Wrong trigger[${trigger_name}] value: ${JSON.stringify(
+              trigger_value
+            )}` + ` of rule:\n${JSON.stringify(rule_source, null, 2)}]`
           );
         }
       }

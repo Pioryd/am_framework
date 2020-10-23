@@ -90,11 +90,7 @@ function parse_header(start_index, lines) {
   for (const [name, found] of Object.entries(header_data_found))
     if (found === false) throw new Error(`Not found header key[${name}].`);
 
-  eval(
-    `parsed_header.data = {${Util.command_args_to_array(
-      parsed_header.data
-    ).join()}}`
-  );
+  eval(`parsed_header.data = {${parsed_header.data}}`);
 
   if (parsed_header.name === "") throw new Error("No script name");
 
@@ -105,45 +101,45 @@ function parse_header(start_index, lines) {
 }
 
 function parse_api_source(source) {
-  const parsed_api = {};
+  source = source.trim();
+  if (source.length === 0) return;
+
+  const parsed = {};
+
+  // Find parameters and api name
   const splitted = source.replace(/  +/g, " ").split(" ");
 
-  let index = 0;
-  if (["-r", "-t"].includes(splitted[index])) {
-    if (splitted[index] === "-r") {
-      parsed_api.return = splitted[index + 1];
-      index += 2;
-    } else if (splitted[index] === "-t") {
-      parsed_api.timeout = splitted[index + 1];
-      index += 2;
-    }
-    if (["-r", "-t"].includes(splitted[index])) {
-      if (splitted[index] === "-r") {
-        parsed_api.return = splitted[index + 1];
-        index += 2;
-      } else if (splitted[index] === "-t") {
-        parsed_api.timeout = splitted[index + 1];
-        index += 2;
-      }
-    }
-  }
+  for (const index of [0, 2])
+    if (["-t", "-r"].includes(splitted[0]))
+      parsed[splitted[index] === "-t" ? "timeout" : "return"] = splitted[
+        index + 1
+      ].trim();
 
-  parsed_api.api = splitted[index];
-  index++;
-  parsed_api.args = source;
+  let api_index = 0;
+  if (parsed.return != null) api_index += 2;
+  if (parsed.timeout != null) api_index += 2;
+  parsed.api = splitted[api_index].trim();
 
-  for (let i = 0; i < index; i++)
-    parsed_api.args = parsed_api.args.replace(splitted[i], "");
+  // Get only args source
 
-  parsed_api.args = parsed_api.args.trim();
+  //  return_value_name can be same as api
+  let args_index = 0;
+  if (parsed.return != null)
+    args_index =
+      source.indexOf(parsed.return, args_index) + parsed.return.length;
+  args_index = source.indexOf(parsed.api, args_index) + parsed.api.length;
+
+  parsed.args = source.substr(args_index).trim();
 
   try {
-    eval(`const check_args = ()=>{return {${parsed_api.args}};}`);
+    eval(`const check_args = ()=>{return {${parsed.args}};}`);
   } catch (e) {
-    throw new Error(`Wrong arguments format of API[${parsed_api.api}].`);
+    throw new Error(
+      `Wrong arguments format of API[${parsed.api}] Args[${parsed.args}].`
+    );
   }
 
-  return parsed_api;
+  return parsed;
 }
 
 function parse_source(source) {

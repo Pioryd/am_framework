@@ -1,0 +1,6 @@
+name Name_Script
+data val:0
+
+while data.val < 3
+  js data.val++
+  js data.val++

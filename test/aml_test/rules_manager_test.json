@@ -1,0 +1,131 @@
+{
+  "programs": {
+    "ID_Program_1": {
+      "id": "ID_Program_1",
+      "name": "Name_Program_1",
+      "rules": [
+        {
+          "triggers": [
+            {
+              "program_initialize": { "value": "Name_Program_1" }
+            }
+          ],
+          "actions": [
+            {
+              "module_initialize": { "value": "Name_Module_1" }
+            }
+          ]
+        },
+        {
+          "triggers": [
+            {
+              "trigger_01": { "min": 0, "max": 10 }
+            }
+          ],
+          "actions": [
+            {
+              "module_initialize": { "value": "Name_Module_2" }
+            }
+          ]
+        },
+        {
+          "triggers": [
+            {
+              "trigger_01": { "min": 11, "max": 100 }
+            }
+          ],
+          "actions": [
+            {
+              "module_terminate": { "value": "Name_Module_2" }
+            }
+          ]
+        },
+        {
+          "triggers": [
+            {
+              "trigger_02": { "value": 3 }
+            },
+            {
+              "trigger_02": { "value": 4.5 }
+            },
+            {
+              "trigger_02": { "value": -7 }
+            },
+            {
+              "trigger_02": { "value": "init" }
+            },
+            {
+              "trigger_02": { "value": true }
+            }
+          ],
+          "actions": [
+            {
+              "module_initialize": { "value": "Name_Module_2" }
+            }
+          ]
+        },
+        {
+          "triggers": [
+            {
+              "trigger_02": { "value": 5 }
+            },
+            {
+              "trigger_02": { "value": 6.5 }
+            },
+            {
+              "trigger_02": { "value": 0 }
+            },
+            {
+              "trigger_02": { "value": "term" }
+            },
+            {
+              "trigger_02": { "value": false }
+            }
+          ],
+          "actions": [
+            {
+              "module_terminate": { "value": "Name_Module_2" }
+            }
+          ]
+        },
+        {
+          "triggers": [
+            {
+              "trigger_03": { "any": {} }
+            }
+          ],
+          "actions": [
+            {
+              "module_initialize": { "value": "Name_Module_2" }
+            }
+          ]
+        },
+        {
+          "triggers": [
+            {
+              "trigger_04": { "any": {} }
+            }
+          ],
+          "actions": [
+            {
+              "module_terminate": { "value": "Name_Module_2" }
+            }
+          ]
+        }
+      ],
+      "modules": ["Name_Module_1", "Name_Module_2"]
+    }
+  },
+  "modules": {
+    "ID_Module_1": {
+      "id": "ID_Module_1",
+      "name": "Name_Module_1",
+      "rules": []
+    },
+    "ID_Module_2": {
+      "id": "ID_Module_2",
+      "name": "Name_Module_2",
+      "rules": []
+    }
+  }
+}

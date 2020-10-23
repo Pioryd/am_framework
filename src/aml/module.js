@@ -42,8 +42,9 @@ class Module {
     for (const script of Object.values(this._running_scripts)) {
       const return_value = script.process();
 
-      if (return_value.return_code === RETURN_CODE.PROCESSED)
+      if (return_value.return_code === RETURN_CODE.PROCESSED) {
         this._terminate_script(script.get_name());
+      }
     }
 
     this._root.emit("module_process", this.get_name());
@@ -51,21 +52,18 @@ class Module {
     return { return_code: RETURN_CODE.PROCESSED };
   }
 
-  update() {
-    const aml_scripts_ids = Object.keys(
-      this._root.data.aml[this._parent._parent.get_id()][this._parent.get_id()][
-        this.get_id()
-      ]
-    );
-
-    for (const [name, running_script] of Object.entries(
-      this._running_scripts
-    )) {
-      if (!aml_scripts_ids.includes(running_script.get_id())) {
+  update(aml) {
+    for (const [name, script] of Object.entries(this._running_scripts)) {
+      if (aml.scripts[name] != script.get_id()) {
         this._terminate_script(name);
         this._run_script(name);
       }
     }
+  }
+
+  parse_return_data(data) {
+    for (const script of Object.values(this._running_scripts))
+      script.parse_return_data(data);
   }
 
   get_id() {
@@ -80,15 +78,7 @@ class Module {
     if (name in this._running_scripts) return;
 
     this._root.get_source_async(
-      {
-        type: "script",
-        name,
-        id: Object.keys(
-          this._root.data.aml[this._parent._parent.get_id()][
-            this._parent.get_id()
-          ][this.get_id()]
-        )
-      },
+      { type: "script", id: this._root.mirror.aml.scripts[name] },
       (source) => {
         try {
           this._running_scripts[name] = new Script(this._root, source, this);

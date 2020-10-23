@@ -1,0 +1,78 @@
+{
+  "programs": {
+    "ID_Program_0": {
+      "id": "ID_Program_0",
+      "name": "Name_Program",
+      "rules": [],
+      "modules": []
+    },
+    "ID_Program_1": {
+      "id": "ID_Program_1",
+      "name": "Name_Program",
+      "rules": [
+        {
+          "triggers": [
+            {
+              "program_initialize": { "value": "Name_Program" }
+            }
+          ],
+          "actions": [
+            {
+              "module_initialize": { "value": "Name_Module" }
+            }
+          ]
+        }
+      ],
+      "modules": ["Name_Module"]
+    }
+  },
+  "modules": {
+    "ID_Module_0": {
+      "id": "ID_Module_0",
+      "name": "Name_Module",
+      "rules": []
+    },
+    "ID_Module_1": {
+      "id": "ID_Module_1",
+      "name": "Name_Module",
+      "rules": [
+        {
+          "triggers": [
+            {
+              "module_initialize": { "value": "Name_Module" }
+            }
+          ],
+          "actions": [
+            {
+              "script_initialize": { "value": "Name_Script" }
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "scripts": {
+    "ID_Script_0": {
+      "id": "ID_Script_0",
+      "name": "Name_Script",
+      "data": {},
+      "root_scope": { "type": "scope", "id": "api_0", "instructions": [] }
+    },
+    "ID_Script_1": {
+      "id": "ID_Script_1",
+      "name": "Name_Script",
+      "data": { "val_1": 0 },
+      "root_scope": {
+        "type": "scope",
+        "id": "api_0",
+        "instructions": [
+          {
+            "type": "js",
+            "id": "api_1",
+            "body": "script.data.val_1++"
+          }
+        ]
+      }
+    }
+  }
+}

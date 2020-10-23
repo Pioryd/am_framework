@@ -13,12 +13,12 @@ const INIT_CONFIG = {
   modules: {
     module_example: {
       managers_order: {
-        initialize: ["admin_server"],
-        terminate: ["admin_server"],
-        poll: ["admin_server"]
+        initialize: ["core_admin_server"],
+        terminate: ["core_admin_server"],
+        poll: ["core_admin_server"]
       },
       managers_map: {
-        admin_server: {
+        core_admin_server: {
           login: "admin",
           password: "123",
           options: {

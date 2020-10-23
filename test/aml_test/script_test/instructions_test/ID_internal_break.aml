@@ -1,0 +1,18 @@
+name Name_Script
+data val:0, val_2:0
+
+for data.i = 0; data.i < 5; data.i++
+  js data.val = 0
+    js data.val++
+      js data.val++
+      break
+      js data.val++
+    js data.val++
+  js data.val++
+while data.val < 3
+  js data.val++
+  while data.val_2 < 3
+    js data.val_2++
+    break
+    js data.val_2++
+  js data.val++

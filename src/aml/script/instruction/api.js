@@ -12,7 +12,7 @@ class Api {
     if (script._goto_find.enabled)
       return { return_code: RETURN_CODE.PROCESSED };
 
-    this._fn(script, root);
+    this._fn(script, script.data, script._root.mirror, root);
 
     return { return_code: RETURN_CODE.PROCESSED };
   }

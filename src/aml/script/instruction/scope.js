@@ -42,23 +42,19 @@ class Scope {
     if (this._current_child_index < this._childs.length) {
       const child = this._childs[this._current_child_index];
 
-      if (!script.timeout(child._timeout, child.id)) {
-        this._current_child_index++;
-      } else {
-        const { return_code, internal } = child.process(script, root);
+      const { return_code, internal } = child.process(script, root);
 
-        if (
-          internal === "goto" ||
-          internal === "break" ||
-          internal === "continue"
-        ) {
-          this._reset();
-          return { return_code: RETURN_CODE.PROCESSING, internal };
-        } else if (return_code === RETURN_CODE.PROCESSED) {
-          this._current_child_index++;
-        } else if (return_code === RETURN_CODE.PROCESSING) {
-          return { return_code };
-        }
+      if (
+        internal === "goto" ||
+        internal === "break" ||
+        internal === "continue"
+      ) {
+        this._reset();
+        return { return_code: RETURN_CODE.PROCESSING, internal };
+      } else if (return_code === RETURN_CODE.PROCESSED) {
+        this._current_child_index++;
+      } else if (return_code === RETURN_CODE.PROCESSING) {
+        return { return_code };
       }
     }
 

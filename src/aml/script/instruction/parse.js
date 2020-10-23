@@ -50,7 +50,9 @@ function parse_instruction_js(script, instruction) {
 
   return new JS({
     id: instruction.id,
-    fn: Util.string_to_function(`(script, root){${instruction.body};}`)
+    fn: Util.string_to_function(
+      `(script, data, mirror, root){${instruction.body};}`
+    )
   });
 }
 
@@ -81,7 +83,9 @@ function parse_instruction_if(script, instruction) {
 
     initialization_data.conditions.push({
       fn: Util.string_to_function(
-        `(script, root){return ${fn_source === "" ? "true" : fn_source};}`
+        `(script, data, mirror, root){return ${
+          fn_source === "" ? "true" : fn_source
+        };}`
       ),
       childs
     });
@@ -101,7 +105,7 @@ function parse_instruction_while(script, instruction) {
   const initialization_data = { id: instruction.id, childs: [] };
 
   initialization_data.condition = Util.string_to_function(
-    `(script, root){return ${
+    `(script, data, mirror, root){return ${
       instruction.condition === "" ? "true" : instruction.condition
     };}`
   );
@@ -130,15 +134,15 @@ function parse_instruction_for(script, instruction) {
 
   if (init_source !== "")
     initialization_data.init = Util.string_to_function(
-      `(script, root){${init_source};}`
+      `(script, data, mirror, root){${init_source};}`
     );
   if (condition_source !== "")
     initialization_data.condition = Util.string_to_function(
-      `(script, root){return ${condition_source};}`
+      `(script, data, mirror, root){return ${condition_source};}`
     );
   if (increment_source !== "")
     initialization_data.increment = Util.string_to_function(
-      `(script, root){${increment_source};}`
+      `(script, data, mirror, root){${increment_source};}`
     );
 
   for (const source of instruction.instructions)
@@ -155,22 +159,18 @@ function parse_instruction_api(script, instruction) {
   const return_data_key = instruction.return != null ? instruction.return : "";
   let args =
     "{" + (instruction.args != null ? instruction.args.toString() : "") + "}";
+
   let body =
-    `const aml = {` +
-    `  script: script.get_id(),` +
-    `  module: script._parent.get_id(),` +
-    `  program: script._parent._parent.get_id(),` +
-    `  system: script._parent._parent._parent.get_id(),` +
-    `};` +
-    `const query_id = root.generate_unique_id();` +
-    `script.add_return_data(` +
-    `  {query_id, timeout: ${timeout}, key: "${return_data_key}"});` +
-    `root.process_api(` +
-    `  "${instruction.api}", aml, query_id, ${timeout}, ${args});`;
+    `script.process_api({` +
+    `  api: "${instruction.api}",` +
+    `  timeout: ${timeout},` +
+    `  args: ${args},` +
+    `  return_data_key: "${return_data_key}"` +
+    `});`;
 
   return new Api({
     id: instruction.id,
-    fn: Util.string_to_function(`(script, root){${body}}`)
+    fn: Util.string_to_function(`(script, data, mirror, root){${body}}`)
   });
 }
 

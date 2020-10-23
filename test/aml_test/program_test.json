@@ -1,0 +1,83 @@
+{
+  "programs": {
+    "ID_Program_1": {
+      "id": "ID_Program_1",
+      "name": "Name_Program_1",
+      "rules": [
+        {
+          "triggers": [
+            {
+              "program_initialize": { "value": "Name_Program_1" }
+            }
+          ],
+          "actions": [
+            {
+              "module_initialize": { "value": "Name_Module_1" }
+            }
+          ]
+        },
+        {
+          "triggers": [
+            {
+              "trigger_01": { "min": 0, "max": 10 }
+            }
+          ],
+          "actions": [
+            {
+              "module_initialize": { "value": "Name_Module_2" }
+            }
+          ]
+        },
+        {
+          "triggers": [
+            {
+              "trigger_01": { "min": 11, "max": 100 }
+            }
+          ],
+          "actions": [
+            {
+              "module_terminate": { "value": "Name_Module_2" }
+            }
+          ]
+        },
+        {
+          "triggers": [
+            {
+              "trigger_02": { "value": 100 }
+            }
+          ],
+          "actions": [
+            {
+              "module_initialize": { "value": "NAME_unknown_module" }
+            }
+          ]
+        },
+        {
+          "triggers": [
+            {
+              "trigger_02": { "value": 0 }
+            }
+          ],
+          "actions": [
+            {
+              "module_terminate": { "value": "NAME_unknown_module" }
+            }
+          ]
+        }
+      ],
+      "modules": ["Name_Module_1", "Name_Module_2", "Name_Module_3"]
+    }
+  },
+  "modules": {
+    "ID_Module_1": {
+      "id": "ID_Module_1",
+      "name": "Name_Module_1",
+      "rules": []
+    },
+    "ID_Module_2": {
+      "id": "ID_Module_2",
+      "name": "Name_Module_2",
+      "rules": []
+    }
+  }
+}

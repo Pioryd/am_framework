@@ -1,3 +1,4 @@
+const _ = require("lodash");
 const parse_instruction = require("./instruction/parse");
 const { Stopwatch } = require("../../stopwatch");
 const { RETURN_CODE } = require("./instruction/return_code");
@@ -24,7 +25,9 @@ class Script {
     };
 
     this._goto_find = { enabled: false, label_name: "" };
-    this._timeout_list = { instructions: {}, return_data_list: [] };
+
+    this._instructions_timeout_map = {};
+    this._return_data_timeout_list = {};
 
     this.options = { debug_enabled: false };
 
@@ -39,8 +42,6 @@ class Script {
     this._root.emit("script_process", this.get_name());
 
     this.print_debug();
-
-    this._check_return_data();
 
     // Internal:sleep
     if (this._sleep_timer.enabled) {
@@ -91,42 +92,51 @@ class Script {
     this._goto_find.label_name = label_name;
   }
 
-  timeout(timeout, id) {
-    if (timeout == null || timeout == 0) return true;
-
-    if (id in this._timeout_list.instructions) {
-      if (this._timeout_list.instructions[id].stopwatch.is_elapsed()) {
-        delete this._timeout_list.instructions[id];
-        return false;
-      }
-    } else {
-      this._timeout_list.instructions[id] = {
-        stopwatch: new Stopwatch(timeout)
-      };
+  parse_return_data(data) {
+    for (const [query_id, return_data_timeout] of Object.entries(
+      this._return_data_timeout_list
+    )) {
+      if (return_data_timeout.stopwatch.is_elapsed())
+        delete this._return_data_timeout_list[query_id];
     }
 
-    return true;
+    const return_data_timeout = this._return_data_timeout_list[data.query_id];
+    if (return_data_timeout == null) return;
+
+    if (!return_data_timeout.stopwatch.is_elapsed())
+      eval(`this.data.${return_data_timeout.key} = ${data.value}`);
+
+    delete this._return_data_timeout_list[data.query_id];
   }
 
-  add_return_data({ query_id, timeout, key }) {
-    this._timeout_list.return_data_list[query_id] = {
+  process_api({ api, timeout, args, return_data_key }) {
+    const module = this._parent.get_name();
+    const query_id = this._root.generate_unique_id();
+
+    this._return_data_timeout_list[query_id] = {
       stopwatch: new Stopwatch(timeout),
-      key
+      key: return_data_key
     };
+
+    this._root.process_api({
+      module,
+      query_id,
+      api,
+      timeout,
+      args
+    });
   }
 
   print_debug(line_number) {
     if (!this.options.debug_enabled && !this._root.options.debug_enabled)
       return;
 
-    const { _debug_current_program } = this._root._system;
-    const { _debug_current_module } = _debug_current_program;
+    const program = this._root._program;
+    const module = program._debug_current_module;
 
     logger.debug(
-      `Program [${_debug_current_program.get_id()}` +
-        `/${_debug_current_program.get_id()}]` +
-        `->Module name[${_debug_current_module.get_name()}` +
-        `/${_debug_current_module.get_id()}]` +
+      `Program [${program.get_id()}/${program.get_id()}]` +
+        `->Module name[${module.get_name()}/${module.get_id()}]` +
         `->Script name:[${this.get_name()}/${this.get_id()}]` +
         (line_number != null ? `Line[${line_number}]` : `start process`)
     );
@@ -140,31 +150,8 @@ class Script {
     return this._source.name;
   }
 
-  _check_return_data() {
-    const received_return_data_list = this._root.return_data.pop({
-      script: this.get_id(),
-      module: this._parent.get_id(),
-      program: this._parent._parent.get_id(),
-      system: this._parent._parent._parent.get_id()
-    });
-
-    for (const received_return_data of received_return_data_list) {
-      const script_return_data = this._timeout_list.return_data_list[
-        received_return_data.query_id
-      ];
-      if (script_return_data == null) continue;
-
-      if (!script_return_data.stopwatch.is_elapsed())
-        eval(
-          `this.data.${script_return_data.key} = ${received_return_data.value}`
-        );
-
-      delete this._timeout_list.return_data_list[received_return_data.query_id];
-    }
-  }
-
   _clear_return_data() {
-    this._timeout_list.return_data_list = [];
+    this._return_data_timeout_list = [];
   }
 }
 

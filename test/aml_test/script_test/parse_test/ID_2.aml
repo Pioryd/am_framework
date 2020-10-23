@@ -1,0 +1,40 @@
+name Name_2
+data val:0, val_2:"test_1", \
+    val_3:{}
+
+
+if data.val_2 === "test_1"
+  js data.val++
+  if data.val_2 === "test_1"
+    js data.val++
+    sleep 50
+    js data.val += 2
+  elif data.val_2 === "test_2"
+    js data.val++
+    if data.val_2 === "test_1"
+      js data.val++
+      sleep 50
+      js data.val += 2
+    elif data.val_2 === "test_2"
+      js data.val++
+      sleep 50
+      js data.val += 3
+    else
+      js data.val++
+      sleep 50
+      js data.val += 4
+    js data.val += 3
+  else
+    js data.val++
+    sleep 50
+    js data.val += 4
+  js data.val += 2
+elif data.val_2 === "test_2"
+  js data.val++
+  sleep 50
+  js data.val += 3
+else
+  js data.val++
+  sleep 50
+  js data.val += 4
+

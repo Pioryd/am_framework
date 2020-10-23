@@ -46,19 +46,19 @@ class Scope_FOR {
     }
 
     if (!this._initialized) {
-      this._init(script, root);
+      this._init(script, script.data, script._root.mirror, root);
       this._initialized = true;
       return { return_code: RETURN_CODE.PROCESSING };
     }
 
     if (this._current_child_index >= this._childs.length) {
-      this._increment(script, root);
+      this._increment(script, script.data, script._root.mirror, root);
       this._current_child_index = -1;
       return { return_code: RETURN_CODE.PROCESSING };
     }
 
     if (this._current_child_index === -1) {
-      if (!this._condition(script, root)) {
+      if (!this._condition(script, script.data, script._root.mirror, root)) {
         this._reset();
         return { return_code: RETURN_CODE.PROCESSED };
       } else {
@@ -70,24 +70,20 @@ class Scope_FOR {
     if (this._current_child_index < this._childs.length) {
       const child = this._childs[this._current_child_index];
 
-      if (!script.timeout(child._timeout, child.id)) {
-        this._current_child_index++;
-      } else {
-        const { return_code, internal } = child.process(script, root);
+      const { return_code, internal } = child.process(script, root);
 
-        if (internal === "goto") {
-          this._reset();
-          return { return_code: RETURN_CODE.PROCESSING };
-        } else if (internal === "break") {
-          this._reset();
-          return { return_code: RETURN_CODE.PROCESSED };
-        } else if (internal === "continue") {
-          this._current_child_index = this._childs.length;
-        } else if (return_code === RETURN_CODE.PROCESSED) {
-          this._current_child_index++;
-        } else if (return_code === RETURN_CODE.PROCESSING) {
-          return { return_code: RETURN_CODE.PROCESSING };
-        }
+      if (internal === "goto") {
+        this._reset();
+        return { return_code: RETURN_CODE.PROCESSING };
+      } else if (internal === "break") {
+        this._reset();
+        return { return_code: RETURN_CODE.PROCESSED };
+      } else if (internal === "continue") {
+        this._current_child_index = this._childs.length;
+      } else if (return_code === RETURN_CODE.PROCESSED) {
+        this._current_child_index++;
+      } else if (return_code === RETURN_CODE.PROCESSING) {
+        return { return_code: RETURN_CODE.PROCESSING };
       }
     }
 

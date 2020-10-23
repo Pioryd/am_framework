@@ -52,7 +52,9 @@ class Scope_IF {
 
     if (this._selected_condition_index === -1) {
       for (let i = 0; i < this._conditions.length; i++) {
-        if (this._conditions[i].fn(script, root)) {
+        if (
+          this._conditions[i].fn(script, script.data, script._root.mirror, root)
+        ) {
           this._selected_condition_index = i;
           return { return_code: RETURN_CODE.PROCESSING };
         }
@@ -66,23 +68,19 @@ class Scope_IF {
     if (this._current_child_index < childs.length) {
       const child = childs[this._current_child_index];
 
-      if (!script.timeout(child._timeout, child.id)) {
-        this._current_child_index++;
-      } else {
-        const { return_code, internal } = child.process(script, root);
+      const { return_code, internal } = child.process(script, root);
 
-        if (
-          internal === "goto" ||
-          internal === "break" ||
-          internal === "continue"
-        ) {
-          this._reset();
-          return { return_code: RETURN_CODE.PROCESSING, internal };
-        } else if (return_code === RETURN_CODE.PROCESSED) {
-          this._current_child_index++;
-        } else if (return_code === RETURN_CODE.PROCESSING) {
-          return { return_code: RETURN_CODE.PROCESSING };
-        }
+      if (
+        internal === "goto" ||
+        internal === "break" ||
+        internal === "continue"
+      ) {
+        this._reset();
+        return { return_code: RETURN_CODE.PROCESSING, internal };
+      } else if (return_code === RETURN_CODE.PROCESSED) {
+        this._current_child_index++;
+      } else if (return_code === RETURN_CODE.PROCESSING) {
+        return { return_code: RETURN_CODE.PROCESSING };
       }
     }
 

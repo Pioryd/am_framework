@@ -1,0 +1,43 @@
+{
+  "programs": {
+    "ID_Program": {
+      "id": "ID_Program",
+      "name": "Name_Program",
+      "rules": [
+        {
+          "triggers": [
+            {
+              "program_initialize": { "value": "Name_Program" }
+            }
+          ],
+          "actions": [
+            {
+              "module_initialize": { "value": "Name_Module" }
+            }
+          ]
+        }
+      ],
+      "modules": ["Name_Module"]
+    }
+  },
+  "modules": {
+    "ID_Module": {
+      "id": "ID_Module",
+      "name": "Name_Module",
+      "rules": [
+        {
+          "triggers": [
+            {
+              "module_initialize": { "value": "Name_Module" }
+            }
+          ],
+          "actions": [
+            {
+              "script_initialize": { "value": "Name_Script" }
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

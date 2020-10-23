@@ -21,7 +21,6 @@ class ModulesManager {
     this.event_emitter = event_emitter;
     this.root_path = root_path;
 
-    this.managers_path = path.join(root_path, this.config.managers_rel_name);
     this.modules_map = {};
     this.event_module_bounds = {};
   }
@@ -68,17 +67,21 @@ class ModulesManager {
   load_modules() {
     const map_found_managers = () => {
       const managers_map = {};
-      if (fs.existsSync(this.managers_path)) {
-        const dirs = Util.get_directories(this.managers_path);
-        const files = Util.get_files(this.managers_path).map((el) => {
-          return el.split(".").slice(0, -1).join(".");
-        });
+      for (const managers_rel_name of this.config.managers_rel_names) {
+        const managers_full_path = path.join(this.root_path, managers_rel_name);
 
-        for (const manager_name of [...dirs, ...files])
-          managers_map[manager_name] = require(path.join(
-            this.managers_path,
-            manager_name
-          ));
+        if (fs.existsSync(managers_full_path)) {
+          const dirs = Util.get_directories(managers_full_path);
+          const files = Util.get_files(managers_full_path).map((el) => {
+            return el.split(".").slice(0, -1).join(".");
+          });
+
+          for (const manager_name of [...dirs, ...files])
+            managers_map[manager_name] = require(path.join(
+              managers_full_path,
+              manager_name
+            ));
+        }
       }
       return { ...default_managers, ...managers_map };
     };

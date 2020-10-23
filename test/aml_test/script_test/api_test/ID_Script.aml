@@ -1,0 +1,7 @@
+name Name_Script
+data val:0, min:1
+
+js data.val++
+api -t 20 -r add_min_max add_min_max min:data.min, max:5
+sleep 50
+js data.val++

@@ -1,11 +1,13 @@
 class Stopwatch {
   constructor(countdown_time) {
-    this.countdown_time = countdown_time;
+    this.countdown_time = countdown_time || 0;
     this.state_start_time = new Date();
+
+    this.reset(countdown_time);
   }
 
   reset(countdown_time) {
-    if (countdown_time != null) this.countdown_time = countdown_time;
+    this.countdown_time = countdown_time || 0;
     this.state_start_time = new Date();
   }
 

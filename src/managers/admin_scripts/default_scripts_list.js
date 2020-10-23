@@ -20,7 +20,7 @@ module.exports = [
       const module = app.modules_manager.modules_map[module_name];
 
       for (const script of Object.values(
-        module.managers.admin_scripts.get_scripts_map()
+        module.managers.core_admin_scripts.get_scripts_map()
       )) {
         const { id, desc, args } = script;
         command_list[id] = { desc, args };
@@ -34,7 +34,7 @@ module.exports = [
   {
     id: "net_msg",
     desc: "Enable/Disable network logs",
-    args: ["module name", "manager(server) name", "enabled[true/false]"],
+    args: ["module name", "manager(core_server) name", "enabled[true/false]"],
     fn: (app, args) => {
       const [module_name, manager_name, enabled] = args;
       const root_module = app.modules_manager.modules_map[module_name];
@@ -42,7 +42,7 @@ module.exports = [
       const enabled_msg = enabled === true;
       const manager = root_module.managers[manager_name];
 
-      const net_logger = "server" in manager ? manager.server : manager.client;
+      const net_logger = "client" in manager ? manager.client : manager.server;
 
       net_logger.options = {
         ...net_logger.options,

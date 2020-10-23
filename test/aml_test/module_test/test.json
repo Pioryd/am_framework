@@ -1,0 +1,91 @@
+{
+  "programs": {
+    "ID_Program_1": {
+      "id": "ID_Program_1",
+      "name": "Name_Program_1",
+      "rules": [
+        {
+          "triggers": [
+            {
+              "program_initialize": { "value": "Name_Program_1" }
+            }
+          ],
+          "actions": [
+            {
+              "module_initialize": { "value": "Name_Module_1" }
+            }
+          ]
+        }
+      ],
+      "modules": ["Name_Module_1"]
+    }
+  },
+  "modules": {
+    "ID_Module_1": {
+      "id": "ID_Module_1",
+      "name": "Name_Module_1",
+      "rules": [
+        {
+          "triggers": [
+            {
+              "module_initialize": { "value": "Name_Module_1" }
+            }
+          ],
+          "actions": [
+            {
+              "script_initialize": { "value": "Name_Script_2" }
+            }
+          ]
+        },
+        {
+          "triggers": [
+            {
+              "trigger_01": { "value": true }
+            }
+          ],
+          "actions": [
+            {
+              "script_initialize": { "value": "Name_Script_1" }
+            }
+          ]
+        },
+        {
+          "triggers": [
+            {
+              "script_initialize": { "value": "Name_Script_1" }
+            }
+          ],
+          "actions": [
+            {
+              "script_initialize": { "value": "Name_Script_2" }
+            }
+          ]
+        },
+        {
+          "triggers": [
+            {
+              "script_terminate": { "value": "Name_Script_3" }
+            }
+          ],
+          "actions": [
+            {
+              "script_initialize": { "value": "Name_Script_2" }
+            }
+          ]
+        },
+        {
+          "triggers": [
+            {
+              "trigger_02": { "value": true }
+            }
+          ],
+          "actions": [
+            {
+              "script_initialize": { "value": "Name_Script_3" }
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

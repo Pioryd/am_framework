@@ -1,11 +1,11 @@
 class Stopper {
-  constructor(countdown_time) {
+  constructor() {
     this.start_time = null;
     this.diff_time = 0;
   }
 
   _reset() {
-    this.start_time = null;
+    this.start_time = 0;
     this.diff_time = 0;
   }
 
